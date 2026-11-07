@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- SEO -->
+  <title>Injet Nobre | Utilidades em plástico injetado – Catálogo 2026</title>
+  <meta name="description" content="Catálogo Injet Nobre: caixas, potes, baldes, banquetas, organizadores e linha relojoaria em plástico injetado. Peça pelo WhatsApp ou compre no atacado.">
+  <meta name="theme-color" content="#111111">
+  <link rel="canonical" href="https://www.injetnobre.com.br/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:site_name" content="Injet Nobre">
+  <meta property="og:title" content="Injet Nobre | Praticidade que se encaixa no seu dia">
+  <meta property="og:description" content="Utilidades em plástico injetado: Linha Utilidades e Linha Relojoaria. Ofertas de até 30% e condições especiais no atacado.">
+  <meta property="og:url" content="https://www.injetnobre.com.br/">
+  <meta property="og:image" content="https://www.injetnobre.com.br/assets/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Esconde só o hero até a animação de entrada assumir (evita "piscar").
+       Fica antes das folhas de estilo para não esperar por elas.
+       Rede de segurança: reaparece sozinho em 2,5 s se o GSAP não carregar. -->
+  <script>
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: no-preference)").matches) {
+      document.documentElement.classList.add("motion-pending");
+      setTimeout(function () { document.documentElement.classList.remove("motion-pending"); }, 2500);
+    }
+  </script>
+
+  <!-- Favicon -->
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+
+  <!-- Fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+  <!-- ============ HEADER ============ -->
+  <header class="site-header" id="topo">
+    <div class="container header-inner">
+      <a href="#topo" class="logo" aria-label="Injet Nobre – início">
+        <span class="logo-mark" aria-hidden="true">IN</span>
+        <span class="logo-text">Injet<br>Nobre</span>
+      </a>
+
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="menu-principal" aria-label="Abrir menu">
+        <span class="nav-toggle-bar" aria-hidden="true"></span>
+      </button>
+
+      <nav class="site-nav" id="menu-principal" aria-label="Menu principal">
+        <ul>
+          <li><a href="#produtos">Produtos</a></li>
+          <li><a href="#linha-utilidades">Linha Utilidades</a></li>
+          <li><a href="#linha-relojoaria">Linha Relojoaria</a></li>
+          <li><a href="#sobre">Sobre</a></li>
+          <li><a href="#atacado">Atacado</a></li>
+          <li><a href="#contato">Contato</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="conteudo">
+
+    <!-- ============ HERO ============ -->
+    <section class="hero" aria-labelledby="hero-titulo" data-section="hero">
+      <div class="hero-grid">
+        <div class="hero-main">
+          <span class="dots-pattern dots-pattern--hero" data-float aria-hidden="true"></span>
+          <span class="dots-pattern dots-pattern--hero-b" data-float aria-hidden="true"></span>
+          <p class="eyebrow eyebrow--dark" data-hero-intro>Catálogo · Edição 2026</p>
+          <!-- Cada .line entra separadamente (animations.js) -->
+          <h1 id="hero-titulo" class="hero-title">
+            <span class="line"><span class="line-inner outline-text outline-text--light">Praticidade</span></span>
+            <span class="line"><span class="line-inner">que <span class="hero-title-accent">se encaixa</span></span></span>
+            <span class="line"><span class="line-inner">no seu dia.</span></span>
+          </h1>
+          <p class="hero-lead" data-hero-intro>Utilidades em plástico injetado para organizar, guardar e transportar. Feitas para durar, pensadas para o dia a dia.</p>
+          <div class="hero-actions" data-hero-intro>
+            <a href="#vitrine" class="btn btn--dark">Ver catálogo</a>
+            <a href="#atacado" class="btn btn--ghost-dark">Sou lojista</a>
+          </div>
+          <a class="pdf-link" data-pdf data-hero-intro href="assets/catalogo-injet-nobre.pdf" download>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M11 3h2v10.2l3.6-3.6 1.4 1.4-6 6-6-6 1.4-1.4 3.6 3.6V3ZM4 19h16v2H4v-2Z"/></svg>
+            Baixar catálogo (PDF)
+          </a>
+        </div>
+
+        <!-- Produto em destaque: preenchido via JS (produto com "destaque: true") -->
+        <article class="hero-feature" id="hero-feature" aria-label="Produto em destaque"></article>
+      </div>
+    </section>
+
+    <!-- ============ VITRINE (rolagem horizontal presa no desktop / carrossel no celular) ============ -->
+    <section class="vitrine" id="vitrine" aria-labelledby="vitrine-titulo" aria-roledescription="carrossel">
+      <div class="vitrine-viewport" id="vitrine-viewport" tabindex="-1">
+        <ul class="vitrine-track" id="vitrine-track">
+          <!-- slides inseridos via JS -->
+        </ul>
+      </div>
+
+      <div class="vitrine-ui">
+        <h2 id="vitrine-titulo" class="vitrine-label">Vitrine <span aria-hidden="true">·</span> 2026</h2>
+        <p class="vitrine-count" aria-live="polite">
+          <span class="sr-only">Produto </span><strong id="vitrine-current">01</strong> / <span id="vitrine-total">08</span>
+          <span class="vitrine-name" id="vitrine-name"></span>
+        </p>
+        <div class="vitrine-progress" aria-hidden="true"><span id="vitrine-bar"></span></div>
+        <div class="vitrine-arrows">
+          <button type="button" class="nav-arrow nav-arrow--light" data-vitrine-step="-1" aria-label="Produto anterior">←</button>
+          <button type="button" class="nav-arrow nav-arrow--light" data-vitrine-step="1" aria-label="Próximo produto">→</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PRODUTOS ============ -->
+    <section class="products" id="produtos" aria-labelledby="produtos-titulo">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Nossos produtos</p>
+            <h2 id="produtos-titulo" class="section-title">Catálogo <span class="outline-text">2026</span></h2>
+          </div>
+
+          <div class="filter" role="group" aria-label="Filtrar produtos por linha">
+            <button type="button" class="filter-btn" data-filter="todos" aria-pressed="true">Todos</button>
+            <button type="button" class="filter-btn" data-filter="utilidades" aria-pressed="false">Utilidades</button>
+            <button type="button" class="filter-btn" data-filter="relojoaria" aria-pressed="false">Relojoaria</button>
+          </div>
+        </div>
+        <p class="sr-only" id="filtro-status" aria-live="polite"></p>
+      </div>
+
+      <!-- Linha Utilidades -->
+      <div class="product-line" id="linha-utilidades" data-line="utilidades" aria-labelledby="linha-utilidades-titulo" role="region">
+        <div data-spotlight="utilidades"><!-- destaque em tela cheia via JS --></div>
+        <div class="container">
+          <div class="mosaic" data-grid="utilidades">
+            <div class="tile tile--line tile--orange">
+              <span class="dots-pattern" aria-hidden="true"></span>
+              <p class="tile-kicker">Linha</p>
+              <h3 id="linha-utilidades-titulo" class="tile-title">
+                <span class="outline-text outline-text--light">Utili</span><span class="outline-text outline-text--light">dades</span>
+              </h3>
+              <p class="tile-text">Caixas, potes, baldes e organizadores para casa, comércio e obra.</p>
+            </div>
+            <!-- cards inseridos via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Linha Relojoaria -->
+      <div class="product-line" id="linha-relojoaria" data-line="relojoaria" aria-labelledby="linha-relojoaria-titulo" role="region">
+        <div data-spotlight="relojoaria"><!-- destaque em tela cheia via JS --></div>
+        <div class="container">
+          <div class="mosaic" data-grid="relojoaria">
+            <div class="tile tile--line tile--dark">
+              <span class="dots-pattern dots-pattern--orange" aria-hidden="true"></span>
+              <p class="tile-kicker tile-kicker--orange">Linha</p>
+              <h3 id="linha-relo  joaria-titulo" class="tile-title">
+                <span class="outline-text outline-text--light">Relojo</span><span class="outline-text outline-text--light">aria</span>
+              </h3>
+              <p class="tile-text">Caixas, estojos e expositores para relojoarias e vitrines.</p>
+            </div>
+            <!-- cards inseridos via JS -->
+            <a href="#atacado" class="tile tile--cta tile--gray" data-tile="kit">
+              <p class="tile-kicker">Para lojistas</p>
+              <p class="tile-title tile-title--solid">Monte seu<br>kit vitrine</p>
+              <p class="tile-text">Combine caixas, estojos e expositores com preço de atacado.</p>
+              <span class="tile-link">Saiba mais <span aria-hidden="true">→</span></span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ OFERTAS DO MÊS ============ -->
+    <section class="offers" id="ofertas" aria-labelledby="ofertas-titulo">
+      <span class="dots-pattern dots-pattern--orange dots-pattern--corner" data-float aria-hidden="true"></span>
+      <div class="container offers-inner">
+        <div class="offers-head">
+          <p class="eyebrow eyebrow--orange">Ofertas do mês</p>
+          <h2 id="ofertas-titulo" class="offers-title">
+            Até <span class="outline-text outline-text--orange" id="ofertas-max">30%</span><br>de desconto
+          </h2>
+          <p class="offers-text">Preços especiais em toda a linha enquanto durarem os estoques.</p>
+        </div>
+        <ul class="offers-list" id="ofertas-lista" aria-label="Maiores descontos"></ul>
+      </div>
+    </section>
+
+    <!-- ============ SOBRE ============ -->
+    <section class="about" id="sobre" aria-labelledby="sobre-titulo">
+      <span class="dots-pattern dots-pattern--corner dots-pattern--orange" aria-hidden="true"></span>
+      <div class="container">
+        <div class="about-grid">
+          <div class="about-text">
+            <p class="eyebrow">Sobre a fábrica</p>
+            <h2 id="sobre-titulo" class="section-title">Feito em São Paulo,<br><span class="outline-text">feito para durar</span></h2>
+            <!-- PLACEHOLDER: ajuste o texto com a história real da empresa -->
+            <p>A Injet Nobre fabrica utilidades em plástico injetado com foco em praticidade, resistência e bom acabamento. Do pote hermético à caixa de relógio, cada peça é pensada para encaixar na rotina de quem usa e de quem vende.</p>
+            <p>Da matéria-prima à expedição, todo o processo acontece na nossa fábrica na capital paulista: injeção, controle de qualidade e envio para lojistas de todo o Brasil.</p>
+          </div>
+          <!-- Números vêm de SITE_CONFIG.numerosFabrica (js/products.js) -->
+          <ul class="about-stats" id="fabrica-numeros" aria-label="A fábrica em números"></ul>
+        </div>
+
+        <!-- Fotos vêm de SITE_CONFIG.fotosFabrica (js/products.js) -->
+        <ul class="factory-gallery" id="fabrica-galeria" aria-label="Fotos da produção"></ul>
+      </div>
+    </section>
+
+    <!-- ============ ATACADO ============ -->
+    <section class="wholesale" id="atacado" aria-labelledby="atacado-titulo">
+      <span class="dots-pattern dots-pattern--corner" data-float aria-hidden="true"></span>
+      <div class="container wholesale-grid">
+        <div>
+          <p class="eyebrow eyebrow--dark">Para lojistas e revendedores</p>
+          <h2 id="atacado-titulo" class="wholesale-title">Compre no atacado</h2>
+          <p class="wholesale-sub"><span class="outline-text outline-text--dark">Monte seu kit vitrine</span></p>
+        </div>
+        <div class="wholesale-side">
+          <p>Condições especiais para lojistas, pedido mínimo acessível e envio para todo o Brasil. Consulte nossa equipe.</p>
+          <div class="wholesale-actions">
+            <button type="button" class="btn btn--dark" data-quote-open aria-haspopup="dialog" aria-controls="quote-drawer">Montar orçamento</button>
+            <a class="btn btn--ghost-dark" id="atacado-whatsapp" href="#" target="_blank" rel="noopener">Falar com a equipe</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer" id="contato" aria-labelledby="contato-titulo">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a href="#topo" class="logo" aria-label="Injet Nobre – voltar ao topo">
+          <span class="logo-mark" aria-hidden="true">IN</span>
+          <span class="logo-text">Injet<br>Nobre</span>
+        </a>
+        <h2 id="contato-titulo" class="footer-title">Praticidade que <span>se encaixa</span> no seu dia.</h2>
+        <p class="footer-note">Utilidades em plástico injetado para organizar, guardar e transportar. Preços ilustrativos, válidos enquanto durarem os estoques.</p>
+        <a class="btn btn--orange footer-pdf" data-pdf href="assets/catalogo-injet-nobre.pdf" download>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M11 3h2v10.2l3.6-3.6 1.4 1.4-6 6-6-6 1.4-1.4 3.6 3.6V3ZM4 19h16v2H4v-2Z"/></svg>
+          Baixar catálogo (PDF)
+        </a>
+      </div>
+
+      <div class="footer-contact">
+        <h3 class="footer-heading">Contato</h3>
+        <address>
+          <p>Rua Cabaxi, 355<br>São Paulo – SP</p>
+          <p><a data-config="telefone" href="#">(11) 0000-0000</a></p>
+          <p><a data-config="email" href="#">contato@injetnobre.com.br</a></p>
+        </address>
+        <h3 class="footer-heading">Redes sociais</h3>
+        <ul class="social">
+          <li><a data-config="instagram" href="#" target="_blank" rel="noopener">Instagram</a></li>
+          <li><a data-config="facebook" href="#" target="_blank" rel="noopener">Facebook</a></li>
+          <li><a data-config="whatsapp" href="#" target="_blank" rel="noopener">WhatsApp</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-map">
+        <iframe
+          title="Mapa: Rua Cabaxi, 355 – São Paulo – SP"
+          src="https://www.google.com/maps?q=Rua%20Cabaxi%2C%20355%20-%20S%C3%A3o%20Paulo%20-%20SP&output=embed"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          allowfullscreen></iframe>
+      </div>
+
+      <div class="footer-qr">
+        <!-- Troque pelo QR code real: <img src="assets/qrcode.png" alt="QR code para o WhatsApp da Injet Nobre"> -->
+        <div class="qr-placeholder" role="img" aria-label="Espaço reservado para o QR code">[Seu<br>QR code]</div>
+        <p>Aponte a câmera e fale com a gente</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container">
+        <p>© <span id="ano">2026</span> Injet Nobre. Todos os direitos reservados.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============ MODAL DE PRODUTO ============ -->
+  <dialog class="modal" id="product-modal" aria-labelledby="modal-titulo">
+    <div class="modal-inner">
+      <button type="button" class="modal-close" data-close-modal aria-label="Fechar detalhes">×</button>
+      <div class="modal-content" id="modal-content"></div>
+    </div>
+  </dialog>
+
+  <!-- ============ ORÇAMENTO DE ATACADO ============ -->
+  <button type="button" class="quote-fab" id="quote-fab" data-quote-open aria-haspopup="dialog" aria-controls="quote-drawer" aria-label="Abrir orçamento (0 itens)">
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M9 2h6a2 2 0 0 1 2 2h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2-2Zm0 2v2h6V4H9ZM7 10v2h10v-2H7Zm0 4v2h7v-2H7Z"/></svg>
+    <span class="quote-fab-label" aria-hidden="true">Orçamento</span>
+    <span class="quote-fab-count" id="quote-count" aria-hidden="true">0</span>
+  </button>
+
+  <dialog class="drawer" id="quote-drawer" aria-labelledby="quote-titulo">
+    <div class="drawer-inner">
+      <header class="drawer-head">
+        <div>
+          <p class="eyebrow eyebrow--orange">Atacado</p>
+          <h2 id="quote-titulo" class="drawer-title">Seu orçamento</h2>
+        </div>
+        <button type="button" class="drawer-close" data-quote-close aria-label="Fechar orçamento">×</button>
+      </header>
+
+      <div class="drawer-body">
+        <div class="quote-empty" id="quote-empty">
+          <p>Sua lista está vazia.</p>
+          <p>Use <strong>Adicionar ao orçamento</strong> nos produtos para montar o pedido do atacado.</p>
+          <a href="#produtos" class="btn btn--orange" data-quote-close>Ver produtos</a>
+        </div>
+
+        <div class="quote-filled" id="quote-filled">
+          <ul class="quote-list" id="quote-list" aria-label="Itens do orçamento"></ul>
+          <div class="quote-summary">
+            <p><strong id="quote-total-items">0</strong> produtos · <strong id="quote-total-units">0</strong> unidades</p>
+            <button type="button" class="link-btn" id="quote-clear">Limpar tudo</button>
+          </div>
+
+          <form class="quote-form" id="quote-form">
+            <fieldset>
+              <legend>Seus dados</legend>
+              <label>Nome <span aria-hidden="true">*</span>
+                <input type="text" name="nome" autocomplete="name" required maxlength="80">
+              </label>
+              <label>Empresa <span aria-hidden="true">*</span>
+                <input type="text" name="empresa" autocomplete="organization" required maxlength="80">
+              </label>
+              <label>Cidade <span aria-hidden="true">*</span>
+                <input type="text" name="cidade" autocomplete="address-level2" required maxlength="80" placeholder="Ex.: Campinas – SP">
+              </label>
+            </fieldset>
+            <button type="submit" class="btn btn--whats">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z"/></svg>
+              Enviar pelo WhatsApp
+            </button>
+            <p class="quote-note" id="quote-note">Os preços de atacado são informados pela nossa equipe.</p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <p class="sr-only" id="quote-status" aria-live="polite"></p>
+
+  <!-- Conteúdo primeiro: dados, templates e lógica montam a página na hora -->
+  <script src="js/products.js"></script>
+  <script src="js/illustrations.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/quote.js"></script>
+
+  <!-- Animações por último, sem bloquear a página (defer).
+       Se o CDN falhar, o site funciona estático. -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script defer src="js/animations.js"></script>
+</body>
+</html>
