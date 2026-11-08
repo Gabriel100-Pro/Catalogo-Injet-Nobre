@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- SEO -->
-  <title>Injet Nobre | Utilidades em plástico injetado – Catálogo 2026</title>
-  <meta name="description" content="Catálogo Injet Nobre: caixas, potes, baldes, banquetas, organizadores e linha relojoaria em plástico injetado. Peça pelo WhatsApp ou compre no atacado.">
+  <title>Injet Nobre | Estojos para relógio e expositores – Catálogo 2026</title>
+  <meta name="description" content="Catálogo Injet Nobre: estojos para relógio em 5 cores, suportes de acrílico para relógio e suporte para brinco. Peça pelo WhatsApp ou compre no atacado.">
   <meta name="theme-color" content="#111111">
   <link rel="canonical" href="https://www.injetnobre.com.br/">
 
@@ -15,7 +15,7 @@
   <meta property="og:locale" content="pt_BR">
   <meta property="og:site_name" content="Injet Nobre">
   <meta property="og:title" content="Injet Nobre | Praticidade que se encaixa no seu dia">
-  <meta property="og:description" content="Utilidades em plástico injetado: Linha Utilidades e Linha Relojoaria. Ofertas de até 30% e condições especiais no atacado.">
+  <meta property="og:description" content="Estojos para relógio e expositores em acrílico. Ofertas de até 30% e condições especiais no atacado.">
   <meta property="og:url" content="https://www.injetnobre.com.br/">
   <meta property="og:image" content="https://www.injetnobre.com.br/assets/og-image.jpg">
   <meta property="og:image:width" content="1200">
@@ -34,6 +34,11 @@
 
   <!-- Favicon -->
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+
+  <!-- Foto do hero: começa a baixar antes do CSS/JS -->
+  <link rel="preload" as="image" type="image/webp" fetchpriority="high"
+        imagesrcset="assets/produtos/estojo-relogio-preto-600.webp 600w, assets/produtos/estojo-relogio-preto-1000.webp 1000w"
+        imagesizes="(min-width: 960px) 32vw, 70vw">
 
   <!-- Fontes -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -59,11 +64,12 @@
 
       <nav class="site-nav" id="menu-principal" aria-label="Menu principal">
         <ul>
-          <li><a href="#produtos">Produtos</a></li>
-          <li><a href="#linha-utilidades">Linha Utilidades</a></li>
-          <li><a href="#linha-relojoaria">Linha Relojoaria</a></li>
-          <li><a href="#sobre">Sobre</a></li>
+          <li><a href="#vitrine">Vitrine</a></li>
+          <li><a href="#linha-estojos">Estojos</a></li>
+          <li><a href="#linha-expositores">Expositores</a></li>
+          <li><a href="#kit">Kit vitrine</a></li>
           <li><a href="#atacado">Atacado</a></li>
+          <li><a href="#sobre">Sobre</a></li>
           <li><a href="#contato">Contato</a></li>
         </ul>
       </nav>
@@ -78,14 +84,17 @@
         <div class="hero-main">
           <span class="dots-pattern dots-pattern--hero" data-float aria-hidden="true"></span>
           <span class="dots-pattern dots-pattern--hero-b" data-float aria-hidden="true"></span>
+          <span class="dots-pattern dots-pattern--hero-c" data-float aria-hidden="true"></span>
           <p class="eyebrow eyebrow--dark" data-hero-intro>Catálogo · Edição 2026</p>
           <!-- Cada .line entra separadamente (animations.js) -->
           <h1 id="hero-titulo" class="hero-title">
             <span class="line"><span class="line-inner outline-text outline-text--light">Praticidade</span></span>
-            <span class="line"><span class="line-inner">que <span class="hero-title-accent">se encaixa</span></span></span>
+            <span class="line"><span class="line-inner">que</span></span>
+            <!-- A tarja preta "pinta" da esquerda para a direita (animations.js) -->
+            <span class="line"><span class="line-inner"><span class="hero-title-accent"><span class="accent-paint" aria-hidden="true"></span><span class="accent-text">se encaixa</span></span></span></span>
             <span class="line"><span class="line-inner">no seu dia.</span></span>
           </h1>
-          <p class="hero-lead" data-hero-intro>Utilidades em plástico injetado para organizar, guardar e transportar. Feitas para durar, pensadas para o dia a dia.</p>
+          <p class="hero-lead" data-hero-intro>Estojos para relógio em cinco cores e expositores em acrílico para relojoarias, joalherias e vitrines.</p>
           <div class="hero-actions" data-hero-intro>
             <a href="#vitrine" class="btn btn--dark">Ver catálogo</a>
             <a href="#atacado" class="btn btn--ghost-dark">Sou lojista</a>
@@ -96,13 +105,16 @@
           </a>
         </div>
 
-        <!-- Produto em destaque: preenchido via JS (produto com "destaque: true") -->
+        <!-- Produto em destaque: preenchido via JS (produto com "destaque: true").
+             As outras cores do mesmo grupo ficam atrás e abrem em leque. -->
         <article class="hero-feature" id="hero-feature" aria-label="Produto em destaque"></article>
       </div>
     </section>
 
     <!-- ============ VITRINE (rolagem horizontal presa no desktop / carrossel no celular) ============ -->
     <section class="vitrine" id="vitrine" aria-labelledby="vitrine-titulo" aria-roledescription="carrossel">
+      <!-- Camadas de cor do painel: a do slide atual aparece (troca suave por opacidade) -->
+      <div class="vitrine-bg" id="vitrine-bg" aria-hidden="true"></div>
       <div class="vitrine-viewport" id="vitrine-viewport" tabindex="-1">
         <ul class="vitrine-track" id="vitrine-track">
           <!-- slides inseridos via JS -->
@@ -134,49 +146,49 @@
 
           <div class="filter" role="group" aria-label="Filtrar produtos por linha">
             <button type="button" class="filter-btn" data-filter="todos" aria-pressed="true">Todos</button>
-            <button type="button" class="filter-btn" data-filter="utilidades" aria-pressed="false">Utilidades</button>
-            <button type="button" class="filter-btn" data-filter="relojoaria" aria-pressed="false">Relojoaria</button>
+            <button type="button" class="filter-btn" data-filter="estojos" aria-pressed="false">Estojos</button>
+            <button type="button" class="filter-btn" data-filter="expositores" aria-pressed="false">Expositores</button>
           </div>
         </div>
         <p class="sr-only" id="filtro-status" aria-live="polite"></p>
       </div>
 
-      <!-- Linha Utilidades -->
-      <div class="product-line" id="linha-utilidades" data-line="utilidades" aria-labelledby="linha-utilidades-titulo" role="region">
-        <div data-spotlight="utilidades"><!-- destaque em tela cheia via JS --></div>
+      <!-- Linha Estojos -->
+      <div class="product-line" id="linha-estojos" data-line="estojos" aria-labelledby="linha-estojos-titulo" role="region">
+        <div data-spotlight="estojos" data-word="Estojos" data-line-name="Estojos para relógio" data-picker="swatches"><!-- vitrine de linha via JS --></div>
         <div class="container">
-          <div class="mosaic" data-grid="utilidades">
+          <div class="mosaic" data-grid="estojos">
             <div class="tile tile--line tile--orange">
               <span class="dots-pattern" aria-hidden="true"></span>
               <p class="tile-kicker">Linha</p>
-              <h3 id="linha-utilidades-titulo" class="tile-title">
-                <span class="outline-text outline-text--light">Utili</span><span class="outline-text outline-text--light">dades</span>
+              <h3 id="linha-estojos-titulo" class="tile-title">
+                <span class="outline-text outline-text--light">Esto</span><span class="outline-text outline-text--light">jos</span>
               </h3>
-              <p class="tile-text">Caixas, potes, baldes e organizadores para casa, comércio e obra.</p>
+              <p class="tile-text">Estojos para relógio com almofada interna, em cinco cores para combinar com a sua vitrine.</p>
             </div>
             <!-- cards inseridos via JS -->
           </div>
         </div>
       </div>
 
-      <!-- Linha Relojoaria -->
-      <div class="product-line" id="linha-relojoaria" data-line="relojoaria" aria-labelledby="linha-relojoaria-titulo" role="region">
-        <div data-spotlight="relojoaria"><!-- destaque em tela cheia via JS --></div>
+      <!-- Linha Expositores -->
+      <div class="product-line" id="linha-expositores" data-line="expositores" aria-labelledby="linha-expositores-titulo" role="region">
+        <div data-spotlight="expositores" data-word="Expositores" data-line-name="Expositores" data-picker="segmented"><!-- vitrine de linha via JS --></div>
         <div class="container">
-          <div class="mosaic" data-grid="relojoaria">
+          <div class="mosaic" data-grid="expositores">
             <div class="tile tile--line tile--dark">
               <span class="dots-pattern dots-pattern--orange" aria-hidden="true"></span>
               <p class="tile-kicker tile-kicker--orange">Linha</p>
-              <h3 id="linha-relo  joaria-titulo" class="tile-title">
-                <span class="outline-text outline-text--light">Relojo</span><span class="outline-text outline-text--light">aria</span>
+              <h3 id="linha-expositores-titulo" class="tile-title">
+                <span class="outline-text outline-text--light">Expo</span><span class="outline-text outline-text--light">sitores</span>
               </h3>
-              <p class="tile-text">Caixas, estojos e expositores para relojoarias e vitrines.</p>
+              <p class="tile-text">Suportes em acrílico para relógios, joias e bijuterias.</p>
             </div>
             <!-- cards inseridos via JS -->
-            <a href="#atacado" class="tile tile--cta tile--gray" data-tile="kit">
+            <a href="#kit" class="tile tile--cta tile--gray" data-tile="kit">
               <p class="tile-kicker">Para lojistas</p>
               <p class="tile-title tile-title--solid">Monte seu<br>kit vitrine</p>
-              <p class="tile-text">Combine caixas, estojos e expositores com preço de atacado.</p>
+              <p class="tile-text">Combine estojos e expositores com preço de atacado.</p>
               <span class="tile-link">Saiba mais <span aria-hidden="true">→</span></span>
             </a>
           </div>
@@ -199,24 +211,29 @@
       </div>
     </section>
 
-    <!-- ============ SOBRE ============ -->
-    <section class="about" id="sobre" aria-labelledby="sobre-titulo">
-      <span class="dots-pattern dots-pattern--corner dots-pattern--orange" aria-hidden="true"></span>
-      <div class="container">
-        <div class="about-grid">
-          <div class="about-text">
-            <p class="eyebrow">Sobre a fábrica</p>
-            <h2 id="sobre-titulo" class="section-title">Feito em São Paulo,<br><span class="outline-text">feito para durar</span></h2>
-            <!-- PLACEHOLDER: ajuste o texto com a história real da empresa -->
-            <p>A Injet Nobre fabrica utilidades em plástico injetado com foco em praticidade, resistência e bom acabamento. Do pote hermético à caixa de relógio, cada peça é pensada para encaixar na rotina de quem usa e de quem vende.</p>
-            <p>Da matéria-prima à expedição, todo o processo acontece na nossa fábrica na capital paulista: injeção, controle de qualidade e envio para lojistas de todo o Brasil.</p>
-          </div>
-          <!-- Números vêm de SITE_CONFIG.numerosFabrica (js/products.js) -->
-          <ul class="about-stats" id="fabrica-numeros" aria-label="A fábrica em números"></ul>
+    <!-- ============ MONTE SEU KIT VITRINE ============ -->
+    <section class="kit" id="kit" aria-labelledby="kit-titulo">
+      <div class="kit-grid">
+        <!-- Composição: "ref" dos produtos (js/products.js). Para incluir um relógio,
+             preencha SITE_CONFIG.fotoRelogioKit em js/products.js -->
+        <div class="kit-stage" role="img" aria-label="Kit vitrine: estojo para relógio branco com suporte de acrílico preto">
+          <span class="dots-pattern" data-float aria-hidden="true"></span>
+          <span class="kit-word outline-text outline-text--light" aria-hidden="true">Kit</span>
+          <div class="kit-item kit-item--case" data-kit-item="IN-E02"></div>
+          <div class="kit-item kit-item--stand" data-kit-item="IN-S02"></div>
+          <img class="kit-watch" data-kit-watch alt="" width="600" height="600" decoding="async" hidden>
+          <span class="kit-tag" aria-hidden="true">Estojo + suporte</span>
         </div>
-
-        <!-- Fotos vêm de SITE_CONFIG.fotosFabrica (js/products.js) -->
-        <ul class="factory-gallery" id="fabrica-galeria" aria-label="Fotos da produção"></ul>
+        <div class="kit-text">
+          <p class="eyebrow">Para lojistas</p>
+          <h2 id="kit-titulo" class="section-title">Monte seu <span class="outline-text">kit vitrine</span></h2>
+          <p>Estojo para apresentar e suporte para expor: o par certo para valorizar cada relógio no balcão. Combine cores e versões e peça tudo de uma vez.</p>
+          <ul class="kit-list" data-kit-list></ul>
+          <div class="kit-actions">
+            <button type="button" class="btn btn--dark" data-kit-add>Adicionar kit ao orçamento</button>
+            <a href="#vitrine" class="btn btn--outline">Ver todas as cores</a>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -227,7 +244,7 @@
         <div>
           <p class="eyebrow eyebrow--dark">Para lojistas e revendedores</p>
           <h2 id="atacado-titulo" class="wholesale-title">Compre no atacado</h2>
-          <p class="wholesale-sub"><span class="outline-text outline-text--dark">Monte seu kit vitrine</span></p>
+          <p class="wholesale-sub"><span class="outline-text outline-text--dark">Preço de fábrica</span></p>
         </div>
         <div class="wholesale-side">
           <p>Condições especiais para lojistas, pedido mínimo acessível e envio para todo o Brasil. Consulte nossa equipe.</p>
@@ -236,6 +253,27 @@
             <a class="btn btn--ghost-dark" id="atacado-whatsapp" href="#" target="_blank" rel="noopener">Falar com a equipe</a>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- ============ SOBRE ============ -->
+    <section class="about" id="sobre" aria-labelledby="sobre-titulo">
+      <span class="dots-pattern dots-pattern--corner dots-pattern--orange" aria-hidden="true"></span>
+      <div class="container">
+        <div class="about-grid">
+          <div class="about-text">
+            <p class="eyebrow">Sobre a fábrica</p>
+            <h2 id="sobre-titulo" class="section-title">Feito em São Paulo,<br><span class="outline-text">feito para durar</span></h2>
+            <!-- PLACEHOLDER: ajuste o texto com a história real da empresa -->
+            <p>A Injet Nobre fabrica estojos e expositores com foco em praticidade, resistência e bom acabamento. Do estojo de relógio ao suporte de acrílico, cada peça é pensada para valorizar o produto na vitrine de quem vende.</p>
+            <p>Da matéria-prima à expedição, todo o processo acontece na nossa fábrica na capital paulista: produção, controle de qualidade e envio para lojistas de todo o Brasil.</p>
+          </div>
+          <!-- Números vêm de SITE_CONFIG.numerosFabrica (js/products.js) -->
+          <ul class="about-stats" id="fabrica-numeros" aria-label="A fábrica em números"></ul>
+        </div>
+
+        <!-- Fotos vêm de SITE_CONFIG.fotosFabrica (js/products.js) -->
+        <ul class="factory-gallery" id="fabrica-galeria" aria-label="Fotos da produção"></ul>
       </div>
     </section>
   </main>
@@ -249,7 +287,7 @@
           <span class="logo-text">Injet<br>Nobre</span>
         </a>
         <h2 id="contato-titulo" class="footer-title">Praticidade que <span>se encaixa</span> no seu dia.</h2>
-        <p class="footer-note">Utilidades em plástico injetado para organizar, guardar e transportar. Preços ilustrativos, válidos enquanto durarem os estoques.</p>
+        <p class="footer-note">Estojos para relógio e expositores em acrílico para relojoarias, joalherias e vitrines. Preços ilustrativos, válidos enquanto durarem os estoques.</p>
         <a class="btn btn--orange footer-pdf" data-pdf href="assets/catalogo-injet-nobre.pdf" download>
           <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M11 3h2v10.2l3.6-3.6 1.4 1.4-6 6-6-6 1.4-1.4 3.6 3.6V3ZM4 19h16v2H4v-2Z"/></svg>
           Baixar catálogo (PDF)
@@ -321,14 +359,14 @@
       <div class="drawer-body">
         <div class="quote-empty" id="quote-empty">
           <p>Sua lista está vazia.</p>
-          <p>Use <strong>Adicionar ao orçamento</strong> nos produtos para montar o pedido do atacado.</p>
+          <p>Escolha a cor e a quantidade e use <strong>Adicionar ao orçamento</strong> nos produtos.</p>
           <a href="#produtos" class="btn btn--orange" data-quote-close>Ver produtos</a>
         </div>
 
         <div class="quote-filled" id="quote-filled">
           <ul class="quote-list" id="quote-list" aria-label="Itens do orçamento"></ul>
           <div class="quote-summary">
-            <p><strong id="quote-total-items">0</strong> produtos · <strong id="quote-total-units">0</strong> unidades</p>
+            <p><strong id="quote-total-items">0</strong> itens · <strong id="quote-total-units">0</strong> unidades</p>
             <button type="button" class="link-btn" id="quote-clear">Limpar tudo</button>
           </div>
 
@@ -360,7 +398,6 @@
 
   <!-- Conteúdo primeiro: dados, templates e lógica montam a página na hora -->
   <script src="js/products.js"></script>
-  <script src="js/illustrations.js"></script>
   <script src="js/render.js"></script>
   <script src="js/main.js"></script>
   <script src="js/quote.js"></script>

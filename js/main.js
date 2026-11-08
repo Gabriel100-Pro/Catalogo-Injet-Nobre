@@ -7,6 +7,7 @@
      injet:modal-open    { product, content }
      injet:modal-change  { product, content }
      injet:vitrine       { index }
+     injet:line-change   { line, product, item }
    O orçamento de atacado fica em quote.js.
    ========================================================================== */
 
@@ -14,8 +15,7 @@
   "use strict";
 
   const R = window.InjetRender;
-  const I = window.InjetIllustrations;
-  const products = window.PRODUCTS || [];
+  const products = R.products;
   const config = window.SITE_CONFIG || {};
 
   const $ = (sel, ctx = document) => ctx.querySelector(sel);
@@ -24,7 +24,14 @@
 
   const findIndex = (ref) => products.findIndex((p) => p.ref === ref);
 
-  /* ---------- Imagens: carrega a foto; se faltar, mantém a ilustração ---------- */
+  /** Aplica cor do painel / contorno / tema de um produto num elemento. */
+  function setPanel(el, product) {
+    el.style.setProperty("--panel", product.painel || "#FF6A13");
+    el.dataset.contorno = product.contorno || "light";
+    el.dataset.tema = product.tema || "light";
+  }
+
+  /* ---------- Fotos da fábrica: carrega; se faltar, mantém o quadro provisório ---------- */
   function hydrateImages(root = document) {
     $$("img[data-src]", root).forEach((img) => {
       const holder = img.closest("[data-art]");
@@ -33,39 +40,6 @@
       img.src = img.dataset.src;
       img.removeAttribute("data-src");
     });
-  }
-
-  /* Verifica (uma vez) se cada foto existe, para montar a galeria do modal */
-  const photoCache = new Map();
-  function photoExists(src) {
-    if (!photoCache.has(src)) {
-      photoCache.set(src, new Promise((resolve) => {
-        const img = new Image();
-        img.onload = () => resolve(true);
-        img.onerror = () => resolve(false);
-        img.src = src;
-      }));
-    }
-    return photoCache.get(src);
-  }
-
-  async function galleryFor(product) {
-    const srcs = R.photoList(product);
-    const ok = await Promise.all(srcs.map(photoExists));
-    const photos = srcs
-      .filter((_, i) => ok[i])
-      .map((src, i) => ({ type: "img", src, label: `${product.nome}, foto ${i + 1}` }));
-    if (photos.length) return photos;
-
-    // Sem fotos: usa as variações de cor da ilustração
-    if (I && I.has(product.ref)) {
-      return I.variants(product.ref).map((v) => ({
-        type: "svg",
-        html: I.draw(product.ref, v),
-        label: `Cor ilustrativa: ${I.palettes[v].nome}`
-      }));
-    }
-    return [{ type: "svg", html: `<span class="media-placeholder-name">${R.esc(product.nome)}</span>`, label: product.nome }];
   }
 
   /* ---------- Grades de produtos ---------- */
@@ -79,13 +53,56 @@
     });
   }
 
-  /* ---------- Destaques de linha (tela cheia) ---------- */
+  /* ---------- Vitrine de linha (tela cheia, com seletor) ---------- */
   function initSpotlights() {
     $$("[data-spotlight]").forEach((el) => {
       const line = el.dataset.spotlight;
       const list = products.filter((p) => p.linha === line);
-      const featured = list.find((p) => p.destaqueLinha) || list[0];
-      if (featured) el.innerHTML = R.spotlightHTML(featured, line, list.length);
+      if (!list.length) {
+        const region = el.closest(".product-line");
+        if (region) region.hidden = true;
+        return;
+      }
+      el.innerHTML = R.spotlightHTML(list, line, {
+        word: el.dataset.word || line,
+        lineName: el.dataset.lineName || line,
+        picker: el.dataset.picker
+      });
+    });
+
+    function select(line, ref) {
+      const root = $(`[data-spotlight-root="${line}"]`);
+      const product = R.findProduct(ref);
+      if (!root || !product) return;
+      const list = products.filter((p) => p.linha === line);
+
+      let activeItem = null;
+      $$("[data-swap-ref]", root).forEach((item) => {
+        const on = item.dataset.swapRef === ref;
+        item.classList.toggle("is-active", on);
+        if (on) { item.removeAttribute("aria-hidden"); activeItem = item; }
+        else item.setAttribute("aria-hidden", "true");
+      });
+      // Fundo: a camada da cor escolhida aparece por cima (opacidade)
+      $$("[data-layer]", root).forEach((layer) => layer.classList.toggle("is-active", layer.dataset.layer === ref));
+      setPanel(root, product);
+
+      $$(`input[name="linha-${line}"]`, root).forEach((r) => (r.checked = r.value === ref));
+      $$("[data-line-thumb]", root).forEach((t) => t.setAttribute("aria-pressed", String(t.value === ref)));
+      const legend = $("[data-line-variant]", root);
+      if (legend) legend.textContent = product.variante;
+      $("[data-line-card]", root).innerHTML = R.lineCardHTML(product, list.length, $(`[data-spotlight="${line}"]`).dataset.lineName);
+
+      emit("injet:line-change", { line, product, item: activeItem, root });
+    }
+
+    document.addEventListener("change", (e) => {
+      const picker = e.target.closest("[data-line-picker]");
+      if (picker && e.target.type === "radio") select(picker.dataset.linePicker, e.target.value);
+    });
+    document.addEventListener("click", (e) => {
+      const thumb = e.target.closest("[data-line-thumb]");
+      if (thumb) select(thumb.dataset.lineThumb, thumb.value);
     });
   }
 
@@ -96,15 +113,63 @@
     if (el && featured) el.innerHTML = R.heroHTML(featured);
   }
 
-  /* ---------- Ofertas do mês: 3 maiores descontos ---------- */
+  /* ---------- Ofertas do mês: 3 maiores descontos (um por produto, não por cor) ---------- */
   function initOffers() {
     const list = $("#ofertas-lista");
     if (!list) return;
+    const seen = new Set();
     const top = products
       .filter((p) => R.discount(p) > 0)
       .sort((a, b) => R.discount(b) - R.discount(a))
+      .filter((p) => {
+        const key = p.grupo || p.ref;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
       .slice(0, 3);
     list.innerHTML = top.map(R.offerItemHTML).join("");
+    const max = $("#ofertas-max");
+    if (max && top[0]) max.textContent = `${R.discount(top[0])}%`;
+    if (!top.length) $("#ofertas").hidden = true;
+  }
+
+  /* ---------- Monte seu kit vitrine ---------- */
+  function initKit() {
+    const refs = [];
+    $$("[data-kit-item]").forEach((el) => {
+      const product = R.findProduct(el.dataset.kitItem);
+      if (!product) return;
+      refs.push(product.ref);
+      el.innerHTML = R.artHTML(product, { sizes: "(min-width: 960px) 30vw, 60vw" });
+    });
+
+    const list = $("[data-kit-list]");
+    if (list) {
+      list.innerHTML = refs.map((ref) => {
+        const p = R.findProduct(ref);
+        return `<li><span class="kit-dot" style="--dot: ${R.esc(p.cor)}" aria-hidden="true"></span>${R.esc(R.fullName(p))} <small>Ref. ${R.esc(p.ref)}</small></li>`;
+      }).join("");
+    }
+
+    // Foto opcional de relógio (SITE_CONFIG.fotoRelogioKit)
+    const watch = $("[data-kit-watch]");
+    if (watch && config.fotoRelogioKit) {
+      watch.addEventListener("load", () => { watch.hidden = false; $(".kit-stage").classList.add("has-watch"); }, { once: true });
+      watch.addEventListener("error", () => watch.remove(), { once: true });
+      watch.src = config.fotoRelogioKit;
+    } else if (watch) {
+      watch.remove();
+    }
+
+    const add = $("[data-kit-add]");
+    if (add) {
+      add.addEventListener("click", () => {
+        if (!window.InjetQuote) return;
+        refs.forEach((ref) => window.InjetQuote.add(ref, 1));
+        window.InjetQuote.open();
+      });
+    }
   }
 
   /* ---------- Vitrine: carrossel (base) ----------
@@ -115,11 +180,16 @@
   window.InjetVitrine = vitrine;
 
   function initVitrine() {
+    const section = $("#vitrine");
     const track = $("#vitrine-track");
     const viewport = $("#vitrine-viewport");
+    const bg = $("#vitrine-bg");
     if (!track || !viewport) return;
 
     track.innerHTML = products.map((p, i) => R.slideHTML(p, i, products.length)).join("");
+    // Uma camada de cor por slide; a troca é uma transição de opacidade
+    if (bg) bg.innerHTML = products.map((p) => `<span class="vitrine-layer" style="--panel: ${R.esc(p.painel)}"></span>`).join("");
+    const layers = bg ? $$(".vitrine-layer", bg) : [];
     vitrine.count = products.length;
     $("#vitrine-total").textContent = R.pad(products.length);
 
@@ -138,10 +208,12 @@
       vitrine.ready = true;
       vitrine.index = i;
       current.textContent = R.pad(i + 1);
-      name.textContent = products[i] ? products[i].nome : "";
+      name.textContent = products[i] ? R.fullName(products[i]) : "";
       prev.disabled = i === 0;
       next.disabled = i === vitrine.count - 1;
       slides.forEach((s, n) => s.classList.toggle("is-current", n === i));
+      layers.forEach((l, n) => l.classList.toggle("is-active", n === i));
+      if (products[i]) setPanel(section, products[i]);
       emit("injet:vitrine", { index: i });
     };
 
@@ -206,7 +278,7 @@
     });
 
     // Links do menu para uma linha específica resetam o filtro
-    $$('a[href="#linha-utilidades"], a[href="#linha-relojoaria"]').forEach((a) => {
+    $$('a[href="#linha-estojos"], a[href="#linha-expositores"]').forEach((a) => {
       a.addEventListener("click", () => {
         const target = $(a.getAttribute("href"));
         if (target && target.hidden) $('.filter-btn[data-filter="todos"]').click();
@@ -221,30 +293,14 @@
     if (!modal || !content) return;
     let lastFocus = null;
     let currentIndex = -1;
-    let requestId = 0;
 
     const hoverZoom = window.matchMedia("(hover: hover) and (pointer: fine)");
 
-    function setupGallery() {
-      const items = $$(".stage-item", content);
-      const thumbs = $$(".thumb", content);
-      thumbs.forEach((thumb) => {
-        thumb.addEventListener("click", () => {
-          const n = Number(thumb.dataset.thumb);
-          thumbs.forEach((t) => t.setAttribute("aria-pressed", String(t === thumb)));
-          items.forEach((item, i) => {
-            item.classList.toggle("is-active", i === n);
-            if (i === n) item.removeAttribute("aria-hidden");
-            else item.setAttribute("aria-hidden", "true");
-          });
-          emit("injet:gallery-change", { item: items[n] });
-        });
-      });
-
-      // Zoom ao passar o mouse: só transform (escala) + origem no cursor
+    // Zoom ao passar o mouse: só transform (escala) + origem no cursor
+    function setupZoom() {
       const frame = $("[data-zoom]", content);
       const zoom = frame && $(".stage-zoom", frame);
-      if (!frame || !zoom || !hoverZoom.matches) return;
+      if (!frame || !zoom || !hoverZoom.matches || !$(".pic", frame)) return;
       frame.classList.add("can-zoom");
       frame.addEventListener("pointermove", (e) => {
         const r = frame.getBoundingClientRect();
@@ -256,63 +312,62 @@
       frame.addEventListener("pointerleave", () => frame.classList.remove("is-zoomed"));
     }
 
-    async function render(index, { focusStep } = {}) {
+    function render(index, { focus } = {}) {
       const product = products[index];
-      if (!product) return false;
-      const id = ++requestId;
-      const gallery = await galleryFor(product);
-      if (id !== requestId) return false; // outro produto foi pedido enquanto carregava
+      if (!product) return null;
       currentIndex = index;
-      content.innerHTML = R.modalHTML(product, index, products.length, gallery);
-      setupGallery();
-      if (focusStep) {
-        const btn = $(`[data-modal-step="${focusStep}"]`, content);
-        if (btn) btn.focus();
+      content.innerHTML = R.modalHTML(product, index, products.length);
+      setupZoom();
+      if (focus) {
+        const el = $(focus, content);
+        if (el) el.focus();
       }
       return product;
     }
 
-    async function open(ref) {
+    function open(ref) {
       const index = findIndex(ref);
       if (index < 0) return;
       lastFocus = document.activeElement;
-      const product = await render(index);
-      if (!product) return;
+      const product = render(index);
       if (!modal.open) modal.showModal();
       document.body.classList.add("is-modal-open");
       $(".modal-close", modal).focus();
       emit("injet:modal-open", { product, content });
     }
 
-    async function step(dir) {
-      const index = (currentIndex + dir + products.length) % products.length;
-      const product = await render(index, { focusStep: String(dir) });
+    function show(index, focus) {
+      const product = render(index, { focus });
       if (product) emit("injet:modal-change", { product, content });
     }
+
+    const step = (dir) => show((currentIndex + dir + products.length) % products.length, `[data-modal-step="${dir}"]`);
 
     modal.addEventListener("close", () => {
       document.body.classList.remove("is-modal-open");
       if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
     });
 
-    // Clique no fundo escuro fecha
     modal.addEventListener("click", (e) => {
-      if (e.target === modal) modal.close();
+      if (e.target === modal) return modal.close(); // clique no fundo escuro
       const stepBtn = e.target.closest("[data-modal-step]");
-      if (stepBtn) step(Number(stepBtn.dataset.modalStep));
+      if (stepBtn) return step(Number(stepBtn.dataset.modalStep));
+      const color = e.target.closest("[data-modal-goto]");
+      if (color) show(findIndex(color.dataset.modalGoto), `[data-modal-goto="${color.dataset.modalGoto}"]`);
     });
     $$("[data-close-modal]", modal).forEach((b) => b.addEventListener("click", () => modal.close()));
 
-    // Setas do teclado trocam de produto
+    // Setas do teclado trocam de produto (fora dos campos de quantidade)
     modal.addEventListener("keydown", (e) => {
+      if (e.target.matches("input")) return;
       if (e.key === "ArrowRight") { e.preventDefault(); step(1); }
       if (e.key === "ArrowLeft") { e.preventDefault(); step(-1); }
     });
 
     // Delegação: qualquer [data-open-product] ou clique no card abre o modal
     document.addEventListener("click", (e) => {
-      // Links (WhatsApp) e botões de orçamento têm ação própria
-      if (e.target.closest("a, [data-quote-add], [data-quote-open]")) return;
+      // Links, botões de orçamento, quantidade e seletores têm ação própria
+      if (e.target.closest("a, [data-quote-add], [data-quote-open], [data-buy], label, input")) return;
       if (modal.contains(e.target)) return;
       const trigger = e.target.closest("[data-open-product]");
       if (trigger) return open(trigger.dataset.openProduct);
@@ -375,6 +430,7 @@
     initSpotlights();
     initGrids();
     initOffers();
+    initKit();
     initFactory();
     hydrateImages();
     initFilter();

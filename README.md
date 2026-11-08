@@ -5,64 +5,44 @@ Site estático feito com HTML, CSS e JavaScript puros. Não tem build nem depend
 ## Estrutura
 
 ```
-index.html            Página única (estrutura e textos fixos)
-css/styles.css        Estilos (mobile first, organizados por seção)
-js/products.js        DADOS: contatos + lista de produtos  ← edite aqui
-js/illustrations.js   Desenhos provisórios dos produtos (usados enquanto não há foto)
-js/render.js          Templates HTML (card, vitrine, destaques, modal, ofertas)
-js/main.js            Comportamento (menu, filtro, vitrine/carrossel, modal, imagens)
-js/animations.js      Animações com GSAP + ScrollTrigger
-assets/favicon.svg    Ícone da aba
-assets/og-image.jpg   Imagem de compartilhamento (1200×630), provisória
-assets/produtos/      Fotos dos produtos
+index.html                Página única (estrutura e textos fixos)
+css/styles.css            Estilos (mobile first, organizados por seção)
+js/products.js            DADOS: contatos + produtos  ← edite aqui
+js/render.js              Templates HTML (card, hero, vitrine, vitrine de linha, modal, ofertas)
+js/main.js                Comportamento (menu, filtro, vitrine/carrossel, seletores, modal, kit)
+js/quote.js               Orçamento de atacado (cor + quantidade → WhatsApp)
+js/animations.js          Animações com GSAP + ScrollTrigger
+tools/otimizar-imagens.py Gera as fotos otimizadas (WebP + PNG) em assets/produtos/
+assets/*.png              Fotos originais dos produtos (fundo transparente)
 ```
 
 ## Como editar os produtos
 
-Abra `js/products.js`.
-
-**Contatos:** edite o bloco `SITE_CONFIG`:
+Abra `js/products.js`. **Cada cor é um produto** (e um slide da vitrine). O bloco no topo do arquivo explica todos os campos. Os principais são:
 
 ```js
-whatsapp: "5511987654321",   // só números: 55 + DDD + número
-telefone: "(11) 98765-4321",
-email: "contato@injetnobre.com.br",
-instagram: "https://instagram.com/injetnobre",
-facebook: "https://facebook.com/injetnobre",
+{ ...ESTOJO, ref: "IN-E04", numero: "04", variante: "Azul", ativo: true,
+  imagem: "estojo-relogio-azul", cor: "#2F8FE0", painel: "#2F8FE0", contorno: "light" }
 ```
 
-**Produtos:** cada item de `PRODUCTS` segue este modelo:
+- `nome` + `variante` formam a linha do orçamento: `• Estojo para relógio – Azul – 50 un.`
+- `painel` é a cor do painel na vitrine, na vitrine de linha e no modal. `contorno` define a cor do número vazado (`light`, `dark` ou `orange`), e `efeito` pode ser `glow` (brilho laranja) ou `spot` (holofote).
+- `linha` (`estojos` ou `expositores`) define a seção e o filtro. `grupo` junta as cores do mesmo item ("Outras cores" no modal e o leque do hero).
+- `ativo: false` esconde o produto. Os produtos fictícios de utilidades continuam no arquivo, ocultos.
+- **Preços e referências são provisórios** (PLACEHOLDER): troque pelos reais.
+- O selo de % OFF é calculado a partir dos dois preços. "Ofertas do mês" mostra os 3 maiores descontos, um por produto.
 
-```js
-{
-  ref: "IN-909",
-  numero: "09",
-  nome: "Nome do Produto",
-  linha: "utilidades",            // ou "relojoaria"
-  descricao: "Texto curto.",
-  caracteristicas: [
-    { rotulo: "Material", valor: "Polipropileno" }
-  ],
-  precoAntigo: 39.90,             // ponto como separador decimal; null se não houver
-  preco: 29.90,
-  destaque: false,                // true = aparece no topo (use em só um)
-  destaqueLinha: false            // true = produto grande na abertura da linha (um por linha)
-},
-```
+## Fotos
 
-- O desconto do selo é calculado sozinho a partir dos dois preços.
-- A faixa "Ofertas do mês" mostra automaticamente os 3 maiores descontos.
-- O card mostra as 2 primeiras características e o modal mostra todas.
-- Para remover um produto, apague o bloco `{ ... },` dele.
+1. Salve o PNG **com fundo transparente** em `assets/`, com nome em kebab-case, sem espaços nem acentos, começando com `estojo-` ou `suporte-`.
+2. Rode `python tools/otimizar-imagens.py` (precisa do Pillow: `pip install pillow`). O script recorta, centraliza e padroniza o tamanho e gera `-600.webp`, `-1000.webp` e `.png` em `assets/produtos/`.
+3. Use o nome-base (sem extensão) no campo `imagem`.
 
-**Fotos:** salve em `assets/produtos/` com o nome da referência em minúsculas: `IN-606` vira `in-606.jpg`. Para usar outro nome ou formato (por exemplo `.png` ou `.webp`), adicione `imagem: "assets/produtos/meu-arquivo.png"` ao produto. O ideal é usar fundo transparente (PNG/WebP), proporção 4:3 e uns 1200 px de largura. Assim o produto "flutua" sobre os blocos de cor da vitrine.
+A sombra é feita no CSS (`drop-shadow`). Fora do hero, as fotos carregam em modo *lazy*.
 
-- Enquanto não há foto, o site mostra uma **ilustração provisória** do produto (`js/illustrations.js`). Produtos novos sem desenho mostram um quadro cinza com o nome.
-- **Miniaturas do modal:** liste as fotos no campo `imagens`. Sem fotos, as miniaturas mostram variações de cor da ilustração, só como demonstração.
+**Foto com fundo:** com `imagemComFundo: true`, o site mostra "Foto em breve" no lugar da foto. É o caso atual do suporte para brinco.
 
-```js
-imagens: ["assets/produtos/in-101.jpg", "assets/produtos/in-101-2.jpg", "assets/produtos/in-101-3.jpg"]
-```
+**Relógio no kit:** para mostrar um relógio na composição "Monte seu kit vitrine", salve a foto (PNG transparente) e preencha `SITE_CONFIG.fotoRelogioKit`.
 
 ## Outros ajustes
 
@@ -94,16 +74,12 @@ python -m http.server 8000
 
 Nos dois casos, cada alteração enviada ao GitHub publica o site de novo automaticamente.
 
-## Vitrine e animações
+## Seções e animações
 
-- **Vitrine:** no desktop, ao rolar a página os produtos passam para o lado, um por vez (rolagem horizontal presa). No celular, e para quem desativou animações, ela vira um carrossel deslizável. O indicador `01 / 08`, a barra de progresso e as setas funcionam nos dois modos.
-- **Destaques de linha:** cada linha abre com uma tela cheia. O produto que aparece ali é o marcado com `destaqueLinha: true`.
-- **Modal:** imagem grande com zoom ao passar o mouse, miniaturas e setas (ou ← → do teclado) para ir ao produto anterior ou ao próximo.
-- **Animações** (`js/animations.js`): usam GSAP 3.12.5 + ScrollTrigger via CDN e só mexem em `transform` e `opacity`. As durações vão até 0,8 s.
-  - Quem ativou "reduzir movimento" no sistema vê o site estático.
-  - Se o CDN não carregar, o site continua funcionando, só que sem animação.
-
-## Próximas etapas (preparado para)
-
-- Cada recurso em `main.js` e `animations.js` é uma função isolada.
-- O site dispara eventos que dá para escutar com `document.addEventListener(...)`, por exemplo para analytics: `injet:filter`, `injet:modal-open`, `injet:modal-change`, `injet:gallery-change` e `injet:vitrine`.
+- **Hero:** painel laranja desliza da esquerda, título linha por linha com a tarja preta "pintando", estojo preto entra girando e as outras 4 cores abrem em leque. O leque fecha ao rolar.
+- **Vitrine (8 slides):** no desktop, a seção fica presa e os produtos passam para o lado. O painel de cor alterna de lado e a cor muda com transição suave (camadas com opacidade). No celular (e com movimento reduzido) vira carrossel deslizável com a mesma troca de cor.
+- **Vitrine de linha:** Estojos (bolinhas de cor) e Expositores (Cristal / Preto / Brinco + miniaturas). A palavra gigante corre na horizontal ao rolar.
+- **Grade:** cards entram em cascata. Ao passar o mouse, a foto gira e aumenta e o card ganha sombra laranja.
+- **Ofertas e atacado:** títulos entram com desfoque que vira nitidez.
+- `js/animations.js` usa GSAP 3.12.5 + ScrollTrigger via CDN e anima só `transform`, `opacity` e `filter`. Com "reduzir movimento" ativado, o site fica estático (com o leque aberto). Se o CDN falhar, o site funciona sem animação.
+- Eventos para analytics: `injet:filter`, `injet:modal-open`, `injet:modal-change`, `injet:vitrine`, `injet:line-change`, `injet:quote-add`, `injet:quote-change`.

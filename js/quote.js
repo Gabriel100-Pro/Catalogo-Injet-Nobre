@@ -1,7 +1,8 @@
 /* ==========================================================================
    INJET NOBRE – ORÇAMENTO DE ATACADO
-   Lista salva no localStorage do visitante. Ao finalizar, monta uma
-   mensagem com os itens e abre o WhatsApp da empresa.
+   Lista salva no localStorage do visitante. Cada cor é um produto (ref).
+   Ao finalizar, monta uma mensagem com os itens e abre o WhatsApp:
+   "• Estojo para relógio – Azul – 50 un."
    Eventos: injet:quote-add { ref, qty }, injet:quote-change { count }
    ========================================================================== */
 
@@ -9,9 +10,6 @@
   "use strict";
 
   const R = window.InjetRender;
-  const I = window.InjetIllustrations;
-  const products = window.PRODUCTS || [];
-  const config = window.SITE_CONFIG || {};
 
   const KEY_ITEMS = "injet-orcamento-v1";
   const KEY_CLIENT = "injet-orcamento-cliente-v1";
@@ -20,7 +18,7 @@
   const $ = (sel, ctx = document) => ctx.querySelector(sel);
   const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
   const emit = (name, detail) => document.dispatchEvent(new CustomEvent(name, { detail }));
-  const findProduct = (ref) => products.find((p) => p.ref === ref);
+  const findProduct = R.findProduct; // só produtos ativos
   const clampQty = (n) => Math.min(MAX_QTY, Math.max(1, Math.round(Number(n)) || 1));
 
   /* ---------- Armazenamento (falha silenciosa: modo privado etc.) ---------- */
@@ -57,7 +55,7 @@
     else items.push({ ref, qty: clampQty(qty) });
     save();
     const item = items.find((i) => i.ref === ref);
-    announce(`${findProduct(ref).nome} no orçamento: ${item.qty} ${item.qty === 1 ? "unidade" : "unidades"}.`);
+    announce(`${R.fullName(findProduct(ref))} no orçamento: ${item.qty} ${item.qty === 1 ? "unidade" : "unidades"}.`);
     emit("injet:quote-add", { ref, qty: item.qty });
   }
 
@@ -72,7 +70,7 @@
     const product = findProduct(ref);
     items = items.filter((i) => i.ref !== ref);
     save();
-    if (product) announce(`${product.nome} removido do orçamento.`);
+    if (product) announce(`${R.fullName(product)} removido do orçamento.`);
   }
 
   function clear() {
@@ -105,14 +103,14 @@
 
   function itemHTML(item) {
     const p = findProduct(item.ref);
-    const name = R.esc(p.nome);
-    const thumb = I && I.has(p.ref) ? I.draw(p.ref) : "";
+    const name = R.esc(R.fullName(p));
+    const thumb = R.hasPhoto(p) ? R.pictureHTML(p.imagem, "", { sizes: "56px" }) : "";
     return `
       <li class="quote-item" data-ref="${R.esc(p.ref)}">
         <div class="quote-thumb" aria-hidden="true">${thumb}</div>
         <div class="quote-info">
-          <p class="quote-name">${name}</p>
-          <p class="quote-ref">Ref. ${R.esc(p.ref)}</p>
+          <p class="quote-name">${R.esc(p.nome)}</p>
+          <p class="quote-ref">${p.variante ? `<span class="quote-dot" style="--dot: ${R.esc(p.cor)}" aria-hidden="true"></span>${R.esc(p.variante)} · ` : ""}Ref. ${R.esc(p.ref)}</p>
         </div>
         <div class="qty" role="group" aria-label="Quantidade de ${name}">
           <button type="button" data-qty-step="-1" aria-label="Diminuir quantidade de ${name}" ${item.qty <= 1 ? "disabled" : ""}>−</button>
@@ -234,26 +232,41 @@
     if (e.target.closest("[data-quote-close]")) close();
   });
 
-  /* ---------- Botões espalhados pelo site (delegação) ---------- */
+  /* ---------- Botões espalhados pelo site (delegação) ----------
+     Cada produto tem quantidade (+ / −) e "Adicionar ao orçamento". */
   const labelTimers = new WeakMap();
   document.addEventListener("click", (e) => {
     const addBtn = e.target.closest("[data-quote-add]");
     if (addBtn) {
-      add(addBtn.dataset.quoteAdd, 1);
+      const ref = addBtn.dataset.quoteAdd;
+      const input = addBtn.closest("[data-buy]") && addBtn.closest("[data-buy]").querySelector("[data-buy-qty]");
+      add(ref, clampQty(input ? input.value : 1));
+      if (input) input.value = 1;
       const label = addBtn.querySelector("[data-quote-label]");
-      const item = items.find((i) => i.ref === addBtn.dataset.quoteAdd);
+      const item = items.find((i) => i.ref === ref);
       if (label && item) {
         addBtn.classList.add("is-added");
-        label.textContent = `No orçamento (${item.qty})`;
+        label.textContent = `No orçamento: ${item.qty.toLocaleString("pt-BR")} un.`;
         clearTimeout(labelTimers.get(addBtn));
         labelTimers.set(addBtn, setTimeout(() => {
           addBtn.classList.remove("is-added");
           label.textContent = "Adicionar ao orçamento";
-        }, 1800));
+        }, 2000));
       }
       return;
     }
+    const step = e.target.closest("[data-buy-step]");
+    if (step) {
+      const input = step.closest("[data-buy]").querySelector("[data-buy-qty]");
+      input.value = clampQty(Number(input.value) + Number(step.dataset.buyStep));
+      return;
+    }
     if (e.target.closest("[data-quote-open]") && !drawer.contains(e.target)) open();
+  });
+
+  // Quantidade digitada fica entre 1 e 9999
+  document.addEventListener("change", (e) => {
+    if (e.target.matches("[data-buy-qty]")) e.target.value = clampQty(e.target.value);
   });
 
   /* ---------- Enviar pelo WhatsApp ---------- */
@@ -265,7 +278,7 @@
   function buildMessage(client) {
     const lines = items.map((i) => {
       const p = findProduct(i.ref);
-      return `• ${i.qty}x ${p.nome} (Ref. ${p.ref})`;
+      return `• ${R.fullName(p)} – ${i.qty.toLocaleString("pt-BR")} un.`;
     });
     const units = items.reduce((s, i) => s + i.qty, 0);
     return [
@@ -278,7 +291,7 @@
       "*Itens:*",
       ...lines,
       "",
-      `Total: ${items.length} ${items.length === 1 ? "produto" : "produtos"}, ${units.toLocaleString("pt-BR")} unidades.`
+      `Total: ${items.length} ${items.length === 1 ? "item" : "itens"}, ${units.toLocaleString("pt-BR")} unidades.`
     ].join("\n");
   }
 

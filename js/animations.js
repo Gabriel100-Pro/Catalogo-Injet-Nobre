@@ -1,7 +1,8 @@
 /* ==========================================================================
    INJET NOBRE – ANIMAÇÕES (GSAP + ScrollTrigger)
    Regras:
-   - Só transform e opacity (bom desempenho no celular).
+   - Só transform, opacity e filter (bom desempenho no celular). O leque do
+     hero anima variáveis CSS (--fan-in / --fan-out) que só mexem em transform.
    - Durações de até 0,8 s, com cascata (stagger) entre itens de grade.
    - Tudo dentro de gsap.matchMedia: com prefers-reduced-motion: reduce
      nada aqui roda e o site fica estático. Se o GSAP não carregar, idem.
@@ -33,14 +34,28 @@
   const imageFrom = (dir = 1) => ({ rotation: 15 * dir, scale: 0.7, opacity: 0 });
   const imageTo = { rotation: 0, scale: 1, opacity: 1, duration: 0.8, ease: BOUNCE };
 
-  /* ---------- Hero: título linha por linha ---------- */
+  /* ---------- Hero ----------
+     Painel laranja desliza da esquerda, título entra linha por linha, a tarja
+     preta "pinta" da esquerda para a direita, o produto entra girando com
+     quique e as outras cores abrem em leque atrás dele. */
   function hero() {
     const tl = gsap.timeline({ defaults: { ease: OUT, duration: 0.7 } });
-    tl.from(".hero-title .line-inner", { yPercent: 110, duration: 0.8, stagger: 0.12 })
-      .from("[data-hero-intro]", { x: -48, opacity: 0, stagger: 0.08 }, "-=0.5")
-      .fromTo(".hero-feature .media-frame", imageFrom(1), { ...imageTo }, 0.25)
-      .from(".hero-feature [data-pop]", { scale: 0, duration: 0.45, ease: POP }, "-=0.3")
-      .from(".hero-feature-body > *", { x: 48, opacity: 0, stagger: 0.06, duration: 0.6 }, "-=0.55");
+    tl.from(".hero-main", { xPercent: -100, duration: 0.8, ease: "power4.out" })
+      .from(".hero-title .line-inner", { yPercent: 110, duration: 0.75, stagger: 0.11 }, "-=0.3")
+      .fromTo(".accent-paint", { scaleX: 0 }, { scaleX: 1, duration: 0.55, ease: "power2.inOut" }, "-=0.45")
+      .from(".accent-text", { opacity: 0, duration: 0.3 }, "<0.2")
+      .from("[data-hero-intro]", { x: -48, opacity: 0, stagger: 0.08 }, "-=0.35")
+      .fromTo(".hero-feature .media-frame", imageFrom(1), { ...imageTo }, 0.3)
+      .fromTo("#hero-fan", { "--fan-in": 0 }, { "--fan-in": 1, duration: 0.9, ease: BOUNCE }, 0.95)
+      .from(".hero-feature [data-pop]", { scale: 0, duration: 0.45, ease: POP }, "-=0.5")
+      .from(".hero-feature-body > *", { x: 48, opacity: 0, stagger: 0.06, duration: 0.6 }, 0.55);
+
+    // Ao rolar, o leque volta a fechar atrás do estojo preto
+    gsap.fromTo("#hero-fan", { "--fan-out": 1 }, {
+      "--fan-out": 0,
+      ease: "none",
+      scrollTrigger: { trigger: ".hero", start: () => `top ${headerH()}`, end: "bottom 35%", scrub: 0.5 }
+    });
   }
 
   /* ---------- Entrada de um slide da vitrine ---------- */
@@ -190,9 +205,10 @@
   function textReveals() {
     const groups = [
       { trigger: "#produtos .section-head", items: "#produtos .section-head > div > *, #produtos .filter" },
-      { trigger: "#ofertas", items: ".offers-head > *", opposite: ".offers-list > li" },
+      { trigger: "#ofertas", items: ".offers-head > :not(.offers-title)", opposite: ".offers-list > li" },
+      { trigger: "#kit", items: ".kit-text > *" },
+      { trigger: "#atacado", items: ".wholesale-grid > div:first-child > :not(.wholesale-title)", opposite: ".wholesale-side > *" },
       { trigger: "#sobre", items: ".about-text > *", opposite: ".about-stats > li" },
-      { trigger: "#atacado", items: ".wholesale-grid > div:first-child > *", opposite: ".wholesale-side > *" },
       { trigger: "#contato", items: ".footer-brand > *, .footer-contact > *", opposite: ".footer-map, .footer-qr" }
     ];
 
@@ -204,6 +220,42 @@
         tl.from(g.opposite, { x: -70 * dir, opacity: 0, duration: 0.6, ease: OUT, stagger: 0.08 }, 0.15);
       }
     });
+  }
+
+  /* ---------- Títulos gigantes: desfoque que vira nitidez ---------- */
+  function blurTitles() {
+    gsap.fromTo(".offers-title",
+      { filter: "blur(18px)", opacity: 0, scale: 1.15 },
+      { filter: "blur(0px)", opacity: 1, scale: 1, duration: 0.9, ease: OUT, clearProps: "filter",
+        scrollTrigger: { trigger: "#ofertas", start: "top 75%" } });
+
+    gsap.fromTo(".wholesale-title",
+      { filter: "blur(14px)", opacity: 0, x: -120 },
+      { filter: "blur(0px)", opacity: 1, x: 0, duration: 0.8, ease: OUT, clearProps: "filter",
+        scrollTrigger: { trigger: "#atacado", start: "top 78%" } });
+  }
+
+  /* ---------- Monte seu kit vitrine ---------- */
+  function kit() {
+    const stage = $(".kit-stage");
+    if (!stage) return;
+    const tl = gsap.timeline({ scrollTrigger: { trigger: stage, start: "top 70%" } });
+    tl.fromTo(".kit-item--case", imageFrom(-1), { ...imageTo })
+      .fromTo(".kit-item--stand", imageFrom(1), { ...imageTo }, 0.15)
+      .from(".kit-tag", { scale: 0, duration: 0.45, ease: POP }, 0.6);
+    if ($(".kit-watch")) tl.from(".kit-watch", { y: -60, opacity: 0, duration: 0.6, ease: BOUNCE }, 0.4);
+    gsap.fromTo(".kit-word", { xPercent: -10 }, {
+      xPercent: 10, ease: "none",
+      scrollTrigger: { trigger: stage, start: "top bottom", end: "bottom top", scrub: true }
+    });
+  }
+
+  /* ---------- Vitrine de linha: card e preço reagem à troca de produto ---------- */
+  function onLineChange(e) {
+    if (!allowMotion()) return;
+    const card = $("[data-line-card]", e.detail.root);
+    gsap.fromTo(card, { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: OUT, clearProps: "transform,opacity" });
+    gsap.fromTo($$("[data-pop]", card), { scale: 0 }, { scale: 1, duration: 0.45, ease: POP, delay: 0.1, clearProps: "transform" });
   }
 
   /* ---------- Quadradinhos: flutuação + parallax ---------- */
@@ -218,7 +270,7 @@
         yoyo: true,
         repeat: -1
       });
-      if (el.closest(".vitrine")) return; // dentro da área presa, só flutua
+      if (el.closest(".vitrine, .hero-feature")) return; // área presa / destaque: só flutua
       gsap.fromTo(el, { yPercent: 0 }, {
         yPercent: i % 2 ? -160 : -90,
         ease: "none",
@@ -286,15 +338,7 @@
       isChange ? { scale: 0.88, rotation: 6, opacity: 0 } : { scale: 0.75, rotation: 12, opacity: 0 },
       { scale: 1, rotation: 0, opacity: 1, duration: isChange ? 0.55 : 0.7, ease: BOUNCE, clearProps: "transform,opacity" })
       .from($$("[data-pop]", c), { scale: 0, duration: 0.4, ease: POP, stagger: 0.1, clearProps: "transform" }, "-=0.3")
-      .from($$(".modal-body > *", c), { x: 40, opacity: 0, duration: 0.45, ease: OUT, stagger: 0.04, clearProps: "transform,opacity" }, 0.05)
-      .from($$(".thumb", c), { y: 16, opacity: 0, duration: 0.35, ease: OUT, stagger: 0.06, clearProps: "transform,opacity" }, 0.2);
-  }
-
-  function onGalleryChange(e) {
-    if (!allowMotion() || !e.detail.item) return;
-    gsap.fromTo(e.detail.item.firstElementChild, { scale: 0.9, rotation: -4 }, {
-      scale: 1, rotation: 0, duration: 0.5, ease: BOUNCE, clearProps: "transform"
-    });
+      .from($$(".modal-body > *", c), { x: 40, opacity: 0, duration: 0.45, ease: OUT, stagger: 0.04, clearProps: "transform,opacity" }, 0.05);
   }
 
   /* ---------- Inicialização ---------- */
@@ -312,6 +356,8 @@
       spotlights();
       grids();
       textReveals();
+      blurTitles();
+      kit();
       counters();
       factoryGallery();
       floaters();
@@ -326,7 +372,7 @@
 
     document.addEventListener("injet:modal-open", (e) => onModal(e, false));
     document.addEventListener("injet:modal-change", (e) => onModal(e, true));
-    document.addEventListener("injet:gallery-change", onGalleryChange);
+    document.addEventListener("injet:line-change", onLineChange);
     document.addEventListener("injet:quote-add", onQuoteAdd);
     document.addEventListener("injet:quote-open", onQuoteOpen);
     document.addEventListener("injet:filter", () => ScrollTrigger.refresh());
