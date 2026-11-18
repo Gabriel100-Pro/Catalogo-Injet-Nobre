@@ -205,7 +205,6 @@
   function textReveals() {
     const groups = [
       { trigger: "#produtos .section-head", items: "#produtos .section-head > div > *, #produtos .filter" },
-      { trigger: "#ofertas", items: ".offers-head > :not(.offers-title)", opposite: ".offers-list > li" },
       { trigger: "#kit", items: ".kit-text > *" },
       { trigger: "#atacado", items: ".wholesale-grid > div:first-child > :not(.wholesale-title)", opposite: ".wholesale-side > *" },
       { trigger: "#sobre", items: ".about-text > *", opposite: ".about-stats > li" },
@@ -224,11 +223,6 @@
 
   /* ---------- Títulos gigantes: desfoque que vira nitidez ---------- */
   function blurTitles() {
-    gsap.fromTo(".offers-title",
-      { filter: "blur(18px)", opacity: 0, scale: 1.15 },
-      { filter: "blur(0px)", opacity: 1, scale: 1, duration: 0.9, ease: OUT, clearProps: "filter",
-        scrollTrigger: { trigger: "#ofertas", start: "top 75%" } });
-
     gsap.fromTo(".wholesale-title",
       { filter: "blur(14px)", opacity: 0, x: -120 },
       { filter: "blur(0px)", opacity: 1, x: 0, duration: 0.8, ease: OUT, clearProps: "filter",

@@ -55,8 +55,7 @@ window.SITE_CONFIG = {
   - rotuloLinha ...... texto pequeno acima do nome ("Linha relojoaria")
   - descricao ........ texto curto
   - caracteristicas .. lista de { rotulo, valor } exibida na tabelinha
-  - precoAntigo ...... preço "de" (ponto como decimal: 18.90). null se não houver.
-  - preco ............ preço "por"
+  - preco ............ preço por unidade (ponto como decimal: 2.50)
   - imagem ........... nome-base da foto em assets/produtos/ (sem extensão).
                        O site usa <imagem>-600.webp, <imagem>-1000.webp e <imagem>.png.
                        Gere com: python tools/otimizar-imagens.py
@@ -69,10 +68,11 @@ window.SITE_CONFIG = {
   - destaque ......... true = produto do hero (use em apenas um)
   - destaqueLinha .... true = produto que abre a vitrine da sua linha (um por linha)
   - legenda .......... (opcional) nome curto do botão do seletor ("Cristal")
+  - formato/interior . (só caixas de acrílico) opções dos dois seletores da vitrine
+                       de linha. Cada combinação é um produto com foto e preço próprios.
 */
 
-// PLACEHOLDERS: referências, preços e características abaixo são provisórios.
-// Troque pelos valores reais antes de publicar.
+// Preços reais por unidade. Referências e características ainda são provisórias.
 const ESTOJO = {
   nome: "Estojo para relógio",
   grupo: "estojo-relogio",
@@ -82,11 +82,40 @@ const ESTOJO = {
   caracteristicas: [
     { rotulo: "Tampa", valor: "De encaixe, removível" },
     { rotulo: "Interno", valor: "Almofada para relógio" },
-    { rotulo: "Cores", valor: "Preto, branco, amarelo, azul e rosa" }
+    { rotulo: "Cores", valor: "Preto, branco, amarelo, azul, rosa e vermelho" }
   ],
-  precoAntigo: 18.90,
-  preco: 14.90
+  preco: 2.50
 };
+
+// Caixa de acrílico: tampa transparente, dois formatos e dois interiores.
+// O preço depende do interior (espuma R$ 1,90 / almofada R$ 2,30).
+const CAIXA_ACRILICO = {
+  nome: "Caixa de acrílico",
+  grupo: "caixa-acrilico",
+  linha: "acrilicos",
+  rotuloLinha: "Linha relojoaria",
+  descricao: "Caixa com tampa de acrílico transparente e base preta para apresentar o relógio com destaque.",
+  cor: "#DDE6EE",
+  painel: "#111111",
+  contorno: "orange",
+  efeito: "glow"
+};
+const INTERIOR = {
+  Espuma:   { preco: 1.90, detalhe: "Espuma" },
+  Almofada: { preco: 2.30, detalhe: "Almofada (a mesma do estojo clássico)" }
+};
+const caixa = (ref, numero, formato, interior, imagem, extra = {}) => ({
+  ...CAIXA_ACRILICO, ref, numero, formato, interior, imagem, ativo: true,
+  variante: `${formato} – Com ${interior.toLowerCase()}`,
+  legenda: `${formato} · ${interior}`,
+  preco: INTERIOR[interior].preco,
+  caracteristicas: [
+    { rotulo: "Formato", valor: formato },
+    { rotulo: "Interior", valor: INTERIOR[interior].detalhe },
+    { rotulo: "Tampa", valor: "Acrílico transparente" }
+  ],
+  ...extra
+});
 
 const SUPORTE = {
   nome: "Suporte para relógio de acrílico",
@@ -99,8 +128,7 @@ const SUPORTE = {
     { rotulo: "Formato", valor: "C, com base" },
     { rotulo: "Uso", valor: "Vitrine e balcão" }
   ],
-  precoAntigo: 6.90,
-  preco: 4.90
+  preco: 1.00
 };
 
 window.PRODUCTS = [
@@ -116,15 +144,17 @@ window.PRODUCTS = [
     imagem: "estojo-relogio-azul", cor: "#2F8FE0", painel: "#2F8FE0", contorno: "light" },
   { ...ESTOJO, ref: "IN-E05", numero: "05", variante: "Rosa", ativo: true,
     imagem: "estojo-relogio-rosa", cor: "#E8338A", painel: "#E8338A", contorno: "light" },
+  { ...ESTOJO, ref: "IN-E06", numero: "06", variante: "Vermelho", ativo: true,
+    imagem: "estojo-relogio-vermelho", cor: "#D62828", painel: "#D62828", contorno: "light" },
 
   // ---------------- EXPOSITORES ----------------
-  { ...SUPORTE, ref: "IN-S01", numero: "06", variante: "Transparente", legenda: "Cristal", ativo: true,
+  { ...SUPORTE, ref: "IN-S01", numero: "07", variante: "Transparente", legenda: "Cristal", ativo: true,
     imagem: "suporte-relogio-acrilico-transparente", cor: "#DDE6EE", painel: "#111111", contorno: "orange",
     efeito: "glow", destaqueLinha: true },
-  { ...SUPORTE, ref: "IN-S02", numero: "07", variante: "Preto", legenda: "Preto", ativo: true,
+  { ...SUPORTE, ref: "IN-S02", numero: "08", variante: "Preto", legenda: "Preto", ativo: true,
     imagem: "suporte-relogio-acrilico-preto", cor: "#1E1E1E", painel: "#FF6A13", contorno: "light" },
   {
-    ref: "IN-B01", numero: "08", nome: "Suporte para brinco", variante: "Transparente", legenda: "Brinco",
+    ref: "IN-B01", numero: "09", nome: "Suporte para brinco", variante: "Transparente", legenda: "Brinco",
     ativo: true,
     grupo: "suporte-brinco",
     linha: "expositores",
@@ -135,14 +165,19 @@ window.PRODUCTS = [
       { rotulo: "Base", valor: "Em L, inclinada" },
       { rotulo: "Capacidade", valor: "1 par" }
     ],
-    precoAntigo: 9.90,
-    preco: 6.90,
+    preco: 2.00,
     imagem: "suporte-brinco-transparente",
     // A foto atual ainda tem o fundo claro dentro da placa de acrílico.
     // Troque o PNG em assets/, rode tools/otimizar-imagens.py e mude para false.
     imagemComFundo: true,
     cor: "#E9EEF2", painel: "#111111", contorno: "orange", efeito: "spot"
   },
+
+  // ---------------- CAIXAS DE ACRÍLICO ----------------
+  caixa("IN-A01", "10", "Redonda", "Espuma", "caixa-redonda-acrilico-espuma"),
+  caixa("IN-A02", "11", "Redonda", "Almofada", "caixa-redonda-acrilico-almofada", { destaqueLinha: true }),
+  caixa("IN-A03", "12", "Quadrangular", "Espuma", "caixa-acrilico-quadrangular-espuma"),
+  caixa("IN-A04", "13", "Quadrangular", "Almofada", "caixa-acrilico-quadrangular-almofada"),
 
   // ---------------- PRODUTOS FICTÍCIOS (ocultos) ----------------
   // Mantidos só como exemplo de cadastro. Com "ativo: false" não aparecem no site.
@@ -159,7 +194,6 @@ window.PRODUCTS = [
       { rotulo: "Tampa", valor: "Com travas laterais" },
       { rotulo: "Uso", valor: "Empilhável" }
     ],
-    precoAntigo: 89.90,
     preco: 69.90,
     destaque: false
   },
@@ -176,7 +210,6 @@ window.PRODUCTS = [
       { rotulo: "BPA", valor: "Livre de BPA" },
       { rotulo: "Uso", valor: "Micro-ondas e freezer" }
     ],
-    precoAntigo: 32.90,
     preco: 24.90
   },
   {
@@ -191,7 +224,6 @@ window.PRODUCTS = [
       { rotulo: "Alça", valor: "Reforçada" },
       { rotulo: "Medida", valor: "Graduação interna" }
     ],
-    precoAntigo: 49.90,
     preco: 39.90
   },
   {
@@ -206,7 +238,6 @@ window.PRODUCTS = [
       { rotulo: "Fechada", valor: "6 cm" },
       { rotulo: "Base", valor: "Antiderrapante" }
     ],
-    precoAntigo: 79.90,
     preco: 59.90
   },
   {
@@ -220,7 +251,6 @@ window.PRODUCTS = [
       { rotulo: "Módulos", valor: "6 peças" },
       { rotulo: "Encaixe", valor: "Sem ferramentas" }
     ],
-    precoAntigo: 59.90,
     preco: 44.90
   },
 
@@ -237,7 +267,6 @@ window.PRODUCTS = [
       { rotulo: "Interno", valor: "Almofada removível" },
       { rotulo: "Cor", valor: "Preto fosco" }
     ],
-    precoAntigo: 18.90,
     preco: 14.90
   },
   {
@@ -251,7 +280,6 @@ window.PRODUCTS = [
       { rotulo: "Tampa", valor: "Articulada" },
       { rotulo: "Interno", valor: "Berço" }
     ],
-    precoAntigo: 29.90,
     preco: 22.90
   },
   {
@@ -266,7 +294,6 @@ window.PRODUCTS = [
       { rotulo: "Cor", valor: "Cristal" },
       { rotulo: "Uso", valor: "Vitrine" }
     ],
-    precoAntigo: 6.90,
     preco: 4.90
   }
 ];

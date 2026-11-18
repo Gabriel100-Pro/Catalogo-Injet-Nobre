@@ -224,30 +224,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .btn--whats { background: var(--black); color: var(--white); width: 100%; }
 .btn--whats:hover { background: var(--orange); color: var(--black); }
 
-/* Selo de desconto quadrado */
-.badge {
-  position: absolute;
-  top: 16px; left: 16px;
-  z-index: 2;
-  display: grid;
-  place-items: center;
-  width: 72px; height: 72px;
-  background: var(--black);
-  color: var(--orange);
-  font-family: var(--font-title);
-  font-weight: 700;
-  font-size: 1.6rem;
-  line-height: .9;
-  text-align: center;
-}
-.badge small {
-  display: block;
-  margin-top: 4px;
-  font-size: .8rem;
-  letter-spacing: .1em;
-  color: var(--white);
-}
-
 /* Mídia do produto: imagem sobre bloco com listras diagonais */
 .media {
   position: relative;
@@ -328,19 +304,20 @@ button { font: inherit; color: inherit; cursor: pointer; }
   border-right: 0;
 }
 
-/* Preço: antigo riscado + atual dentro de círculo */
+/* Preço por unidade dentro de círculo */
 .price {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 14px;
 }
-.price-old {
+.price-unit {
   margin: 0;
   font-size: .9rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
   color: var(--gray-text);
 }
-.price-old s { color: var(--gray-text); }
 .price-circle {
   flex-shrink: 0;
   display: grid;
@@ -586,13 +563,20 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .hero-feature-body { padding: 4px var(--gutter) 40px; }
 .hero-feature-title { margin-bottom: 10px; font-size: clamp(2rem, 8vw, 2.8rem); }
 .hero-feature-desc { color: var(--gray-text); }
-.hero-feature .price-old { margin-bottom: 0; font-size: 1rem; }
 .hero-price {
   margin-bottom: 20px;
   font-family: var(--font-title);
   font-weight: 700;
   font-size: clamp(2.6rem, 11vw, 3.6rem);
   line-height: 1;
+}
+.hero-price-unit {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--gray-text);
 }
 .hero-feature-actions { display: grid; gap: 10px; }
 
@@ -627,61 +611,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .filter-btn[aria-pressed="true"]::before { content: "■ "; color: var(--orange); }
 
 .product-line { padding-bottom: 48px; }
-
-/* Ofertas */
-.offers {
-  position: relative;
-  padding: 64px 0;
-  background: var(--black);
-  color: var(--white);
-}
-.offers-inner { display: grid; gap: 32px; }
-.offers-title {
-  margin-bottom: 16px;
-  font-size: clamp(2.8rem, 12vw, 5.6rem);
-  line-height: .95;
-}
-.offers-text { color: #D0D0D0; }
-.offers-list {
-  display: grid;
-  gap: 12px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.offer-item {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: center;
-  gap: 4px 16px;
-  width: 100%;
-  padding: 14px;
-  border: 1px solid #333;
-  background: #1A1A1A;
-  text-align: left;
-  color: var(--white);
-  transition: border-color var(--dur) var(--ease);
-}
-.offer-item:hover { border-color: var(--orange); }
-.offer-pct {
-  grid-row: span 2;
-  display: grid;
-  place-items: center;
-  width: 64px; height: 64px;
-  background: var(--orange);
-  color: var(--black);
-  font-family: var(--font-title);
-  font-weight: 700;
-  font-size: 1.3rem;
-}
-.offer-name {
-  font-family: var(--font-title);
-  font-weight: 600;
-  font-size: 1.15rem;
-  text-transform: uppercase;
-}
-.offer-price { font-size: .9rem; color: #D0D0D0; }
-.offer-price s { color: #9A9A9A; margin-right: 6px; }
 
 /* Sobre */
 .about { padding: 72px 0; }
@@ -852,9 +781,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .section-head { flex-direction: row; align-items: flex-end; justify-content: space-between; }
 
   .hero-feature-actions { grid-template-columns: 1fr auto; }
-  .offers-list { grid-template-columns: repeat(3, 1fr); }
-  .offer-item { grid-template-columns: 1fr; grid-template-rows: auto; height: 100%; }
-  .offer-pct { grid-row: auto; }
 
   .footer-grid { grid-template-columns: 1fr 1fr; }
 }
@@ -897,10 +823,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .hero-feature .media { padding: 40px 48px 40px 40px; }
   .hero-feature-body { padding: 0 40px 48px; }
 
-  .offers-inner { grid-template-columns: 1fr 1.1fr; align-items: center; }
-  .offers-list { grid-template-columns: 1fr; }
-  .offer-item { grid-template-columns: auto 1fr; }
-  .offer-pct { grid-row: span 2; }
 
   .about-grid { grid-template-columns: 1.3fr 1fr; align-items: center; }
   .wholesale-grid { grid-template-columns: 1.4fr 1fr; align-items: end; }
@@ -1110,7 +1032,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
   text-transform: uppercase;
 }
 .spotlight-name { font-size: 2rem; }
-.spotlight > .badge { top: 32px; left: var(--gutter); }
 .dots-pattern--spot-a { top: 14%; left: auto; right: 22%; width: 40px; height: 40px; }
 
 
@@ -1244,7 +1165,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
     bottom: 48px;
     width: 340px;
   }
-  .spotlight > .badge { top: 48px; left: max(var(--gutter), calc((100vw - var(--container)) / 2 + var(--gutter))); }
 }
 
 @media (min-width: 960px) and (max-height: 760px) {
@@ -1395,6 +1315,9 @@ body.is-drawer-open { overflow: hidden; }
 .quote-info { grid-area: info; min-width: 0; }
 .quote-name { margin: 0; font-family: var(--font-title); font-weight: 600; font-size: 1.05rem; line-height: 1.15; text-transform: uppercase; }
 .quote-ref { margin: 2px 0 0; font-size: .75rem; font-weight: 600; letter-spacing: .08em; color: var(--gray-text); }
+.quote-price { margin: 4px 0 0; font-size: .85rem; }
+.quote-total { flex-basis: 100%; font-size: 1.1rem; }
+.quote-total strong { font-family: var(--font-title); font-size: 1.4rem; }
 .qty { grid-area: qty; display: inline-flex; justify-self: start; border: 2px solid var(--black); background: var(--white); }
 .qty button {
   width: 40px; height: 40px;
@@ -1644,10 +1567,6 @@ body.is-drawer-open { overflow: hidden; }
 [data-contorno="orange"] .slide-number,
 [data-contorno="orange"] .spotlight-word { -webkit-text-stroke-color: var(--orange); }
 /* Selo sobre painel preto: inverte para laranja */
-.slide[data-contorno="orange"] .badge,
-.showcase[data-contorno="orange"] .badge { background: var(--orange); color: var(--black); }
-.slide[data-contorno="orange"] .badge small,
-.showcase[data-contorno="orange"] .badge small { color: var(--black); }
 
 /* Efeitos atrás da foto */
 .fx { position: absolute; inset: 0; pointer-events: none; }
@@ -1709,6 +1628,9 @@ body.is-drawer-open { overflow: hidden; }
   pointer-events: none;
 }
 .swap-item.is-active { opacity: 1; transform: none; pointer-events: auto; }
+/* Interior da caixa de acrílico: mesma caixa, troca suave sem giro */
+.swap[data-swap="fade"] .swap-item:not(.is-active) { transform: scale(.94); }
+.swap[data-swap="fade"] .swap-item { transition: opacity .45s var(--ease), transform .6s var(--ease); }
 
 /* Miniaturas dos expositores */
 .line-thumbs { display: flex; gap: 10px; }
@@ -1782,6 +1704,24 @@ body.is-drawer-open { overflow: hidden; }
 .segment:hover input:not(:checked) + span { background: var(--gray); }
 .spotlight-info .swatches,
 .spotlight-info .segmented { padding-bottom: 14px; border-bottom: 1px solid var(--gray-line); }
+/* Dois seletores seguidos (formato + interior): só o último tem a linha */
+.spotlight-info .segmented[data-option]:not(:last-of-type) { padding-bottom: 4px; border-bottom: 0; }
+
+/* Versões no modal (caixa de acrílico) */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  min-height: 40px;
+  padding: 6px 12px;
+  border: 2px solid var(--black);
+  background: var(--white);
+  font-family: var(--font-title);
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.chip:hover { background: var(--gray); }
+.chip[aria-pressed="true"] { background: var(--black); color: var(--white); }
 
 /* Quantidade + adicionar ao orçamento */
 .buy { display: flex; align-items: stretch; gap: 8px; }

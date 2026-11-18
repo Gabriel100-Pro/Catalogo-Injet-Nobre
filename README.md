@@ -8,7 +8,7 @@ Site estático feito com HTML, CSS e JavaScript puros. Não tem build nem depend
 index.html                Página única (estrutura e textos fixos)
 css/styles.css            Estilos (mobile first, organizados por seção)
 js/products.js            DADOS: contatos + produtos  ← edite aqui
-js/render.js              Templates HTML (card, hero, vitrine, vitrine de linha, modal, ofertas)
+js/render.js              Templates HTML (card, hero, vitrine, vitrine de linha, modal)
 js/main.js                Comportamento (menu, filtro, vitrine/carrossel, seletores, modal, kit)
 js/quote.js               Orçamento de atacado (cor + quantidade → WhatsApp)
 js/animations.js          Animações com GSAP + ScrollTrigger
@@ -27,14 +27,16 @@ Abra `js/products.js`. **Cada cor é um produto** (e um slide da vitrine). O blo
 
 - `nome` + `variante` formam a linha do orçamento: `• Estojo para relógio – Azul – 50 un.`
 - `painel` é a cor do painel na vitrine, na vitrine de linha e no modal. `contorno` define a cor do número vazado (`light`, `dark` ou `orange`), e `efeito` pode ser `glow` (brilho laranja) ou `spot` (holofote).
-- `linha` (`estojos` ou `expositores`) define a seção e o filtro. `grupo` junta as cores do mesmo item ("Outras cores" no modal e o leque do hero).
+- `linha` (`estojos`, `expositores` ou `acrilicos`) define a seção e o filtro. `grupo` junta as cores do mesmo item ("Outras cores" no modal e o leque do hero).
 - `ativo: false` esconde o produto. Os produtos fictícios de utilidades continuam no arquivo, ocultos.
-- **Preços e referências são provisórios** (PLACEHOLDER): troque pelos reais.
-- O selo de % OFF é calculado a partir dos dois preços. "Ofertas do mês" mostra os 3 maiores descontos, um por produto.
+- `preco` é o preço por unidade (estojo R$ 2,50, suporte para relógio R$ 1,00, suporte para brinco R$ 2,00, caixa de acrílico R$ 1,90 com espuma / R$ 2,30 com almofada). O orçamento calcula preço × quantidade e envia o total no WhatsApp.
+- Caixas de acrílico: cada combinação de `formato` + `interior` é um produto (função `caixa()` em `js/products.js`). A vitrine de linha mostra dois seletores; trocar o formato gira a foto, trocar o interior só troca a foto e o preço.
+- As fotos originais com fundo preto ficam em `assets/originais/`. As versões em `assets/` já estão sem fundo.
+- **Referências são provisórias** (PLACEHOLDER): troque pelas reais.
 
 ## Fotos
 
-1. Salve o PNG **com fundo transparente** em `assets/`, com nome em kebab-case, sem espaços nem acentos, começando com `estojo-` ou `suporte-`.
+1. Salve o PNG **com fundo transparente** em `assets/`, com nome em kebab-case, sem espaços nem acentos, começando com `estojo-`, `suporte-` ou `caixa-`.
 2. Rode `python tools/otimizar-imagens.py` (precisa do Pillow: `pip install pillow`). O script recorta, centraliza e padroniza o tamanho e gera `-600.webp`, `-1000.webp` e `.png` em `assets/produtos/`.
 3. Use o nome-base (sem extensão) no campo `imagem`.
 
@@ -80,6 +82,6 @@ Nos dois casos, cada alteração enviada ao GitHub publica o site de novo automa
 - **Vitrine (8 slides):** no desktop, a seção fica presa e os produtos passam para o lado. O painel de cor alterna de lado e a cor muda com transição suave (camadas com opacidade). No celular (e com movimento reduzido) vira carrossel deslizável com a mesma troca de cor.
 - **Vitrine de linha:** Estojos (bolinhas de cor) e Expositores (Cristal / Preto / Brinco + miniaturas). A palavra gigante corre na horizontal ao rolar.
 - **Grade:** cards entram em cascata. Ao passar o mouse, a foto gira e aumenta e o card ganha sombra laranja.
-- **Ofertas e atacado:** títulos entram com desfoque que vira nitidez.
+- **Atacado:** título entram com desfoque que vira nitidez.
 - `js/animations.js` usa GSAP 3.12.5 + ScrollTrigger via CDN e anima só `transform`, `opacity` e `filter`. Com "reduzir movimento" ativado, o site fica estático (com o leque aberto). Se o CDN falhar, o site funciona sem animação.
 - Eventos para analytics: `injet:filter`, `injet:modal-open`, `injet:modal-change`, `injet:vitrine`, `injet:line-change`, `injet:quote-add`, `injet:quote-change`.

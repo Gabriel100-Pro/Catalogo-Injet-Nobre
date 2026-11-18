@@ -2,7 +2,7 @@
    INJET NOBRE – ORÇAMENTO DE ATACADO
    Lista salva no localStorage do visitante. Cada cor é um produto (ref).
    Ao finalizar, monta uma mensagem com os itens e abre o WhatsApp:
-   "• Estojo para relógio – Azul – 50 un."
+   "• Estojo para relógio – Azul – 50 un. × R$ 2,50 = R$ 125,00" + total geral
    Eventos: injet:quote-add { ref, qty }, injet:quote-change { count }
    ========================================================================== */
 
@@ -88,6 +88,7 @@
   const filled = $("#quote-filled");
   const totalItems = $("#quote-total-items");
   const totalUnits = $("#quote-total-units");
+  const totalValue = $("#quote-total-value");
   const clearBtn = $("#quote-clear");
   const form = $("#quote-form");
   const note = $("#quote-note");
@@ -101,6 +102,11 @@
     setTimeout(() => (status.textContent = text), 50);
   }
 
+  /** Soma de preço × quantidade de todos os itens. */
+  function grandTotal() {
+    return items.reduce((sum, i) => sum + R.lineTotal(findProduct(i.ref), i.qty), 0);
+  }
+
   function itemHTML(item) {
     const p = findProduct(item.ref);
     const name = R.esc(R.fullName(p));
@@ -111,6 +117,7 @@
         <div class="quote-info">
           <p class="quote-name">${R.esc(p.nome)}</p>
           <p class="quote-ref">${p.variante ? `<span class="quote-dot" style="--dot: ${R.esc(p.cor)}" aria-hidden="true"></span>${R.esc(p.variante)} · ` : ""}Ref. ${R.esc(p.ref)}</p>
+          <p class="quote-price">${R.formatPrice(p.preco)} / un. · <strong>${R.formatPrice(R.lineTotal(p, item.qty))}</strong></p>
         </div>
         <div class="qty" role="group" aria-label="Quantidade de ${name}">
           <button type="button" data-qty-step="-1" aria-label="Diminuir quantidade de ${name}" ${item.qty <= 1 ? "disabled" : ""}>−</button>
@@ -143,6 +150,7 @@
     fab.setAttribute("aria-label", `Abrir orçamento (${count} ${count === 1 ? "item" : "itens"})`);
     totalItems.textContent = count;
     totalUnits.textContent = units.toLocaleString("pt-BR");
+    if (totalValue) totalValue.textContent = R.formatPrice(grandTotal());
     empty.hidden = count > 0;
     filled.hidden = count === 0;
     resetClear();
@@ -278,7 +286,7 @@
   function buildMessage(client) {
     const lines = items.map((i) => {
       const p = findProduct(i.ref);
-      return `• ${R.fullName(p)} – ${i.qty.toLocaleString("pt-BR")} un.`;
+      return `• ${R.fullName(p)} – ${i.qty.toLocaleString("pt-BR")} un. × ${R.formatPrice(p.preco)} = ${R.formatPrice(R.lineTotal(p, i.qty))}`;
     });
     const units = items.reduce((s, i) => s + i.qty, 0);
     return [
@@ -291,7 +299,8 @@
       "*Itens:*",
       ...lines,
       "",
-      `Total: ${items.length} ${items.length === 1 ? "item" : "itens"}, ${units.toLocaleString("pt-BR")} unidades.`
+      `${items.length} ${items.length === 1 ? "item" : "itens"}, ${units.toLocaleString("pt-BR")} ${units === 1 ? "unidade" : "unidades"}.`,
+      `*Total: ${R.formatPrice(grandTotal())}*`
     ].join("\n");
   }
 

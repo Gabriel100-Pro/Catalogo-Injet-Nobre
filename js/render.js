@@ -33,10 +33,9 @@
     return value.toFixed(2).replace(".", ",");
   }
 
-  /** Percentual de desconto inteiro, ou 0. */
-  function discount(product) {
-    if (!product.precoAntigo || product.precoAntigo <= product.preco) return 0;
-    return Math.round((1 - product.preco / product.precoAntigo) * 100);
+  /** Preço × quantidade, calculado em centavos para evitar erro de arredondamento. */
+  function lineTotal(product, qty) {
+    return (Math.round(product.preco * 100) * qty) / 100;
   }
 
   /** "Estojo para relógio – Preto" */
@@ -98,19 +97,12 @@
 
   /* ---------- Blocos reutilizáveis ---------- */
 
-  function badgeHTML(product) {
-    const pct = discount(product);
-    if (!pct) return "";
-    return `<span class="badge" data-pop aria-label="${pct}% de desconto"><span aria-hidden="true">${pct}%<small>OFF</small></span></span>`;
-  }
-
-  /** Área da imagem: quadro tracejado sobre bloco de listras diagonais + selo. */
+  /** Área da imagem: quadro tracejado sobre bloco de listras diagonais. */
   function mediaHTML(product, { extraClass = "", eager = false, sizes, inner } = {}) {
     return `
       <div class="media ${extraClass}">
         <span class="media-stripes" aria-hidden="true"></span>
         <div class="media-frame" data-art>${inner || artHTML(product, { eager, sizes: sizes || "(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw" })}</div>
-        ${badgeHTML(product)}
       </div>`;
   }
 
@@ -127,13 +119,10 @@
   }
 
   function priceHTML(product) {
-    const old = product.precoAntigo
-      ? `<p class="price-old"><span class="sr-only">Preço anterior: </span>de <s>${formatPrice(product.precoAntigo)}</s> por</p>`
-      : `<p class="price-old">por apenas</p>`;
     return `
       <div class="price">
-        ${old}
-        <p class="price-circle" data-pop><span class="sr-only">Preço atual: </span><small aria-hidden="true">R$</small><span class="sr-only">R$ </span>${formatNumber(product.preco)}</p>
+        <p class="price-circle" data-pop><span class="sr-only">Preço: </span><small aria-hidden="true">R$</small><span class="sr-only">R$ </span>${formatNumber(product.preco)}</p>
+        <p class="price-unit">por unidade</p>
       </div>`;
   }
 
@@ -205,7 +194,15 @@
   function heroHTML(product) {
     const back = siblings(product).filter((p) => p !== product && hasPhoto(p));
     const sizes = "(min-width: 960px) 32vw, 70vw";
-    const slots = [-2, -1, 1, 2, -3, 3];
+    // Posições do leque distribuídas pela quantidade de cores (lado esquerdo
+    // recebe a sobra): 4 cores = -2, -1, 1, 2; 5 cores = -2, -1.45, -0.9, 1, 2...
+    const left = Math.ceil(back.length / 2);
+    const right = back.length - left;
+    const spread = (count, i) => (count < 2 ? 1.5 : 2 - (i * (2 - 0.9)) / (count - 1));
+    const slots = [
+      ...Array.from({ length: left }, (_, i) => -spread(left, i)),
+      ...Array.from({ length: right }, (_, i) => spread(right, right - 1 - i))
+    ].map((n) => Math.round(n * 100) / 100);
     const fan = `
       <div class="fan" id="hero-fan">
         ${back.map((p, i) => `
@@ -219,8 +216,7 @@
         <p class="card-meta">${esc(product.numero)} · Ref. ${esc(product.ref)} · Destaque</p>
         <h2 class="hero-feature-title">${titleHTML(product)}</h2>
         <p class="hero-feature-desc">${esc(product.descricao)}</p>
-        ${product.precoAntigo ? `<p class="price-old"><span class="sr-only">Preço anterior: </span><s>${formatPrice(product.precoAntigo)}</s></p>` : ""}
-        <p class="hero-price"><span class="sr-only">Preço atual: </span>${formatPrice(product.preco)}</p>
+        <p class="hero-price"><span class="sr-only">Preço: </span>${formatPrice(product.preco)} <span class="hero-price-unit">por unidade</span></p>
         <div class="hero-feature-actions">
           ${whatsButton(product)}
           ${detailsButton(product)}
@@ -244,7 +240,6 @@
           <span class="slide-number outline-text" aria-hidden="true">${esc(product.numero)}</span>
           <span class="dots-pattern" data-float aria-hidden="true"></span>
           <div class="slide-art" data-art>${artHTML(product, { sizes: "(min-width: 960px) 34vw, 70vw" })}</div>
-          ${badgeHTML(product)}
         </div>
         <div class="slide-info">
           <p class="card-meta">${esc(product.rotuloLinha || "")} · Ref. ${esc(product.ref)}</p>
@@ -293,6 +288,28 @@
       </fieldset>`;
   }
 
+  /** Valores únicos de um campo, na ordem do cadastro ("Redonda", "Quadrangular"). */
+  const uniqueValues = (list, key) => [...new Set(list.map((p) => p[key]).filter(Boolean))];
+
+  /**
+   * Dois seletores segmentados (caixas de acrílico): formato + interior.
+   * Cada combinação é um produto; main.js acha o produto pelos dois valores.
+   */
+  const OPTION_LABELS = { formato: "Formato", interior: "Interior" };
+  function optionsHTML(list, line, current) {
+    return Object.keys(OPTION_LABELS).map((key) => `
+      <fieldset class="segmented" data-line-picker="${esc(line)}" data-option="${key}">
+        <legend class="picker-legend">${OPTION_LABELS[key]}</legend>
+        <div class="segmented-list">
+          ${uniqueValues(list, key).map((v) => `
+            <label class="segment">
+              <input type="radio" name="linha-${esc(line)}-${key}" value="${esc(v)}" ${current[key] === v ? "checked" : ""}>
+              <span>${esc(v)}</span>
+            </label>`).join("")}
+        </div>
+      </fieldset>`).join("");
+  }
+
   /** Miniaturas embaixo do produto (expositores). */
   function lineThumbsHTML(list, line, current) {
     return `
@@ -322,7 +339,9 @@
       <div class="swap-item${p === current ? " is-active" : ""}" data-swap-ref="${esc(p.ref)}" ${p === current ? "" : 'aria-hidden="true"'}>
         ${artHTML(p, { sizes: "(min-width: 960px) 48vw, 86vw" })}
       </div>`).join("");
-    const pickerHTML = picker === "segmented" ? segmentedHTML(list, line, current) : swatchesHTML(list, line, current);
+    const pickerHTML = picker === "segmented" ? segmentedHTML(list, line, current)
+      : picker === "options" ? optionsHTML(list, line, current)
+      : swatchesHTML(list, line, current);
     return `
       <div class="spotlight spotlight--${esc(line)}" data-spotlight-root="${esc(line)}" ${panelAttrs(current)}>
         <div class="spot-layers">${layers}</div>
@@ -330,7 +349,7 @@
         <span class="dots-pattern dots-pattern--spot-a" data-float aria-hidden="true"></span>
         <span class="dots-pattern dots-pattern--spot-b" data-float aria-hidden="true"></span>
         <div class="spotlight-stage">
-          <div class="spotlight-art swap">${arts}</div>
+          <div class="spotlight-art swap" data-swap>${arts}</div>
           ${picker === "segmented" ? lineThumbsHTML(list, line, current) : ""}
         </div>
         <div class="spotlight-info">
@@ -345,7 +364,16 @@
   /** Conteúdo do modal (foto com zoom, outras cores e navegação). */
   function modalHTML(product, index, total) {
     const others = siblings(product);
-    const colors = others.length > 1
+    const versions = product.formato && others.length > 1
+      ? `<div class="modal-colors">
+          <p class="picker-legend">Outras versões</p>
+          <div class="chips">
+            ${others.map((p) => `
+              <button type="button" class="chip" data-modal-goto="${esc(p.ref)}" aria-pressed="${p === product}">${esc(p.legenda || p.variante)}</button>`).join("")}
+          </div>
+        </div>`
+      : "";
+    const colors = versions || (others.length > 1
       ? `<div class="modal-colors">
           <p class="picker-legend">Outras cores</p>
           <div class="swatches-list">
@@ -356,7 +384,7 @@
               </button>`).join("")}
           </div>
         </div>`
-      : "";
+      : "");
 
     return `
       <div class="showcase" ${panelAttrs(product)}>
@@ -368,7 +396,6 @@
               <div class="stage-item is-active">${artHTML(product, { eager: true, sizes: "(min-width: 760px) 460px, 90vw" })}</div>
             </div>
           </div>
-          ${badgeHTML(product)}
           ${hasPhoto(product) ? '<p class="stage-hint" aria-hidden="true">Passe o mouse para ampliar</p>' : ""}
         </div>
       </div>
@@ -423,18 +450,6 @@
       </li>`;
   }
 
-  /** Item da faixa de ofertas. */
-  function offerItemHTML(product) {
-    return `
-      <li>
-        <button type="button" class="offer-item" data-open-product="${esc(product.ref)}" aria-haspopup="dialog">
-          <span class="offer-pct">-${discount(product)}%</span>
-          <span class="offer-name">${esc(product.nome)}</span>
-          <span class="offer-price"><s>${formatPrice(product.precoAntigo)}</s> ${formatPrice(product.preco)}</span>
-        </button>
-      </li>`;
-  }
-
   window.InjetRender = {
     esc,
     pad,
@@ -444,7 +459,7 @@
     fullName,
     hasPhoto,
     formatPrice,
-    discount,
+    lineTotal,
     whatsappLink,
     productWhatsapp,
     pictureHTML,
@@ -455,7 +470,6 @@
     spotlightHTML,
     lineCardHTML,
     modalHTML,
-    offerItemHTML,
     statHTML,
     factoryPhotoHTML
   };

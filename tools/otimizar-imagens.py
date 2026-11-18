@@ -17,7 +17,7 @@ SRC = os.path.join(ROOT, "assets")
 OUT = os.path.join(SRC, "produtos")
 CANVAS = 1000
 FILL = 0.88
-PREFIXES = ("estojo-", "suporte-")
+PREFIXES = ("estojo-", "suporte-", "caixa-")
 
 os.makedirs(OUT, exist_ok=True)
 

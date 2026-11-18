@@ -70,11 +70,21 @@
       });
     });
 
-    function select(line, ref) {
+    /**
+     * swap: "rotate" (padrão) = a nova foto entra girando;
+     *       "fade" = só troca a foto (interior da caixa de acrílico).
+     */
+    function select(line, ref, swap = "rotate") {
       const root = $(`[data-spotlight-root="${line}"]`);
       const product = R.findProduct(ref);
       if (!root || !product) return;
       const list = products.filter((p) => p.linha === line);
+
+      const swapEl = $("[data-swap]", root);
+      if (swapEl && swapEl.dataset.swap !== swap) {
+        swapEl.dataset.swap = swap;
+        void swapEl.offsetWidth; // aplica o novo ponto de partida antes da troca
+      }
 
       let activeItem = null;
       $$("[data-swap-ref]", root).forEach((item) => {
@@ -88,6 +98,9 @@
       setPanel(root, product);
 
       $$(`input[name="linha-${line}"]`, root).forEach((r) => (r.checked = r.value === ref));
+      $$("[data-option]", root).forEach((group) => {
+        $$("input", group).forEach((r) => (r.checked = r.value === product[group.dataset.option]));
+      });
       $$("[data-line-thumb]", root).forEach((t) => t.setAttribute("aria-pressed", String(t.value === ref)));
       const legend = $("[data-line-variant]", root);
       if (legend) legend.textContent = product.variante;
@@ -98,7 +111,22 @@
 
     document.addEventListener("change", (e) => {
       const picker = e.target.closest("[data-line-picker]");
-      if (picker && e.target.type === "radio") select(picker.dataset.linePicker, e.target.value);
+      if (!picker || e.target.type !== "radio") return;
+      const line = picker.dataset.linePicker;
+      if (!picker.dataset.option) return select(line, e.target.value);
+
+      // Formato + interior: acha o produto com os dois valores marcados
+      const root = picker.closest("[data-spotlight-root]");
+      const chosen = {};
+      $$("[data-option]", root).forEach((g) => {
+        const checked = $("input:checked", g);
+        if (checked) chosen[g.dataset.option] = checked.value;
+      });
+      const list = products.filter((p) => p.linha === line);
+      const match = list.find((p) => Object.keys(chosen).every((k) => p[k] === chosen[k]))
+        // combinação sem cadastro: usa a mais próxima (mesmo valor do seletor que mudou)
+        || list.find((p) => p[picker.dataset.option] === e.target.value);
+      if (match) select(line, match.ref, picker.dataset.option === "formato" ? "rotate" : "fade");
     });
     document.addEventListener("click", (e) => {
       const thumb = e.target.closest("[data-line-thumb]");
@@ -111,27 +139,6 @@
     const el = $("#hero-feature");
     const featured = products.find((p) => p.destaque) || products[0];
     if (el && featured) el.innerHTML = R.heroHTML(featured);
-  }
-
-  /* ---------- Ofertas do mês: 3 maiores descontos (um por produto, não por cor) ---------- */
-  function initOffers() {
-    const list = $("#ofertas-lista");
-    if (!list) return;
-    const seen = new Set();
-    const top = products
-      .filter((p) => R.discount(p) > 0)
-      .sort((a, b) => R.discount(b) - R.discount(a))
-      .filter((p) => {
-        const key = p.grupo || p.ref;
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      })
-      .slice(0, 3);
-    list.innerHTML = top.map(R.offerItemHTML).join("");
-    const max = $("#ofertas-max");
-    if (max && top[0]) max.textContent = `${R.discount(top[0])}%`;
-    if (!top.length) $("#ofertas").hidden = true;
   }
 
   /* ---------- Monte seu kit vitrine ---------- */
@@ -278,7 +285,7 @@
     });
 
     // Links do menu para uma linha específica resetam o filtro
-    $$('a[href="#linha-estojos"], a[href="#linha-expositores"]').forEach((a) => {
+    $$('a[href^="#linha-"]').forEach((a) => {
       a.addEventListener("click", () => {
         const target = $(a.getAttribute("href"));
         if (target && target.hidden) $('.filter-btn[data-filter="todos"]').click();
@@ -429,7 +436,6 @@
     initVitrine();
     initSpotlights();
     initGrids();
-    initOffers();
     initKit();
     initFactory();
     hydrateImages();
