@@ -27,8 +27,29 @@
        Rede de segurança: reaparece sozinho em 2,5 s se o GSAP não carregar. -->
   <script>
     if (window.matchMedia && matchMedia("(prefers-reduced-motion: no-preference)").matches) {
-      document.documentElement.classList.add("motion-pending");
-      setTimeout(function () { document.documentElement.classList.remove("motion-pending"); }, 2500);
+      var root = document.documentElement;
+      root.classList.add("motion-pending");
+      setTimeout(function () { root.classList.remove("motion-pending"); }, 2500);
+      // Abertura (estojo): só na primeira visita da sessão e sem movimento reduzido.
+      // Rede de segurança: some sozinha se o JS não assumir a tempo.
+      var seen = "1";
+      try { seen = sessionStorage.getItem("injet-intro-v1"); } catch (e) {}
+      if (!seen) {
+        root.classList.add("intro-pending");
+        window.__introSafety = setTimeout(function () { root.classList.remove("intro-pending"); }, 3500);
+      }
+    }
+  </script>
+  <style>html.intro-pending { background: #FF6A13; overflow: hidden; }</style>
+
+  <!-- Three.js (versão fixa) para a seção "Experimente em 3D".
+       Só é baixado quando a seção chega perto da tela (js/try3d.js). -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
     }
   </script>
 
@@ -48,6 +69,57 @@
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+  <!-- ============ ABERTURA (primeira visita; ver js/experience.js) ============ -->
+  <div class="intro" id="intro">
+    <span class="intro-panel intro-panel--l" aria-hidden="true"></span>
+    <span class="intro-panel intro-panel--r" aria-hidden="true"></span>
+    <div class="intro-stage">
+      <div class="ibox" aria-hidden="true">
+          <!-- Fundo: sombra + interior com almofada -->
+          <svg class="ibox-layer ibox-back" viewBox="0 0 340 240" focusable="false">
+            <defs>
+              <radialGradient id="ibox-cushion" cx="45%" cy="40%" r="70%">
+                <stop offset="0" stop-color="#2a2a2a"/><stop offset="1" stop-color="#0b0b0b"/>
+              </radialGradient>
+            </defs>
+            <ellipse class="ibox-shadow" cx="172" cy="226" rx="150" ry="11" fill="rgba(17,17,17,.28)"/>
+            <polygon points="40,130 240,130 300,90 100,90" fill="#050505"/>
+            <polygon points="100,90 300,90 292,96 106,96" fill="#141414"/>
+            <path d="M62 126 C 70 112, 92 100, 116 99 L 268 99 C 282 100, 286 106, 278 112 C 264 122, 246 127, 226 127 L 74 129 C 64 129, 60 128, 62 126 Z" fill="url(#ibox-cushion)"/>
+          </svg>
+          <!-- Frente e lateral da caixa -->
+          <svg class="ibox-layer ibox-front" viewBox="0 0 340 240" focusable="false">
+            <defs>
+              <linearGradient id="ibox-front-g" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#232323"/><stop offset="1" stop-color="#141414"/>
+              </linearGradient>
+            </defs>
+            <polygon points="40,130 240,130 240,220 40,220" fill="url(#ibox-front-g)"/>
+            <polygon points="240,130 300,90 300,180 240,220" fill="#0b0b0b"/>
+            <polyline points="40,130 240,130 300,90" fill="none" stroke="#3b3b3b" stroke-width="1.5"/>
+            <line x1="240" y1="130" x2="240" y2="220" stroke="#2c2c2c" stroke-width="1"/>
+          </svg>
+          <!-- Tampa -->
+          <svg class="ibox-layer ibox-lid" viewBox="0 0 340 240" focusable="false">
+            <defs>
+              <linearGradient id="ibox-lid-g" x1="0" y1="1" x2="1" y2="0">
+                <stop offset="0" stop-color="#2b2b2b"/><stop offset="1" stop-color="#1d1d1d"/>
+              </linearGradient>
+            </defs>
+            <polygon points="32,118 248,118 310,76 94,76" fill="url(#ibox-lid-g)"/>
+            <polygon points="32,118 248,118 248,146 32,146" fill="#1a1a1a"/>
+            <polygon points="248,118 310,76 310,104 248,146" fill="#0c0c0c"/>
+            <polyline points="32,118 248,118 310,76" fill="none" stroke="#424242" stroke-width="1.5"/>
+          </svg>
+          <!-- Logo que sobe de dentro da caixa: o recorte esconde tudo abaixo da borda -->
+          <div class="ibox-logo-clip">
+            <div class="ibox-logo"><span class="logo-mark">IN</span><span class="ibox-name">Injet<br>Nobre</span></div>
+          </div>
+        </div>
+    </div>
+    <button type="button" class="intro-skip" id="intro-skip">Pular <span aria-hidden="true">→</span></button>
+  </div>
+
   <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
 
   <!-- ============ HEADER ============ -->
@@ -64,6 +136,7 @@
 
       <nav class="site-nav" id="menu-principal" aria-label="Menu principal">
         <ul>
+          <li><a href="#experimente-3d">Em 3D</a></li>
           <li><a href="#vitrine">Vitrine</a></li>
           <li><a href="#linha-estojos">Estojos</a></li>
           <li><a href="#linha-expositores">Expositores</a></li>
@@ -109,6 +182,77 @@
         <!-- Produto em destaque: preenchido via JS (produto com "destaque: true").
              As outras cores do mesmo grupo ficam atrás e abrem em leque. -->
         <article class="hero-feature" id="hero-feature" aria-label="Produto em destaque"></article>
+      </div>
+    </section>
+
+    <!-- ============ EXPERIMENTE EM 3D (js/try3d.js + js/try3d-scene.js) ============ -->
+    <section class="try3d" id="experimente-3d" aria-labelledby="try3d-titulo" data-tone="light">
+      <div class="try3d-bg" data-try3d-bg aria-hidden="true"></div>
+      <div class="try3d-grid">
+        <div class="try3d-stage" data-try3d-stage data-cursor="girar"
+             role="group" aria-roledescription="visualizador 3D"
+             aria-label="Produto em 3D. Arraste ou use as setas para girar; clique, toque, Enter ou espaço para abrir e fechar a tampa.">
+          <span class="try3d-word" data-try3d-word aria-hidden="true">Estojo</span>
+          <div class="try3d-photo" data-try3d-photo></div>
+          <p class="try3d-hint" data-try3d-hint aria-hidden="true">Arraste para girar · toque para abrir</p>
+        </div>
+
+        <div class="try3d-panel">
+          <p class="eyebrow">Experimente em 3D</p>
+          <h2 id="try3d-titulo" class="try3d-title" data-try3d-title>Estojo para relógio</h2>
+          <p class="try3d-desc" data-try3d-desc>Tampa encaixada e almofada macia. Gire, abra a tampa e escolha a cor.</p>
+
+          <div class="try3d-price-row">
+            <p class="price-circle try3d-price" aria-live="polite"><span class="sr-only">Preço: R$ </span><small aria-hidden="true">R$</small><span data-try3d-price>2,50</span><small aria-hidden="true">por un.</small></p>
+            <p class="try3d-variant" data-try3d-variant>Preto</p>
+          </div>
+
+          <fieldset class="segmented">
+            <legend class="picker-legend">Produto</legend>
+            <div class="segmented-list">
+              <label class="segment"><input type="radio" name="try3d-prod" value="estojo" checked><span>Estojo clássico</span></label>
+              <label class="segment"><input type="radio" name="try3d-prod" value="acrilico"><span>Caixa de acrílico</span></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="swatches" data-try3d-group="estojo">
+            <legend class="picker-legend">Cor: <strong data-try3d-cor>Preto</strong></legend>
+            <div class="swatches-list" data-try3d-swatches></div>
+          </fieldset>
+
+          <div class="try3d-options" data-try3d-group="acrilico" hidden>
+            <fieldset class="segmented">
+              <legend class="picker-legend">Formato</legend>
+              <div class="segmented-list">
+                <label class="segment"><input type="radio" name="try3d-forma" value="quad" checked><span>Quadrangular</span></label>
+                <label class="segment"><input type="radio" name="try3d-forma" value="red"><span>Redonda</span></label>
+              </div>
+            </fieldset>
+            <fieldset class="segmented">
+              <legend class="picker-legend">Interior</legend>
+              <div class="segmented-list">
+                <label class="segment"><input type="radio" name="try3d-int" value="espuma"><span>Espuma</span></label>
+                <label class="segment"><input type="radio" name="try3d-int" value="almofada" checked><span>Almofada</span></label>
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="try3d-actions">
+            <div class="buy" data-buy>
+              <div class="qty" role="group" aria-label="Quantidade de Estojo para relógio – Preto">
+                <button type="button" data-buy-step="-1" aria-label="Diminuir quantidade de Estojo para relógio – Preto">−</button>
+                <input type="number" min="1" max="9999" step="1" inputmode="numeric" value="1" aria-label="Quantidade de Estojo para relógio – Preto" data-buy-qty>
+                <button type="button" data-buy-step="1" aria-label="Aumentar quantidade de Estojo para relógio – Preto">+</button>
+              </div>
+              <button type="button" class="btn btn--quote" data-try3d-add data-quote-add="IN-E01">
+                <span class="btn-quote-plus" aria-hidden="true">+</span>
+                <span data-quote-label>Adicionar ao orçamento</span>
+                <span class="sr-only"> – Estojo para relógio – Preto</span>
+              </button>
+            </div>
+            <button type="button" class="btn btn--outline try3d-lid" data-try3d-lid>Fechar tampa</button>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -407,11 +551,15 @@
   <script src="js/render.js"></script>
   <script src="js/main.js"></script>
   <script src="js/quote.js"></script>
+  <script src="js/try3d.js"></script>
 
   <!-- Animações por último, sem bloquear a página (defer).
        Se o CDN falhar, o site funciona estático. -->
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <!-- Experiência (abertura, cursor, confete, agradecimento) antes das animações:
+       o hero espera a abertura terminar -->
+  <script defer src="js/experience.js"></script>
   <script defer src="js/animations.js"></script>
 </body>
 </html>

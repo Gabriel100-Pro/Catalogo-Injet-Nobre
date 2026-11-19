@@ -3,7 +3,8 @@
    Lista salva no localStorage do visitante. Cada cor é um produto (ref).
    Ao finalizar, monta uma mensagem com os itens e abre o WhatsApp:
    "• Estojo para relógio – Azul – 50 un. × R$ 2,50 = R$ 125,00" + total geral
-   Eventos: injet:quote-add { ref, qty }, injet:quote-change { count }
+   Eventos: injet:quote-add { ref, qty }, injet:quote-change { count },
+   injet:quote-sent { client } (mensagem aberta no WhatsApp)
    ========================================================================== */
 
 (function () {
@@ -325,6 +326,7 @@
     window.open(url, "_blank", "noopener");
     note.textContent = "Abrimos o WhatsApp com a mensagem pronta. Depois de enviar, você pode limpar a lista.";
     announce("Mensagem do orçamento aberta no WhatsApp.");
+    emit("injet:quote-sent", { client });
   });
 
   window.InjetQuote = { add, remove, setQty, clear, open, close, items: () => items.slice(), buildMessage };

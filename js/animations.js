@@ -50,6 +50,13 @@
       .from(".hero-feature [data-pop]", { scale: 0, duration: 0.45, ease: POP }, "-=0.5")
       .from(".hero-feature-body > *", { x: 48, opacity: 0, stagger: 0.06, duration: 0.6 }, 0.55);
 
+    // Com a abertura do estojo na tela, o hero espera a tela se abrir (experience.js)
+    const intro = window.InjetIntro;
+    if (intro && intro.pending) {
+      tl.pause();
+      intro.onReveal(() => tl.play());
+    }
+
     // Ao rolar, o leque volta a fechar atrás do estojo preto
     gsap.fromTo("#hero-fan", { "--fan-out": 1 }, {
       "--fan-out": 0,
@@ -208,7 +215,8 @@
       { trigger: "#kit", items: ".kit-text > *" },
       { trigger: "#atacado", items: ".wholesale-grid > div:first-child > :not(.wholesale-title)", opposite: ".wholesale-side > *" },
       { trigger: "#sobre", items: ".about-text > *", opposite: ".about-stats > li" },
-      { trigger: "#contato", items: ".footer-brand > *, .footer-contact > *", opposite: ".footer-map, .footer-qr" }
+      { trigger: "#contato", items: ".footer-brand > *, .footer-contact > *", opposite: ".footer-map, .footer-qr" },
+      { trigger: "#experimente-3d", items: ".try3d-panel > *" }
     ];
 
     groups.forEach((g, i) => {
@@ -308,13 +316,8 @@
     });
   }
 
-  /* ---------- Orçamento: ícone pula ao adicionar, painel desliza ---------- */
-  function onQuoteAdd() {
-    if (!allowMotion()) return;
-    gsap.fromTo("#quote-fab", { scale: 0.8 }, { scale: 1, duration: 0.5, ease: POP, clearProps: "transform" });
-    gsap.fromTo("#quote-count", { scale: 0 }, { scale: 1, duration: 0.45, ease: POP, delay: 0.1, clearProps: "transform" });
-  }
-
+  /* ---------- Orçamento: painel desliza ----------
+     (pulo do contador, confete e aviso ao adicionar ficam em experience.js) */
   function onQuoteOpen(e) {
     if (!allowMotion()) return;
     const inner = $(".drawer-inner", e.detail.drawer);
@@ -367,7 +370,6 @@
     document.addEventListener("injet:modal-open", (e) => onModal(e, false));
     document.addEventListener("injet:modal-change", (e) => onModal(e, true));
     document.addEventListener("injet:line-change", onLineChange);
-    document.addEventListener("injet:quote-add", onQuoteAdd);
     document.addEventListener("injet:quote-open", onQuoteOpen);
     document.addEventListener("injet:filter", () => ScrollTrigger.refresh());
 

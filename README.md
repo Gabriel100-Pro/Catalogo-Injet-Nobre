@@ -12,6 +12,9 @@ js/render.js              Templates HTML (card, hero, vitrine, vitrine de linha,
 js/main.js                Comportamento (menu, filtro, vitrine/carrossel, seletores, modal, kit)
 js/quote.js               Orçamento de atacado (cor + quantidade → WhatsApp)
 js/animations.js          Animações com GSAP + ScrollTrigger
+js/experience.js          Abertura do estojo, cursor, confete, aviso e agradecimento
+js/try3d.js               "Experimente em 3D": interface, orçamento e carregamento sob demanda
+js/try3d-scene.js         Cena 3D (módulo ES com Three.js r160)
 tools/otimizar-imagens.py Gera as fotos otimizadas (WebP + PNG) em assets/produtos/
 assets/*.png              Fotos originais dos produtos (fundo transparente)
 ```
@@ -84,4 +87,6 @@ Nos dois casos, cada alteração enviada ao GitHub publica o site de novo automa
 - **Grade:** cards entram em cascata. Ao passar o mouse, a foto gira e aumenta e o card ganha sombra laranja.
 - **Atacado:** título entram com desfoque que vira nitidez.
 - `js/animations.js` usa GSAP 3.12.5 + ScrollTrigger via CDN e anima só `transform`, `opacity` e `filter`. Com "reduzir movimento" ativado, o site fica estático (com o leque aberto). Se o CDN falhar, o site funciona sem animação.
+- `js/experience.js`: abertura com o estojo (só na primeira visita da sessão, chave `injet-intro-v1` no sessionStorage, máx. 2,5 s, botão "Pular" ou Esc), cursor próprio e botões magnéticos (só mouse), chuva de quadradinhos + aviso ao adicionar ao orçamento (vibração curta no celular) e tela de agradecimento ao enviar pelo WhatsApp. Com "reduzir movimento": sem abertura, cursor, magnetismo nem confete.
+- `js/try3d.js` + `js/try3d-scene.js`: seção "Experimente em 3D" (logo após o hero). O Three.js 0.160.0 vem do mapa de imports no `<head>` e só é baixado quando a seção chega perto da tela, depois da abertura e do carregamento da página. Produtos, refs e preços vêm de `js/products.js`, e o botão usa o mesmo `[data-quote-add]` do catálogo. Sem WebGL, aparece a foto real. No celular: sem sombra projetada, resolução limitada a 1,5× e redução automática se os quadros ficarem lentos; a cena só é desenhada com a seção visível. O protótipo original fica em `prototipos/` (fora do git e do site).
 - Eventos para analytics: `injet:filter`, `injet:modal-open`, `injet:modal-change`, `injet:vitrine`, `injet:line-change`, `injet:quote-add`, `injet:quote-change`.

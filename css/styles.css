@@ -1843,3 +1843,350 @@ body.is-drawer-open { overflow: hidden; }
     animation-iteration-count: 1 !important;
   }
 }
+
+/* 10. EXPERIÊNCIA (js/experience.js) -------------------------------------- */
+
+/* Abertura: só existe na tela com html.intro-pending (ver <head>) */
+.intro { display: none; }
+.intro-pending .intro {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+}
+.intro-panel {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 50.5%;
+  background: var(--orange);
+}
+.intro-panel--l { left: 0; }
+.intro-panel--r { right: 0; }
+.intro-stage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+.intro-skip {
+  position: absolute;
+  right: var(--gutter);
+  bottom: max(16px, env(safe-area-inset-bottom));
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 2px solid var(--black);
+  background: transparent;
+  color: var(--black);
+  font-family: var(--font-title);
+  font-size: .95rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.intro-skip:hover, .intro-skip:focus-visible { background: var(--black); color: var(--orange); }
+
+/* Estojo em SVG (mesmas camadas na abertura e no agradecimento).
+   --u = 1 unidade do desenho (viewBox 340 × 240) */
+.ibox {
+  --w: min(72vw, 340px);
+  --u: calc(var(--w) / 340);
+  position: relative;
+  width: var(--w);
+  aspect-ratio: 340 / 240;
+}
+.ibox-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.ibox-back { z-index: 0; }
+.ibox-front { z-index: 1; }
+.ibox-lid { z-index: 2; }
+/* Recorte reto na borda da caixa (y = 130): a logo só aparece ao sair dela */
+.ibox-logo-clip {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  clip-path: inset(-200% -60% 45.84% -60%);
+}
+.ibox-logo {
+  position: absolute;
+  left: calc(var(--u) * 50);
+  top: calc(var(--u) * 150);
+  width: calc(var(--u) * 180);
+  height: calc(var(--u) * 52);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--u) * 10);
+}
+.ibox-logo .logo-mark {
+  width: calc(var(--u) * 50);
+  height: calc(var(--u) * 50);
+  border-radius: calc(var(--u) * 10);
+  background: var(--black);
+  color: var(--orange);
+  font-size: calc(var(--u) * 24);
+}
+.ibox-name {
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: calc(var(--u) * 19);
+  line-height: 1;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--black);
+}
+
+/* Cursor próprio (só mouse; criado pelo JS) */
+.cursor {
+  position: fixed;
+  top: 0; left: 0;
+  z-index: 2000;
+  pointer-events: none;
+  opacity: 0;
+}
+.cursor-dot,
+.cursor-ring { position: absolute; display: block; }
+.cursor-dot {
+  width: 12px; height: 12px;
+  margin: -6px 0 0 -6px;
+  background: var(--orange);
+  box-shadow: 0 0 0 1.5px var(--black);
+}
+.cursor-ring {
+  width: 76px; height: 76px;
+  margin: -38px 0 0 -38px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--black);
+  border-radius: 50%;
+  background: var(--orange);
+  color: var(--black);
+  font-family: var(--font-title);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+/* Esconde a seta do sistema (menos em campos de texto). Com modal/painel
+   abertos (camada superior do navegador) volta a seta normal. */
+html.has-cursor body:not(.is-modal-open):not(.is-drawer-open),
+html.has-cursor body:not(.is-modal-open):not(.is-drawer-open) * { cursor: none; }
+html.has-cursor body:not(.is-modal-open):not(.is-drawer-open) :is(input, textarea, select) { cursor: text; }
+.is-modal-open .cursor,
+.is-drawer-open .cursor { visibility: hidden; }
+
+/* Chuva de quadradinhos */
+.confetti {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  overflow: hidden;
+  pointer-events: none;
+}
+.confetti span { position: absolute; display: block; background: var(--orange); }
+.confetti span.is-black { background: var(--black); }
+
+/* Aviso "Adicionado: ..." (centralizado, sem cobrir o botão do orçamento) */
+.toast {
+  position: fixed;
+  left: var(--gutter);
+  right: 88px;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  z-index: 1400;
+  width: fit-content;
+  max-width: 440px;
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  background: var(--black);
+  color: var(--white);
+  box-shadow: 0 12px 28px -10px rgba(17, 17, 17, .6);
+  pointer-events: none;
+  opacity: 0;
+}
+.toast p { margin: 0; font-size: .95rem; line-height: 1.3; }
+.toast strong { color: var(--orange); font-family: var(--font-title); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.toast-mark { flex-shrink: 0; width: 10px; height: 10px; background: var(--orange); }
+
+/* Agradecimento após enviar pelo WhatsApp */
+body.is-thanks-open { overflow: hidden; }
+.thanks {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+  padding: 32px var(--gutter);
+  overflow-y: auto;
+  background: var(--orange);
+  color: var(--black);
+}
+.thanks[hidden] { display: none; }
+.thanks-dots { top: 24px; left: 24px; }
+.thanks-inner {
+  position: relative;
+  max-width: 540px;
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  text-align: center;
+}
+.thanks-stage { margin-bottom: 8px; }
+.thanks .ibox { --w: min(62vw, 280px); }
+.thanks .eyebrow { margin: 0; }
+.thanks-title {
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: clamp(3rem, 12vw, 5.5rem);
+  font-weight: 700;
+  line-height: .9;
+  text-transform: uppercase;
+}
+.thanks-text { margin: 0; max-width: 42ch; }
+.thanks-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 8px; }
+.thanks .btn--ghost-dark { background: transparent; }
+.thanks .btn--ghost-dark:hover { background: var(--black); color: var(--white); }
+
+@media (prefers-reduced-motion: reduce) {
+  .intro, .cursor, .confetti { display: none !important; }
+}
+
+/* 11. EXPERIMENTE EM 3D (js/try3d.js) -------------------------------------
+   Reaproveita .segmented, .swatch, .price-circle, .buy e .btn; aqui só entram
+   o layout e as cores do tema (--t-bg / --t-ink / --t-stroke, trocados pelo JS
+   conforme a cor escolhida). */
+.try3d {
+  --t-bg: #FF6A13;
+  --t-ink: #111111;
+  --t-stroke: rgba(255, 255, 255, .9);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: var(--t-ink);
+  background: var(--t-bg);
+}
+.try3d [hidden] { display: none !important; }
+.try3d-bg { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.try3d-bg > span { position: absolute; inset: 0; }
+
+.try3d-grid { display: grid; }
+
+/* Palco: canvas 3D ou foto real */
+.try3d-stage {
+  position: relative;
+  height: min(60vh, 480px);
+  min-height: 320px;
+  touch-action: pan-y;           /* arrastar na vertical rola a página */
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.try3d-stage.is-dragging { cursor: grabbing; }
+.try3d-stage:focus-visible { outline: 3px solid var(--t-ink); outline-offset: -8px; }
+.is-3d-fallback .try3d-stage { cursor: default; }
+.try3d-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.try3d-word {
+  position: absolute;
+  left: 50%; top: 46%;
+  z-index: 0;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-title);
+  font-size: 30vw;
+  font-weight: 700;
+  line-height: .85;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: 2px var(--t-stroke);
+  pointer-events: none;
+}
+.try3d-photo {
+  position: absolute;
+  inset: 8% 10% 14%;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  transition: opacity .45s var(--ease), visibility 0s;
+}
+.try3d-photo .pic, .try3d-photo img { width: 100%; height: 100%; object-fit: contain; }
+.try3d-photo img { filter: drop-shadow(0 18px 22px rgba(0, 0, 0, .28)); }
+.is-3d-ready .try3d-photo { opacity: 0; visibility: hidden; transition: opacity .45s var(--ease), visibility 0s .45s; }
+.try3d-hint {
+  position: absolute;
+  left: var(--gutter); right: var(--gutter); bottom: 12px;
+  z-index: 2;
+  margin: 0;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-align: center;
+  text-transform: uppercase;
+  opacity: .75;
+  pointer-events: none;
+}
+
+/* Painel */
+.try3d-panel {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  padding: 28px var(--gutter) 44px;
+}
+.try3d .eyebrow { margin: 0; }
+.try3d .eyebrow::before { background: var(--t-ink); }
+.try3d-title {
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: clamp(2.4rem, 8vw, 3.6rem);
+  font-weight: 700;
+  line-height: .95;
+  text-transform: uppercase;
+}
+.try3d-desc { max-width: 40ch; margin: 0; opacity: .85; }
+.try3d-price-row { display: flex; align-items: center; gap: 16px; }
+.try3d .price-circle { background: var(--t-ink); color: var(--t-bg); }
+.try3d-variant { margin: 0; font-size: 1.05rem; font-weight: 600; }
+.try3d-options { display: grid; gap: 14px; }
+.try3d-actions { display: grid; gap: 10px; }
+
+/* Seletores e botões no tom do fundo */
+.try3d .segmented-list { border-color: var(--t-ink); }
+.try3d .segment + .segment span { border-left-color: var(--t-ink); }
+.try3d .segment input:checked + span { background: var(--t-ink); color: var(--t-bg); }
+.try3d .segment:hover input:not(:checked) + span { background: color-mix(in srgb, var(--t-ink) 12%, transparent); }
+.try3d .segment input:focus-visible + span,
+.try3d .swatch input:focus-visible + .swatch-dot { outline-color: var(--t-ink); }
+.try3d .swatch input:checked + .swatch-dot {
+  box-shadow: inset 0 0 0 1px rgba(17, 17, 17, .3), 0 0 0 3px var(--t-bg), 0 0 0 5px var(--t-ink);
+}
+.try3d .btn--outline { border-color: var(--t-ink); color: var(--t-ink); background: transparent; }
+.try3d .btn--outline:hover { background: var(--t-ink); color: var(--t-bg); }
+
+@media (min-width: 960px) {
+  .try3d-grid { grid-template-columns: minmax(380px, 460px) 1fr; }
+  .try3d-panel {
+    order: -1;
+    align-content: center;
+    padding: 64px 40px 64px max(var(--gutter), calc((100vw - var(--container)) / 2 + var(--gutter)));
+  }
+  .try3d-stage { height: min(86vh, 720px); min-height: 560px; }
+  .try3d-word { font-size: min(20vw, 300px); }
+  .try3d-hint { bottom: 22px; }
+  .try3d-actions { grid-template-columns: 1fr; }
+}
