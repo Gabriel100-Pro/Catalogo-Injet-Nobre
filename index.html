@@ -42,8 +42,8 @@
   </script>
   <style>html.intro-pending { background: #FF6A13; overflow: hidden; }</style>
 
-  <!-- Three.js (versão fixa) para a seção "Experimente em 3D".
-       Só é baixado quando a seção chega perto da tela (js/try3d.js). -->
+  <!-- Three.js (versão fixa) para a hero 3D (js/hero3d.js). É importado
+       depois do HTML; o relógio (assets/relogio.glb) só depois que a caixa aparece. -->
   <script type="importmap">
     {
       "imports": {
@@ -136,12 +136,12 @@
 
       <nav class="site-nav" id="menu-principal" aria-label="Menu principal">
         <ul>
-          <li><a href="#experimente-3d">Em 3D</a></li>
           <li><a href="#vitrine">Vitrine</a></li>
           <li><a href="#linha-estojos">Estojos</a></li>
           <li><a href="#linha-expositores">Expositores</a></li>
           <li><a href="#linha-acrilicos">Acrílico</a></li>
           <li><a href="#kit">Kit vitrine</a></li>
+          <li><a href="#monte-sua-vitrine">Monte a vitrine</a></li>
           <li><a href="#atacado">Atacado</a></li>
           <li><a href="#sobre">Sobre</a></li>
           <li><a href="#contato">Contato</a></li>
@@ -152,108 +152,69 @@
 
   <main id="conteudo">
 
-    <!-- ============ HERO ============ -->
-    <section class="hero" aria-labelledby="hero-titulo" data-section="hero">
-      <div class="hero-grid">
-        <div class="hero-main">
-          <span class="dots-pattern dots-pattern--hero" data-float aria-hidden="true"></span>
-          <span class="dots-pattern dots-pattern--hero-b" data-float aria-hidden="true"></span>
-          <span class="dots-pattern dots-pattern--hero-c" data-float aria-hidden="true"></span>
-          <p class="eyebrow eyebrow--dark" data-hero-intro>Catálogo · Edição 2026</p>
-          <!-- Cada .line entra separadamente (animations.js) -->
-          <h1 id="hero-titulo" class="hero-title">
-            <span class="line"><span class="line-inner outline-text outline-text--light">Praticidade</span></span>
-            <span class="line"><span class="line-inner">que</span></span>
-            <!-- A tarja preta "pinta" da esquerda para a direita (animations.js) -->
-            <span class="line"><span class="line-inner"><span class="hero-title-accent"><span class="accent-paint" aria-hidden="true"></span><span class="accent-text">se encaixa</span></span></span></span>
-            <span class="line"><span class="line-inner">no seu dia.</span></span>
-          </h1>
-          <p class="hero-lead" data-hero-intro>Estojos para relógio em seis cores, caixas e expositores em acrílico para relojoarias, joalherias e vitrines.</p>
-          <div class="hero-actions" data-hero-intro>
-            <a href="#vitrine" class="btn btn--dark">Ver catálogo</a>
-            <a href="#atacado" class="btn btn--ghost-dark">Sou lojista</a>
-          </div>
-          <a class="pdf-link" data-pdf data-hero-intro href="assets/catalogo-injet-nobre.pdf" download>
-            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M11 3h2v10.2l3.6-3.6 1.4 1.4-6 6-6-6 1.4-1.4 3.6 3.6V3ZM4 19h16v2H4v-2Z"/></svg>
-            Baixar catálogo (PDF)
-          </a>
-        </div>
-
-        <!-- Produto em destaque: preenchido via JS (produto com "destaque: true").
-             As outras cores do mesmo grupo ficam atrás e abrem em leque. -->
-        <article class="hero-feature" id="hero-feature" aria-label="Produto em destaque"></article>
+    <!-- ============ HERO 3D (js/hero3d.js + js/hero3d-scene.js) ============
+         Sem WebGL (ou antes do 3D carregar) aparece a foto real do produto. -->
+    <section class="hero3d" id="inicio" aria-labelledby="hero-titulo" data-tone="light" data-section="hero">
+      <div class="hero3d-bg" data-hero-bg aria-hidden="true"></div>
+      <div class="hero3d-glow" aria-hidden="true"></div>
+      <div class="hero3d-stage" data-hero-stage data-cursor="girar"
+           role="group" aria-roledescription="visualizador 3D"
+           aria-label="Produto em 3D. Arraste para girar; clique, toque, Enter ou espaço para abrir e fechar a tampa; setas para os lados trocam a variação.">
+        <span class="hero3d-word" data-hero-word aria-hidden="true">Estojo</span>
+        <div class="hero3d-photo" data-hero-photo></div>
       </div>
-    </section>
 
-    <!-- ============ EXPERIMENTE EM 3D (js/try3d.js + js/try3d-scene.js) ============ -->
-    <section class="try3d" id="experimente-3d" aria-labelledby="try3d-titulo" data-tone="light">
-      <div class="try3d-bg" data-try3d-bg aria-hidden="true"></div>
-      <div class="try3d-grid">
-        <div class="try3d-stage" data-try3d-stage data-cursor="girar"
-             role="group" aria-roledescription="visualizador 3D"
-             aria-label="Produto em 3D. Arraste ou use as setas para girar; clique, toque, Enter ou espaço para abrir e fechar a tampa.">
-          <span class="try3d-word" data-try3d-word aria-hidden="true">Estojo</span>
-          <div class="try3d-photo" data-try3d-photo></div>
-          <p class="try3d-hint" data-try3d-hint aria-hidden="true">Arraste para girar · toque para abrir</p>
+      <div class="hero3d-top" data-hero-in>
+        <div class="hero3d-seg" role="group" aria-label="Produto">
+          <button type="button" data-hero-prod="estojo" aria-pressed="true">Estojo clássico</button>
+          <button type="button" data-hero-prod="acrilico" aria-pressed="false">Caixa de acrílico</button>
         </div>
-
-        <div class="try3d-panel">
-          <p class="eyebrow">Experimente em 3D</p>
-          <h2 id="try3d-titulo" class="try3d-title" data-try3d-title>Estojo para relógio</h2>
-          <p class="try3d-desc" data-try3d-desc>Tampa encaixada e almofada macia. Gire, abra a tampa e escolha a cor.</p>
-
-          <div class="try3d-price-row">
-            <p class="price-circle try3d-price" aria-live="polite"><span class="sr-only">Preço: R$ </span><small aria-hidden="true">R$</small><span data-try3d-price>2,50</span><small aria-hidden="true">por un.</small></p>
-            <p class="try3d-variant" data-try3d-variant>Preto</p>
-          </div>
-
-          <fieldset class="segmented">
-            <legend class="picker-legend">Produto</legend>
-            <div class="segmented-list">
-              <label class="segment"><input type="radio" name="try3d-prod" value="estojo" checked><span>Estojo clássico</span></label>
-              <label class="segment"><input type="radio" name="try3d-prod" value="acrilico"><span>Caixa de acrílico</span></label>
-            </div>
-          </fieldset>
-
-          <fieldset class="swatches" data-try3d-group="estojo">
-            <legend class="picker-legend">Cor: <strong data-try3d-cor>Preto</strong></legend>
-            <div class="swatches-list" data-try3d-swatches></div>
-          </fieldset>
-
-          <div class="try3d-options" data-try3d-group="acrilico" hidden>
-            <fieldset class="segmented">
-              <legend class="picker-legend">Formato</legend>
-              <div class="segmented-list">
-                <label class="segment"><input type="radio" name="try3d-forma" value="quad" checked><span>Quadrangular</span></label>
-                <label class="segment"><input type="radio" name="try3d-forma" value="red"><span>Redonda</span></label>
-              </div>
-            </fieldset>
-            <fieldset class="segmented">
-              <legend class="picker-legend">Interior</legend>
-              <div class="segmented-list">
-                <label class="segment"><input type="radio" name="try3d-int" value="espuma"><span>Espuma</span></label>
-                <label class="segment"><input type="radio" name="try3d-int" value="almofada" checked><span>Almofada</span></label>
-              </div>
-            </fieldset>
-          </div>
-
-          <div class="try3d-actions">
-            <div class="buy" data-buy>
-              <div class="qty" role="group" aria-label="Quantidade de Estojo para relógio – Preto">
-                <button type="button" data-buy-step="-1" aria-label="Diminuir quantidade de Estojo para relógio – Preto">−</button>
-                <input type="number" min="1" max="9999" step="1" inputmode="numeric" value="1" aria-label="Quantidade de Estojo para relógio – Preto" data-buy-qty>
-                <button type="button" data-buy-step="1" aria-label="Aumentar quantidade de Estojo para relógio – Preto">+</button>
-              </div>
-              <button type="button" class="btn btn--quote" data-try3d-add data-quote-add="IN-E01">
-                <span class="btn-quote-plus" aria-hidden="true">+</span>
-                <span data-quote-label>Adicionar ao orçamento</span>
-                <span class="sr-only"> – Estojo para relógio – Preto</span>
-              </button>
-            </div>
-            <button type="button" class="btn btn--outline try3d-lid" data-try3d-lid>Fechar tampa</button>
-          </div>
-        </div>
+        <a href="#atacado" class="hero3d-pill">Sou lojista</a>
       </div>
+      <p class="hero3d-hint" data-hero-hint aria-hidden="true">Arraste para girar · toque para abrir</p>
+
+      <button type="button" class="hero3d-arrow hero3d-arrow--prev" data-hero-step="-1" aria-label="Variação anterior"><span class="hero3d-ring" aria-hidden="true"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button type="button" class="hero3d-arrow hero3d-arrow--next" data-hero-step="1" aria-label="Próxima variação"><span class="hero3d-ring" aria-hidden="true"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7"/></svg></button>
+
+      <div class="hero3d-info" data-hero-in>
+        <div class="hero3d-info-row">
+          <p class="hero3d-price"><span class="sr-only">Preço: R$ </span><small aria-hidden="true">R$</small><span data-hero-price>2,50</span><small aria-hidden="true">por unidade</small></p>
+          <div class="hero3d-heading">
+            <p class="hero3d-tag" data-hero-tag>Linha relojoaria</p>
+            <h1 id="hero-titulo" class="hero3d-title" data-hero-title>Estojo para relógio</h1>
+          </div>
+        </div>
+        <a class="hero3d-pdf" data-pdf href="assets/catalogo-injet-nobre.pdf" download>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M11 3h2v10.2l3.6-3.6 1.4 1.4-6 6-6-6 1.4-1.4 3.6 3.6V3ZM4 19h16v2H4v-2Z"/></svg>
+          <span class="hero3d-long">Baixar </span>catálogo (PDF)
+        </a>
+      </div>
+
+      <div class="hero3d-actions" data-hero-in>
+        <button type="button" class="hero3d-btn" data-hero-lid>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M3 10h18v10H3zM2 6l10-3 10 3v4H2z"/></svg>
+          <span>Fechar<span class="hero3d-long"> tampa</span></span>
+        </button>
+        <button type="button" class="hero3d-btn" data-hero-watch disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="6"/><path d="M9 6l1-4h4l1 4M9 18l1 4h4l1-4M12 9v3l2 1"/></svg>
+          <span>Tirar<span class="hero3d-long"> relógio</span></span>
+        </button>
+        <button type="button" class="hero3d-btn hero3d-btn--solid" data-hero-add data-quote-add="IN-E01">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg>
+          <span>Orçamento</span><span class="sr-only"> – adicionar Estojo para relógio – Preto ao orçamento</span>
+        </button>
+      </div>
+
+      <div class="hero3d-variant" data-hero-in>
+        <p class="hero3d-count"><b data-hero-idx>01</b> / <span data-hero-total>06</span></p>
+        <div class="hero3d-vname-wrap"><p class="hero3d-vname" data-hero-vname aria-hidden="true">Preto</p></div>
+        <div class="hero3d-dots" data-hero-dots role="group" aria-label="Variações"></div>
+      </div>
+
+      <a href="#vitrine" class="hero3d-scroll" aria-label="Role para ver mais">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"/></svg>
+      </a>
+      <p class="sr-only" data-hero-status aria-live="polite"></p>
     </section>
 
     <!-- ============ VITRINE (rolagem horizontal presa no desktop / carrossel no celular) ============ -->
@@ -383,6 +344,72 @@
             <a href="#vitrine" class="btn btn--outline">Ver todas as cores</a>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- ============ MONTE SUA VITRINE (js/vitrine-builder.js) ============ -->
+    <section class="builder" id="monte-sua-vitrine" aria-labelledby="builder-titulo">
+      <div class="container">
+        <div class="builder-head">
+          <p class="eyebrow">Para lojistas</p>
+          <h2 id="builder-titulo" class="section-title">Monte sua <span class="outline-text">vitrine</span></h2>
+          <p class="builder-lead">Arraste os produtos da bandeja para as prateleiras (no celular, toque no produto e depois na prateleira). Ajuste as quantidades e envie a lista pronta.</p>
+          <p class="sr-only" id="builder-ajuda">Teclado: Enter escolhe um produto da bandeja, setas para cima e para baixo escolhem a prateleira e Enter coloca. Esc cancela. Num produto da prateleira: setas para cima e para baixo trocam de prateleira, para os lados mudam a posição e Delete tira da vitrine.</p>
+        </div>
+
+        <div class="builder-grid">
+          <div class="builder-main">
+            <div class="builder-scene" data-builder-scene role="group" aria-label="Balcão com 3 prateleiras" aria-describedby="builder-ajuda">
+              <span class="dots-pattern" aria-hidden="true"></span>
+              <p class="builder-sign" aria-hidden="true"><span class="logo-mark">IN</span>Injet Nobre</p>
+              <div class="builder-cabinet">
+              <div class="shelf" data-shelf="0">
+                <ul class="shelf-items" aria-label="Prateleira 1"></ul>
+                <button type="button" class="shelf-drop" data-shelf-drop="0" hidden>Colocar na prateleira 1</button>
+              </div>
+              <div class="shelf" data-shelf="1">
+                <ul class="shelf-items" aria-label="Prateleira 2"></ul>
+                <button type="button" class="shelf-drop" data-shelf-drop="1" hidden>Colocar na prateleira 2</button>
+              </div>
+              <div class="shelf" data-shelf="2">
+                <ul class="shelf-items" aria-label="Prateleira 3"></ul>
+                <button type="button" class="shelf-drop" data-shelf-drop="2" hidden>Colocar na prateleira 3</button>
+              </div>
+              </div>
+              <div class="builder-counter" aria-hidden="true"><span>Vitrine · 2026</span></div>
+            </div>
+
+            <div class="builder-hint" aria-live="polite">
+              <p data-builder-hint-text>Escolha um produto da bandeja.</p>
+              <button type="button" class="link-btn" data-builder-takeout hidden>Tirar da vitrine</button>
+              <button type="button" class="link-btn" data-builder-cancel hidden>Cancelar</button>
+            </div>
+
+            <div class="builder-tray">
+              <p class="picker-legend" id="bandeja-titulo">Bandeja de produtos</p>
+              <ul class="tray-list" data-builder-tray aria-labelledby="bandeja-titulo" aria-describedby="builder-ajuda"></ul>
+            </div>
+          </div>
+
+          <aside class="builder-panel" aria-labelledby="builder-lista-titulo">
+            <h3 id="builder-lista-titulo" class="builder-panel-title">Sua vitrine</h3>
+            <p class="builder-empty" data-builder-empty>Nenhum produto ainda. Coloque itens nas prateleiras para montar a lista.</p>
+            <ul class="builder-list" data-builder-list aria-label="Produtos da vitrine" hidden></ul>
+            <div class="builder-total">
+              <span>Total</span>
+              <strong data-builder-total>R$ 0,00</strong>
+            </div>
+            <p class="builder-units" data-builder-units>Nenhum produto na vitrine</p>
+            <button type="button" class="btn btn--orange" data-builder-send disabled>
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z"/></svg>
+              Enviar esta vitrine
+            </button>
+            <button type="button" class="btn btn--outline" data-builder-download disabled>Baixar imagem da minha vitrine</button>
+            <button type="button" class="link-btn" data-builder-clear hidden>Limpar vitrine</button>
+            <p class="builder-note">Ao enviar, a lista abre no WhatsApp e também entra no orçamento do site. Preços por unidade; frete e prazo combinados com a equipe.</p>
+          </aside>
+        </div>
+        <p class="sr-only" data-builder-status aria-live="polite"></p>
       </div>
     </section>
 
@@ -551,7 +578,8 @@
   <script src="js/render.js"></script>
   <script src="js/main.js"></script>
   <script src="js/quote.js"></script>
-  <script src="js/try3d.js"></script>
+  <script src="js/hero3d.js"></script>
+  <script src="js/vitrine-builder.js"></script>
 
   <!-- Animações por último, sem bloquear a página (defer).
        Se o CDN falhar, o site funciona estático. -->

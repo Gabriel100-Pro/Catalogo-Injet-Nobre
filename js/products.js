@@ -6,7 +6,7 @@
 
 window.SITE_CONFIG = {
   // Somente números, com DDI 55 + DDD. Ex.: "5511987654321"
-  whatsapp: "5511900000000",
+  whatsapp: "5511951146301",
   telefone: "(11) 0000-0000",
   email: "contato@injetnobre.com.br",
   instagram: "https://instagram.com/",

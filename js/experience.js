@@ -179,7 +179,7 @@
   /* ======================================================================
      3. BOTÕES MAGNÉTICOS (só mouse, sem movimento reduzido)
      ====================================================================== */
-  const MAGNETIC_SEL = ".btn, .nav-arrow, .quote-fab, .filter-btn, .intro-skip";
+  const MAGNETIC_SEL = ".btn, .nav-arrow, .quote-fab, .filter-btn, .intro-skip, .hero3d-btn, .hero3d-arrow, .hero3d-pill";
 
   function magnetic() {
     if (!animate() || !finePointer()) return;
