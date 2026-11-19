@@ -64,7 +64,7 @@
   <!-- Fontes -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -122,33 +122,105 @@
 
   <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
 
-  <!-- ============ HEADER ============ -->
-  <header class="site-header" id="topo">
-    <div class="container header-inner">
-      <a href="#topo" class="logo" aria-label="Injet Nobre – início">
-        <span class="logo-mark" aria-hidden="true">IN</span>
-        <span class="logo-text">Injet<br>Nobre</span>
+  <!-- ============ HEADER (cápsula flutuante; comportamento em js/header.js) ============ -->
+  <header class="site-header" id="topo" data-header>
+    <div class="hdr" data-hdr>
+      <a href="#inicio" class="hdr-logo" aria-label="Injet Nobre – início">
+        <span class="hdr-mark" aria-hidden="true">IN</span>
+        <span class="hdr-name" aria-hidden="true">Injet<br>Nobre</span>
       </a>
 
-      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="menu-principal" aria-label="Abrir menu">
-        <span class="nav-toggle-bar" aria-hidden="true"></span>
-      </button>
-
-      <nav class="site-nav" id="menu-principal" aria-label="Menu principal">
-        <ul>
-          <li><a href="#vitrine">Vitrine</a></li>
-          <li><a href="#linha-estojos">Estojos</a></li>
-          <li><a href="#linha-expositores">Expositores</a></li>
-          <li><a href="#linha-acrilicos">Acrílico</a></li>
-          <li><a href="#kit">Kit vitrine</a></li>
-          <li><a href="#monte-sua-vitrine">Monte a vitrine</a></li>
-          <li><a href="#atacado">Atacado</a></li>
-          <li><a href="#sobre">Sobre</a></li>
-          <li><a href="#contato">Contato</a></li>
+      <nav class="hdr-nav" aria-label="Menu principal">
+        <ul class="hdr-list" data-hdr-list>
+          <li>
+            <button type="button" class="hdr-link" data-spy-link="produtos" data-mega-toggle aria-expanded="false" aria-controls="mega-produtos">
+              <span class="hdr-num" aria-hidden="true">01</span>Produtos
+              <svg class="hdr-caret" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </li>
+          <li><a class="hdr-link" href="#monte-sua-vitrine" data-spy-link="vitrine"><span class="hdr-num" aria-hidden="true">02</span>Monte a vitrine</a></li>
+          <li><a class="hdr-link" href="#atacado" data-spy-link="atacado"><span class="hdr-num" aria-hidden="true">03</span>Atacado</a></li>
+          <li><a class="hdr-link" href="#sobre" data-spy-link="sobre"><span class="hdr-num" aria-hidden="true">04</span>Sobre</a></li>
+          <li><a class="hdr-link" href="#contato" data-spy-link="contato"><span class="hdr-num" aria-hidden="true">05</span>Contato</a></li>
         </ul>
+        <span class="hdr-pill" data-hdr-pill aria-hidden="true"></span>
       </nav>
+
+      <div class="hdr-actions">
+        <button type="button" class="hdr-search" data-search-open aria-keyshortcuts="Control+K Meta+K">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span>Buscar</span>
+          <kbd data-kbd aria-hidden="true">Ctrl K</kbd>
+        </button>
+        <a class="hdr-whats" data-config="whatsapp" href="https://wa.me/5511951146301" target="_blank" rel="noopener">
+          <span class="hdr-dot" aria-hidden="true"></span>WhatsApp<span class="sr-only"> (abre em nova aba)</span>
+        </a>
+        <button type="button" class="hdr-quote" data-quote-open data-quote-btn aria-haspopup="dialog" aria-controls="quote-drawer" aria-label="Abrir orçamento (0 itens)">
+          Orçamento <span class="hdr-count" data-quote-count hidden>0</span>
+        </button>
+
+        <!-- Celular -->
+        <button type="button" class="hdr-icon hdr-icon--search" data-search-open aria-label="Buscar produtos">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <button type="button" class="hdr-icon hdr-burger" data-menu-toggle aria-expanded="false" aria-controls="menu-celular" aria-label="Abrir menu">
+          <span class="hdr-burger-bars" aria-hidden="true"></span>
+        </button>
+      </div>
+      <span class="hdr-progress" data-hdr-progress aria-hidden="true"></span>
+    </div>
+
+    <!-- Mega menu "Produtos" (cards preenchidos por js/header.js) -->
+    <div class="mega" id="mega-produtos" data-mega hidden>
+      <div class="mega-inner">
+        <ul class="mega-cards" data-mega-cards aria-label="Linhas de produtos"></ul>
+        <div class="mega-side">
+          <a class="mega-cta" href="#monte-sua-vitrine">
+            <span class="hdr-num" aria-hidden="true">→</span>
+            <strong>Monte sua vitrine</strong>
+            <span>Arraste os produtos para as prateleiras e envie a lista pronta.</span>
+          </a>
+          <a class="mega-link" data-pdf href="assets/catalogo-injet-nobre.pdf" download>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M11 3h2v10.2l3.6-3.6 1.4 1.4-6 6-6-6 1.4-1.4 3.6 3.6V3ZM4 19h16v2H4v-2Z"/></svg>
+            Catálogo em PDF
+          </a>
+          <a class="mega-link" href="#produtos">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M4 5h16v2H4V5Zm0 6h16v2H4v-2Zm0 6h10v2H4v-2Z"/></svg>
+            Tabela de preços
+          </a>
+        </div>
+      </div>
     </div>
   </header>
+
+  <!-- ============ MENU DO CELULAR (tela cheia) ============ -->
+  <div class="mmenu" id="menu-celular" data-mmenu role="dialog" aria-modal="true" aria-label="Menu" hidden>
+    <nav class="mmenu-nav" aria-label="Menu principal">
+      <ol class="mmenu-list">
+        <li style="--i: 0"><a href="#produtos" data-spy-link="produtos"><span class="mmenu-num" aria-hidden="true">01</span><span class="mmenu-text">Produtos</span></a></li>
+        <li style="--i: 1"><a href="#monte-sua-vitrine" data-spy-link="vitrine"><span class="mmenu-num" aria-hidden="true">02</span><span class="mmenu-text">Monte a vitrine</span></a></li>
+        <li style="--i: 2"><a href="#atacado" data-spy-link="atacado"><span class="mmenu-num" aria-hidden="true">03</span><span class="mmenu-text">Atacado</span></a></li>
+        <li style="--i: 3"><a href="#sobre" data-spy-link="sobre"><span class="mmenu-num" aria-hidden="true">04</span><span class="mmenu-text">Sobre</span></a></li>
+        <li style="--i: 4"><a href="#contato" data-spy-link="contato"><span class="mmenu-num" aria-hidden="true">05</span><span class="mmenu-text">Contato</span></a></li>
+      </ol>
+    </nav>
+    <p class="mmenu-label" style="--i: 5">Atalhos</p>
+    <ul class="mmenu-shortcuts" data-mmenu-shortcuts style="--i: 6"></ul>
+    <a class="mmenu-pdf" data-pdf href="assets/catalogo-injet-nobre.pdf" download style="--i: 7">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M11 3h2v10.2l3.6-3.6 1.4 1.4-6 6-6-6 1.4-1.4 3.6 3.6V3ZM4 19h16v2H4v-2Z"/></svg>
+      Baixar catálogo (PDF)
+    </a>
+    <div class="mmenu-cta" style="--i: 8">
+      <a class="mmenu-btn mmenu-btn--whats" data-config="whatsapp" href="https://wa.me/5511951146301" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z"/></svg>
+        WhatsApp<span class="sr-only"> (abre em nova aba)</span>
+      </a>
+      <a class="mmenu-btn" data-config="instagram" href="https://www.instagram.com/injet_nobre" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7Zm5 3.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9Zm0 2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5ZM17.5 5.8a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z"/></svg>
+        Instagram<span class="sr-only"> (abre em nova aba)</span>
+      </a>
+    </div>
+  </div>
 
   <main id="conteudo">
 
@@ -516,11 +588,6 @@
   </dialog>
 
   <!-- ============ ORÇAMENTO DE ATACADO ============ -->
-  <button type="button" class="quote-fab" id="quote-fab" data-quote-open aria-haspopup="dialog" aria-controls="quote-drawer" aria-label="Abrir orçamento (0 itens)">
-    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M9 2h6a2 2 0 0 1 2 2h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2-2Zm0 2v2h6V4H9ZM7 10v2h10v-2H7Zm0 4v2h7v-2H7Z"/></svg>
-    <span class="quote-fab-label" aria-hidden="true">Orçamento</span>
-    <span class="quote-fab-count" id="quote-count" aria-hidden="true">0</span>
-  </button>
 
   <dialog class="drawer" id="quote-drawer" aria-labelledby="quote-titulo">
     <div class="drawer-inner">
@@ -573,6 +640,56 @@
 
   <p class="sr-only" id="quote-status" aria-live="polite"></p>
 
+  <!-- ============ BARRA INFERIOR (celular) ============ -->
+  <nav class="tabbar" aria-label="Atalhos de navegação">
+    <a class="tab" href="#inicio" data-tab="inicio">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 11 12 4l8 7v9h-5v-6H9v6H4v-9Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      <span>Início</span>
+    </a>
+    <a class="tab" href="#produtos" data-tab="produtos">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 8h18v12H3V8Zm-1-4h20v4H2V4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      <span>Produtos</span>
+    </a>
+    <a class="tab" href="#monte-sua-vitrine" data-tab="vitrine">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 3h16v18H4V3Zm0 6h16M4 15h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      <span>Vitrine</span>
+    </a>
+    <button type="button" class="tab" data-quote-open data-quote-btn aria-haspopup="dialog" aria-controls="quote-drawer" aria-label="Abrir orçamento (0 itens)">
+      <span class="tab-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M9 2h6a2 2 0 0 1 2 2h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2-2Zm0 2v2h6V4H9ZM7 10v2h10v-2H7Zm0 4v2h7v-2H7Z"/></svg>
+        <span class="tab-count" data-quote-count hidden>0</span>
+      </span>
+      <span>Orçamento</span>
+    </button>
+    <a class="tab tab--whats" data-config="whatsapp" href="https://wa.me/5511951146301" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z"/></svg>
+      <span>WhatsApp</span><span class="sr-only"> (abre em nova aba)</span>
+    </a>
+  </nav>
+
+  <!-- ============ BUSCA (Ctrl K) ============ -->
+  <dialog class="search" id="busca" aria-labelledby="busca-titulo">
+    <div class="search-inner">
+      <h2 class="sr-only" id="busca-titulo">Buscar produtos</h2>
+      <div class="search-field">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input type="search" data-search-input placeholder="Buscar estojo, acrílico, suporte, cor…" autocomplete="off" spellcheck="false"
+               role="combobox" aria-expanded="true" aria-controls="busca-lista" aria-autocomplete="list" aria-describedby="busca-ajuda">
+        <button type="button" class="search-close" data-search-close aria-label="Fechar busca"><kbd aria-hidden="true">Esc</kbd></button>
+      </div>
+      <ul class="search-list" id="busca-lista" role="listbox" aria-label="Produtos encontrados" data-search-list></ul>
+      <p class="search-empty" data-search-empty hidden>Nenhum produto encontrado. Tente "estojo", "acrílico" ou uma cor.</p>
+      <p class="search-help" id="busca-ajuda">
+        <span><kbd>↑</kbd><kbd>↓</kbd> navegar</span>
+        <span><kbd>Enter</kbd> abrir</span>
+        <span><kbd data-kbd-mod>Ctrl</kbd>+<kbd>Enter</kbd> orçamento</span>
+        <span><kbd>Esc</kbd> fechar</span>
+      </p>
+      <p class="sr-only" data-search-status aria-live="polite"></p>
+    </div>
+  </dialog>
+
+
   <!-- Conteúdo primeiro: dados, templates e lógica montam a página na hora -->
   <script src="js/products.js"></script>
   <script src="js/render.js"></script>
@@ -580,6 +697,7 @@
   <script src="js/quote.js"></script>
   <script src="js/hero3d.js"></script>
   <script src="js/vitrine-builder.js"></script>
+  <script src="js/header.js"></script>
 
   <!-- Animações por último, sem bloquear a página (defer).
        Se o CDN falhar, o site funciona estático. -->

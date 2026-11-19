@@ -27,7 +27,9 @@
 
   const motionQuery = "(prefers-reduced-motion: no-preference)";
   const allowMotion = () => window.matchMedia(motionQuery).matches;
-  const headerH = () => ($(".site-header") || { offsetHeight: 0 }).offsetHeight;
+  // O header agora flutua por cima do conteúdo (e some ao rolar para baixo):
+  // a área presa começa no topo da janela
+  const headerH = () => 0;
 
   // Entrada padrão das imagens: ~15° + escala, terminando com quique
   const imageFrom = (dir = 1) => ({ rotation: 15 * dir, scale: 0.7, opacity: 0 });

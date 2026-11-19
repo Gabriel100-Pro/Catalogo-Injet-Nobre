@@ -78,6 +78,19 @@
 
   if (!LISTS.acrilico.length) $('[data-hero-prod="acrilico"]').hidden = true;
 
+  /* ---------- Cor de destaque para o header (js/header.js) ----------
+     É a cor da caixa escolhida. Caixas muito escuras (estojo preto) e o
+     acrílico (base preta) usam o laranja da marca, para não sumirem no
+     vidro escuro do header. */
+  function emitAccent() {
+    const v = cur();
+    const n = parseInt(v.box ? v.box.slice(1) : "000000", 16);
+    const lum = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
+    const color = state.prod === "estojo" && lum > 0.2 ? v.box : "#FF6A13";
+    window.InjetHeroAccent = color; // o header lê isto ao iniciar
+    document.dispatchEvent(new CustomEvent("injet:hero-accent", { detail: { color } }));
+  }
+
   /* ---------- Fundo: camadas trocadas por opacidade ---------- */
   let lastBg = "";
   function setTheme(l, animate) {
@@ -145,6 +158,7 @@
     addBtn.dataset.quoteAdd = p.ref;
     $(".sr-only", addBtn).textContent = ` – adicionar ${R.fullName(p)} ao orçamento`;
     $("[data-hero-status]").textContent = `${R.fullName(p)}, ${R.formatPrice(p.preco)} por unidade.`;
+    emitAccent();
   }
 
   /* ---------- Cena ---------- */

@@ -179,7 +179,7 @@
   /* ======================================================================
      3. BOTÕES MAGNÉTICOS (só mouse, sem movimento reduzido)
      ====================================================================== */
-  const MAGNETIC_SEL = ".btn, .nav-arrow, .quote-fab, .filter-btn, .intro-skip, .hero3d-btn, .hero3d-arrow, .hero3d-pill";
+  const MAGNETIC_SEL = ".btn, .nav-arrow, .filter-btn, .intro-skip, .hero3d-btn, .hero3d-arrow, .hero3d-pill, .hdr-quote, .hdr-search";
 
   function magnetic() {
     if (!animate() || !finePointer()) return;
@@ -204,6 +204,7 @@
         xTo = gsap.quickTo(target, "x", { duration: 0.35, ease: "power3.out" });
         yTo = gsap.quickTo(target, "y", { duration: 0.35, ease: "power3.out" });
       }
+      if (!current) return; // fora de qualquer botão magnético
       // centro "de repouso" (desconta o deslocamento atual)
       const r = current.getBoundingClientRect();
       const cx = r.left + r.width / 2 - gsap.getProperty(current, "x");
@@ -242,7 +243,7 @@
       batchTimer = 0;
       const refs = Array.from(new Set(batch.splice(0)));
       const recent = performance.now() - lastTriggerAt < 800 && lastTrigger && lastTrigger.isConnected && lastTrigger.offsetParent !== null;
-      const origin = recent ? lastTrigger : $("#quote-fab");
+      const origin = recent ? lastTrigger : (window.InjetQuote && window.InjetQuote.visibleButton());
 
       try {
         if (navigator.vibrate && window.matchMedia("(pointer: coarse)").matches) navigator.vibrate(30);
@@ -260,10 +261,13 @@
   }
 
   function jumpCounter() {
-    gsap.fromTo("#quote-fab", { scale: 0.85 }, { scale: 1, duration: 0.5, ease: "back.out(3)", overwrite: "auto" });
+    const btn = window.InjetQuote && window.InjetQuote.visibleButton();
+    if (btn) gsap.fromTo(btn, { scale: 0.9 }, { scale: 1, duration: 0.5, ease: "back.out(3)", overwrite: "auto" });
+    const counts = $$("[data-quote-count]").filter((el) => el.offsetParent !== null);
+    if (!counts.length) return;
     gsap.timeline()
-      .to("#quote-count", { y: -16, scale: 1.3, duration: 0.18, ease: "power2.out", overwrite: "auto" })
-      .to("#quote-count", { y: 0, scale: 1, duration: 0.5, ease: "bounce.out" });
+      .to(counts, { y: -12, scale: 1.3, duration: 0.18, ease: "power2.out", overwrite: "auto" })
+      .to(counts, { y: 0, scale: 1, duration: 0.5, ease: "bounce.out" });
   }
 
   function confetti(origin) {
@@ -391,8 +395,8 @@
       document.body.classList.remove("is-thanks-open");
       inerted.forEach((c) => (c.inert = false));
       inerted = [];
-      const fab = $("#quote-fab");
-      if (fab) fab.focus();
+      const btn = window.InjetQuote && window.InjetQuote.visibleButton();
+      if (btn) btn.focus();
     }
 
     document.addEventListener("injet:quote-sent", open);

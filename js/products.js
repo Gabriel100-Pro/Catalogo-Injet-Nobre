@@ -9,7 +9,7 @@ window.SITE_CONFIG = {
   whatsapp: "5511951146301",
   telefone: "(11) 0000-0000",
   email: "contato@injetnobre.com.br",
-  instagram: "https://instagram.com/",
+  instagram: "https://www.instagram.com/injet_nobre",
   facebook: "https://facebook.com/",
   // Mensagem usada no botão "Falar com a equipe" (atacado)
   mensagemAtacado: "Olá! Sou lojista e quero saber das condições de atacado da Injet Nobre.",
