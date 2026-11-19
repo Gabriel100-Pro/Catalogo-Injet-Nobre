@@ -1,8 +1,7 @@
 /* ==========================================================================
    INJET NOBRE – ANIMAÇÕES (GSAP + ScrollTrigger)
    Regras:
-   - Só transform, opacity e filter (bom desempenho no celular). O leque do
-     hero anima variáveis CSS (--fan-in / --fan-out) que só mexem em transform.
+   - Só transform, opacity e filter (bom desempenho no celular).
    - Durações de até 0,8 s, com cascata (stagger) entre itens de grade.
    - Tudo dentro de gsap.matchMedia: com prefers-reduced-motion: reduce
      nada aqui roda e o site fica estático. Se o GSAP não carregar, idem.
@@ -28,34 +27,30 @@
 
   const motionQuery = "(prefers-reduced-motion: no-preference)";
   const allowMotion = () => window.matchMedia(motionQuery).matches;
-  const headerH = () => ($(".site-header") || { offsetHeight: 0 }).offsetHeight;
+  // O header agora flutua por cima do conteúdo (e some ao rolar para baixo):
+  // a área presa começa no topo da janela
+  const headerH = () => 0;
 
   // Entrada padrão das imagens: ~15° + escala, terminando com quique
   const imageFrom = (dir = 1) => ({ rotation: 15 * dir, scale: 0.7, opacity: 0 });
   const imageTo = { rotation: 0, scale: 1, opacity: 1, duration: 0.8, ease: BOUNCE };
 
-  /* ---------- Hero ----------
-     Painel laranja desliza da esquerda, título entra linha por linha, a tarja
-     preta "pinta" da esquerda para a direita, o produto entra girando com
-     quique e as outras cores abrem em leque atrás dele. */
+  /* ---------- Hero 3D ----------
+     Controles entram em cascata quando a tela da abertura se abre
+     (a caixa 3D faz a própria entrada em js/hero3d-scene.js). */
   function hero() {
-    const tl = gsap.timeline({ defaults: { ease: OUT, duration: 0.7 } });
-    tl.from(".hero-main", { xPercent: -100, duration: 0.8, ease: "power4.out" })
-      .from(".hero-title .line-inner", { yPercent: 110, duration: 0.75, stagger: 0.11 }, "-=0.3")
-      .fromTo(".accent-paint", { scaleX: 0 }, { scaleX: 1, duration: 0.55, ease: "power2.inOut" }, "-=0.45")
-      .from(".accent-text", { opacity: 0, duration: 0.3 }, "<0.2")
-      .from("[data-hero-intro]", { x: -48, opacity: 0, stagger: 0.08 }, "-=0.35")
-      .fromTo(".hero-feature .media-frame", imageFrom(1), { ...imageTo }, 0.3)
-      .fromTo("#hero-fan", { "--fan-in": 0 }, { "--fan-in": 1, duration: 0.9, ease: BOUNCE }, 0.95)
-      .from(".hero-feature [data-pop]", { scale: 0, duration: 0.45, ease: POP }, "-=0.5")
-      .from(".hero-feature-body > *", { x: 48, opacity: 0, stagger: 0.06, duration: 0.6 }, 0.55);
+    const items = $$(".hero3d [data-hero-in]");
+    if (!items.length) return;
+    const tl = gsap.timeline();
+    tl.from(items, { y: 28, opacity: 0, duration: 0.7, ease: OUT, stagger: 0.08, clearProps: "transform,opacity" })
+      .from(".hero3d-arrow, .hero3d-scroll", { scale: 0.6, opacity: 0, duration: 0.5, ease: POP, stagger: 0.06, clearProps: "transform,opacity" }, 0.2);
 
-    // Ao rolar, o leque volta a fechar atrás do estojo preto
-    gsap.fromTo("#hero-fan", { "--fan-out": 1 }, {
-      "--fan-out": 0,
-      ease: "none",
-      scrollTrigger: { trigger: ".hero", start: () => `top ${headerH()}`, end: "bottom 35%", scrub: 0.5 }
-    });
+    // Com a abertura do estojo na tela, o hero espera a tela se abrir (experience.js)
+    const intro = window.InjetIntro;
+    if (intro && intro.pending) {
+      tl.pause();
+      intro.onReveal(() => tl.play());
+    }
   }
 
   /* ---------- Entrada de um slide da vitrine ---------- */
@@ -208,7 +203,8 @@
       { trigger: "#kit", items: ".kit-text > *" },
       { trigger: "#atacado", items: ".wholesale-grid > div:first-child > :not(.wholesale-title)", opposite: ".wholesale-side > *" },
       { trigger: "#sobre", items: ".about-text > *", opposite: ".about-stats > li" },
-      { trigger: "#contato", items: ".footer-brand > *, .footer-contact > *", opposite: ".footer-map, .footer-qr" }
+      { trigger: "#contato", items: ".footer-brand > *, .footer-contact > *", opposite: ".footer-map, .footer-qr" },
+      { trigger: "#monte-sua-vitrine", items: "#monte-sua-vitrine .builder-head > *" }
     ];
 
     groups.forEach((g, i) => {
@@ -308,13 +304,8 @@
     });
   }
 
-  /* ---------- Orçamento: ícone pula ao adicionar, painel desliza ---------- */
-  function onQuoteAdd() {
-    if (!allowMotion()) return;
-    gsap.fromTo("#quote-fab", { scale: 0.8 }, { scale: 1, duration: 0.5, ease: POP, clearProps: "transform" });
-    gsap.fromTo("#quote-count", { scale: 0 }, { scale: 1, duration: 0.45, ease: POP, delay: 0.1, clearProps: "transform" });
-  }
-
+  /* ---------- Orçamento: painel desliza ----------
+     (pulo do contador, confete e aviso ao adicionar ficam em experience.js) */
   function onQuoteOpen(e) {
     if (!allowMotion()) return;
     const inner = $(".drawer-inner", e.detail.drawer);
@@ -367,7 +358,6 @@
     document.addEventListener("injet:modal-open", (e) => onModal(e, false));
     document.addEventListener("injet:modal-change", (e) => onModal(e, true));
     document.addEventListener("injet:line-change", onLineChange);
-    document.addEventListener("injet:quote-add", onQuoteAdd);
     document.addEventListener("injet:quote-open", onQuoteOpen);
     document.addEventListener("injet:filter", () => ScrollTrigger.refresh());
 

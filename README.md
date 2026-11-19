@@ -12,6 +12,10 @@ js/render.js              Templates HTML (card, hero, vitrine, vitrine de linha,
 js/main.js                Comportamento (menu, filtro, vitrine/carrossel, seletores, modal, kit)
 js/quote.js               Orçamento de atacado (cor + quantidade → WhatsApp)
 js/animations.js          Animações com GSAP + ScrollTrigger
+js/experience.js          Abertura do estojo, cursor, confete, aviso e agradecimento
+js/hero3d.js              Hero 3D: variações, tampa, relógio, orçamento e carregamento
+js/hero3d-scene.js        Cena da hero (módulo ES, Three.js r160 + relógio .glb)
+js/vitrine-builder.js     "Monte sua vitrine": prateleiras, lista, WhatsApp e imagem PNG
 tools/otimizar-imagens.py Gera as fotos otimizadas (WebP + PNG) em assets/produtos/
 assets/*.png              Fotos originais dos produtos (fundo transparente)
 ```
@@ -84,4 +88,7 @@ Nos dois casos, cada alteração enviada ao GitHub publica o site de novo automa
 - **Grade:** cards entram em cascata. Ao passar o mouse, a foto gira e aumenta e o card ganha sombra laranja.
 - **Atacado:** título entram com desfoque que vira nitidez.
 - `js/animations.js` usa GSAP 3.12.5 + ScrollTrigger via CDN e anima só `transform`, `opacity` e `filter`. Com "reduzir movimento" ativado, o site fica estático (com o leque aberto). Se o CDN falhar, o site funciona sem animação.
+- `js/experience.js`: abertura com o estojo (só na primeira visita da sessão, chave `injet-intro-v1` no sessionStorage, máx. 2,5 s, botão "Pular" ou Esc), cursor próprio e botões magnéticos (só mouse), chuva de quadradinhos + aviso ao adicionar ao orçamento (vibração curta no celular) e tela de agradecimento ao enviar pelo WhatsApp. Com "reduzir movimento": sem abertura, cursor, magnetismo nem confete.
+- `js/hero3d.js` + `js/hero3d-scene.js`: hero 3D em tela cheia (base: `prototipos/hero-3d-injet-nobre.html`, fora do git). Setas, bolinhas e teclado (←/→) trocam a variação; seletor Estojo/Acrílico; tampa e "Tirar/Guardar relógio"; "Orçamento" usa o `[data-quote-add]` do catálogo. Preços e refs vêm de `js/products.js`. O Three.js 0.160.0 vem do mapa de imports no `<head>`; a cena só anima depois da abertura do site. O relógio `assets/relogio.glb` (GLTFLoader, ~3,4 MB) só é baixado depois que a caixa caiu e abriu a tampa; o botão fica desativado até lá e some se o modelo não carregar. O shader do relógio troca mostrador e metal conforme a cor (tabelas `ESTOJO` / `ACRILICO` em `js/hero3d.js`). Sem WebGL aparece a foto real. Mantém "Sou lojista" (vai para #atacado), "Baixar catálogo (PDF)" e a seta "role para ver mais".
+- `js/vitrine-builder.js`: seção "Monte sua vitrine" (depois do kit vitrine). Balcão com 3 prateleiras de 4 lugares; arrastar com o mouse, tocar no produto e depois na prateleira no celular, ou teclado (Enter escolhe, setas ↑/↓ escolhem a prateleira, Enter coloca; num item: setas movem, Delete tira). Cada produto entra com 10 unidades (constante `DEFAULT_QTY`). "Enviar esta vitrine" abre o WhatsApp de `SITE_CONFIG.whatsapp` com a lista e também adiciona tudo ao orçamento. "Baixar imagem" gera um PNG 1600×1000 em canvas. A vitrine fica salva no navegador (`injet-vitrine-v1`).
 - Eventos para analytics: `injet:filter`, `injet:modal-open`, `injet:modal-change`, `injet:vitrine`, `injet:line-change`, `injet:quote-add`, `injet:quote-change`.

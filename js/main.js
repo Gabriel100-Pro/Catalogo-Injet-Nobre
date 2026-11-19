@@ -343,6 +343,9 @@
       emit("injet:modal-open", { product, content });
     }
 
+    // A busca (Ctrl K) abre o produto por aqui
+    window.InjetCatalog = { openProduct: open };
+
     function show(index, focus) {
       const product = render(index, { focus });
       if (product) emit("injet:modal-change", { product, content });

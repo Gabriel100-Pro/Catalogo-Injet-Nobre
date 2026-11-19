@@ -3,7 +3,8 @@
    Lista salva no localStorage do visitante. Cada cor é um produto (ref).
    Ao finalizar, monta uma mensagem com os itens e abre o WhatsApp:
    "• Estojo para relógio – Azul – 50 un. × R$ 2,50 = R$ 125,00" + total geral
-   Eventos: injet:quote-add { ref, qty }, injet:quote-change { count }
+   Eventos: injet:quote-add { ref, qty }, injet:quote-change { count },
+   injet:quote-sent { client } (mensagem aberta no WhatsApp)
    ========================================================================== */
 
 (function () {
@@ -81,8 +82,10 @@
 
   /* ---------- Elementos ---------- */
   const drawer = $("#quote-drawer");
-  const fab = $("#quote-fab");
-  const countEl = $("#quote-count");
+  // Botões de orçamento (header e barra inferior) e seus contadores
+  const quoteBtns = $$("[data-quote-btn]");
+  const countEls = $$("[data-quote-count]");
+  const visibleQuoteBtn = () => quoteBtns.find((b) => b.offsetParent !== null) || null;
   const list = $("#quote-list");
   const empty = $("#quote-empty");
   const filled = $("#quote-filled");
@@ -145,9 +148,11 @@
 
     const count = items.length;
     const units = items.reduce((sum, i) => sum + i.qty, 0);
-    countEl.textContent = count;
-    fab.classList.toggle("has-items", count > 0);
-    fab.setAttribute("aria-label", `Abrir orçamento (${count} ${count === 1 ? "item" : "itens"})`);
+    countEls.forEach((el) => {
+      el.textContent = count;
+      el.hidden = count === 0;
+    });
+    quoteBtns.forEach((b) => b.setAttribute("aria-label", `Abrir orçamento (${count} ${count === 1 ? "item" : "itens"})`));
     totalItems.textContent = count;
     totalUnits.textContent = units.toLocaleString("pt-BR");
     if (totalValue) totalValue.textContent = R.formatPrice(grandTotal());
@@ -233,7 +238,7 @@
   drawer.addEventListener("close", () => {
     document.body.classList.remove("is-drawer-open");
     if (lastFocus && document.contains(lastFocus) && lastFocus.offsetParent !== null) lastFocus.focus();
-    else if (fab) fab.focus();
+    else if (visibleQuoteBtn()) visibleQuoteBtn().focus();
   });
   drawer.addEventListener("click", (e) => {
     if (e.target === drawer) close(); // clique no fundo escuro
@@ -325,9 +330,10 @@
     window.open(url, "_blank", "noopener");
     note.textContent = "Abrimos o WhatsApp com a mensagem pronta. Depois de enviar, você pode limpar a lista.";
     announce("Mensagem do orçamento aberta no WhatsApp.");
+    emit("injet:quote-sent", { client });
   });
 
-  window.InjetQuote = { add, remove, setQty, clear, open, close, items: () => items.slice(), buildMessage };
+  window.InjetQuote = { add, remove, setQty, clear, open, close, items: () => items.slice(), buildMessage, visibleButton: visibleQuoteBtn };
 
   render();
 })();

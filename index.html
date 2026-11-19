@@ -27,8 +27,29 @@
        Rede de segurança: reaparece sozinho em 2,5 s se o GSAP não carregar. -->
   <script>
     if (window.matchMedia && matchMedia("(prefers-reduced-motion: no-preference)").matches) {
-      document.documentElement.classList.add("motion-pending");
-      setTimeout(function () { document.documentElement.classList.remove("motion-pending"); }, 2500);
+      var root = document.documentElement;
+      root.classList.add("motion-pending");
+      setTimeout(function () { root.classList.remove("motion-pending"); }, 2500);
+      // Abertura (estojo): só na primeira visita da sessão e sem movimento reduzido.
+      // Rede de segurança: some sozinha se o JS não assumir a tempo.
+      var seen = "1";
+      try { seen = sessionStorage.getItem("injet-intro-v1"); } catch (e) {}
+      if (!seen) {
+        root.classList.add("intro-pending");
+        window.__introSafety = setTimeout(function () { root.classList.remove("intro-pending"); }, 3500);
+      }
+    }
+  </script>
+  <style>html.intro-pending { background: #FF6A13; overflow: hidden; }</style>
+
+  <!-- Three.js (versão fixa) para a hero 3D (js/hero3d.js). É importado
+       depois do HTML; o relógio (assets/relogio.glb) só depois que a caixa aparece. -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
     }
   </script>
 
@@ -43,73 +64,229 @@
   <!-- Fontes -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+  <!-- ============ ABERTURA (primeira visita; ver js/experience.js) ============ -->
+  <div class="intro" id="intro">
+    <span class="intro-panel intro-panel--l" aria-hidden="true"></span>
+    <span class="intro-panel intro-panel--r" aria-hidden="true"></span>
+    <div class="intro-stage">
+      <div class="ibox" aria-hidden="true">
+          <!-- Fundo: sombra + interior com almofada -->
+          <svg class="ibox-layer ibox-back" viewBox="0 0 340 240" focusable="false">
+            <defs>
+              <radialGradient id="ibox-cushion" cx="45%" cy="40%" r="70%">
+                <stop offset="0" stop-color="#2a2a2a"/><stop offset="1" stop-color="#0b0b0b"/>
+              </radialGradient>
+            </defs>
+            <ellipse class="ibox-shadow" cx="172" cy="226" rx="150" ry="11" fill="rgba(17,17,17,.28)"/>
+            <polygon points="40,130 240,130 300,90 100,90" fill="#050505"/>
+            <polygon points="100,90 300,90 292,96 106,96" fill="#141414"/>
+            <path d="M62 126 C 70 112, 92 100, 116 99 L 268 99 C 282 100, 286 106, 278 112 C 264 122, 246 127, 226 127 L 74 129 C 64 129, 60 128, 62 126 Z" fill="url(#ibox-cushion)"/>
+          </svg>
+          <!-- Frente e lateral da caixa -->
+          <svg class="ibox-layer ibox-front" viewBox="0 0 340 240" focusable="false">
+            <defs>
+              <linearGradient id="ibox-front-g" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#232323"/><stop offset="1" stop-color="#141414"/>
+              </linearGradient>
+            </defs>
+            <polygon points="40,130 240,130 240,220 40,220" fill="url(#ibox-front-g)"/>
+            <polygon points="240,130 300,90 300,180 240,220" fill="#0b0b0b"/>
+            <polyline points="40,130 240,130 300,90" fill="none" stroke="#3b3b3b" stroke-width="1.5"/>
+            <line x1="240" y1="130" x2="240" y2="220" stroke="#2c2c2c" stroke-width="1"/>
+          </svg>
+          <!-- Tampa -->
+          <svg class="ibox-layer ibox-lid" viewBox="0 0 340 240" focusable="false">
+            <defs>
+              <linearGradient id="ibox-lid-g" x1="0" y1="1" x2="1" y2="0">
+                <stop offset="0" stop-color="#2b2b2b"/><stop offset="1" stop-color="#1d1d1d"/>
+              </linearGradient>
+            </defs>
+            <polygon points="32,118 248,118 310,76 94,76" fill="url(#ibox-lid-g)"/>
+            <polygon points="32,118 248,118 248,146 32,146" fill="#1a1a1a"/>
+            <polygon points="248,118 310,76 310,104 248,146" fill="#0c0c0c"/>
+            <polyline points="32,118 248,118 310,76" fill="none" stroke="#424242" stroke-width="1.5"/>
+          </svg>
+          <!-- Logo que sobe de dentro da caixa: o recorte esconde tudo abaixo da borda -->
+          <div class="ibox-logo-clip">
+            <div class="ibox-logo"><span class="logo-mark">IN</span><span class="ibox-name">Injet<br>Nobre</span></div>
+          </div>
+        </div>
+    </div>
+    <button type="button" class="intro-skip" id="intro-skip">Pular <span aria-hidden="true">→</span></button>
+  </div>
+
   <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
 
-  <!-- ============ HEADER ============ -->
-  <header class="site-header" id="topo">
-    <div class="container header-inner">
-      <a href="#topo" class="logo" aria-label="Injet Nobre – início">
-        <span class="logo-mark" aria-hidden="true">IN</span>
-        <span class="logo-text">Injet<br>Nobre</span>
+  <!-- ============ HEADER (cápsula flutuante; comportamento em js/header.js) ============ -->
+  <header class="site-header" id="topo" data-header>
+    <div class="hdr" data-hdr>
+      <a href="#inicio" class="hdr-logo" aria-label="Injet Nobre – início">
+        <span class="hdr-mark" aria-hidden="true">IN</span>
+        <span class="hdr-name" aria-hidden="true">Injet<br>Nobre</span>
       </a>
 
-      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="menu-principal" aria-label="Abrir menu">
-        <span class="nav-toggle-bar" aria-hidden="true"></span>
-      </button>
-
-      <nav class="site-nav" id="menu-principal" aria-label="Menu principal">
-        <ul>
-          <li><a href="#vitrine">Vitrine</a></li>
-          <li><a href="#linha-estojos">Estojos</a></li>
-          <li><a href="#linha-expositores">Expositores</a></li>
-          <li><a href="#linha-acrilicos">Acrílico</a></li>
-          <li><a href="#kit">Kit vitrine</a></li>
-          <li><a href="#atacado">Atacado</a></li>
-          <li><a href="#sobre">Sobre</a></li>
-          <li><a href="#contato">Contato</a></li>
+      <nav class="hdr-nav" aria-label="Menu principal">
+        <ul class="hdr-list" data-hdr-list>
+          <li>
+            <button type="button" class="hdr-link" data-spy-link="produtos" data-mega-toggle aria-expanded="false" aria-controls="mega-produtos">
+              <span class="hdr-num" aria-hidden="true">01</span>Produtos
+              <svg class="hdr-caret" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </li>
+          <li><a class="hdr-link" href="#monte-sua-vitrine" data-spy-link="vitrine"><span class="hdr-num" aria-hidden="true">02</span>Monte a vitrine</a></li>
+          <li><a class="hdr-link" href="#atacado" data-spy-link="atacado"><span class="hdr-num" aria-hidden="true">03</span>Atacado</a></li>
+          <li><a class="hdr-link" href="#sobre" data-spy-link="sobre"><span class="hdr-num" aria-hidden="true">04</span>Sobre</a></li>
+          <li><a class="hdr-link" href="#contato" data-spy-link="contato"><span class="hdr-num" aria-hidden="true">05</span>Contato</a></li>
         </ul>
+        <span class="hdr-pill" data-hdr-pill aria-hidden="true"></span>
       </nav>
+
+      <div class="hdr-actions">
+        <button type="button" class="hdr-search" data-search-open aria-keyshortcuts="Control+K Meta+K">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span>Buscar</span>
+          <kbd data-kbd aria-hidden="true">Ctrl K</kbd>
+        </button>
+        <a class="hdr-whats" data-config="whatsapp" href="https://wa.me/5511951146301" target="_blank" rel="noopener">
+          <span class="hdr-dot" aria-hidden="true"></span>WhatsApp<span class="sr-only"> (abre em nova aba)</span>
+        </a>
+        <button type="button" class="hdr-quote" data-quote-open data-quote-btn aria-haspopup="dialog" aria-controls="quote-drawer" aria-label="Abrir orçamento (0 itens)">
+          Orçamento <span class="hdr-count" data-quote-count hidden>0</span>
+        </button>
+
+        <!-- Celular -->
+        <button type="button" class="hdr-icon hdr-icon--search" data-search-open aria-label="Buscar produtos">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <button type="button" class="hdr-icon hdr-burger" data-menu-toggle aria-expanded="false" aria-controls="menu-celular" aria-label="Abrir menu">
+          <span class="hdr-burger-bars" aria-hidden="true"></span>
+        </button>
+      </div>
+      <span class="hdr-progress" data-hdr-progress aria-hidden="true"></span>
+    </div>
+
+    <!-- Mega menu "Produtos" (cards preenchidos por js/header.js) -->
+    <div class="mega" id="mega-produtos" data-mega hidden>
+      <div class="mega-inner">
+        <ul class="mega-cards" data-mega-cards aria-label="Linhas de produtos"></ul>
+        <div class="mega-side">
+          <a class="mega-cta" href="#monte-sua-vitrine">
+            <span class="hdr-num" aria-hidden="true">→</span>
+            <strong>Monte sua vitrine</strong>
+            <span>Arraste os produtos para as prateleiras e envie a lista pronta.</span>
+          </a>
+          <a class="mega-link" data-pdf href="assets/catalogo-injet-nobre.pdf" download>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M11 3h2v10.2l3.6-3.6 1.4 1.4-6 6-6-6 1.4-1.4 3.6 3.6V3ZM4 19h16v2H4v-2Z"/></svg>
+            Catálogo em PDF
+          </a>
+          <a class="mega-link" href="#produtos">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M4 5h16v2H4V5Zm0 6h16v2H4v-2Zm0 6h10v2H4v-2Z"/></svg>
+            Tabela de preços
+          </a>
+        </div>
+      </div>
     </div>
   </header>
 
+  <!-- ============ MENU DO CELULAR (tela cheia) ============ -->
+  <div class="mmenu" id="menu-celular" data-mmenu role="dialog" aria-modal="true" aria-label="Menu" hidden>
+    <nav class="mmenu-nav" aria-label="Menu principal">
+      <ol class="mmenu-list">
+        <li style="--i: 0"><a href="#produtos" data-spy-link="produtos"><span class="mmenu-num" aria-hidden="true">01</span><span class="mmenu-text">Produtos</span></a></li>
+        <li style="--i: 1"><a href="#monte-sua-vitrine" data-spy-link="vitrine"><span class="mmenu-num" aria-hidden="true">02</span><span class="mmenu-text">Monte a vitrine</span></a></li>
+        <li style="--i: 2"><a href="#atacado" data-spy-link="atacado"><span class="mmenu-num" aria-hidden="true">03</span><span class="mmenu-text">Atacado</span></a></li>
+        <li style="--i: 3"><a href="#sobre" data-spy-link="sobre"><span class="mmenu-num" aria-hidden="true">04</span><span class="mmenu-text">Sobre</span></a></li>
+        <li style="--i: 4"><a href="#contato" data-spy-link="contato"><span class="mmenu-num" aria-hidden="true">05</span><span class="mmenu-text">Contato</span></a></li>
+      </ol>
+    </nav>
+    <p class="mmenu-label" style="--i: 5">Atalhos</p>
+    <ul class="mmenu-shortcuts" data-mmenu-shortcuts style="--i: 6"></ul>
+    <a class="mmenu-pdf" data-pdf href="assets/catalogo-injet-nobre.pdf" download style="--i: 7">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M11 3h2v10.2l3.6-3.6 1.4 1.4-6 6-6-6 1.4-1.4 3.6 3.6V3ZM4 19h16v2H4v-2Z"/></svg>
+      Baixar catálogo (PDF)
+    </a>
+    <div class="mmenu-cta" style="--i: 8">
+      <a class="mmenu-btn mmenu-btn--whats" data-config="whatsapp" href="https://wa.me/5511951146301" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z"/></svg>
+        WhatsApp<span class="sr-only"> (abre em nova aba)</span>
+      </a>
+      <a class="mmenu-btn" data-config="instagram" href="https://www.instagram.com/injet_nobre" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7Zm5 3.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9Zm0 2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5ZM17.5 5.8a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z"/></svg>
+        Instagram<span class="sr-only"> (abre em nova aba)</span>
+      </a>
+    </div>
+  </div>
+
   <main id="conteudo">
 
-    <!-- ============ HERO ============ -->
-    <section class="hero" aria-labelledby="hero-titulo" data-section="hero">
-      <div class="hero-grid">
-        <div class="hero-main">
-          <span class="dots-pattern dots-pattern--hero" data-float aria-hidden="true"></span>
-          <span class="dots-pattern dots-pattern--hero-b" data-float aria-hidden="true"></span>
-          <span class="dots-pattern dots-pattern--hero-c" data-float aria-hidden="true"></span>
-          <p class="eyebrow eyebrow--dark" data-hero-intro>Catálogo · Edição 2026</p>
-          <!-- Cada .line entra separadamente (animations.js) -->
-          <h1 id="hero-titulo" class="hero-title">
-            <span class="line"><span class="line-inner outline-text outline-text--light">Praticidade</span></span>
-            <span class="line"><span class="line-inner">que</span></span>
-            <!-- A tarja preta "pinta" da esquerda para a direita (animations.js) -->
-            <span class="line"><span class="line-inner"><span class="hero-title-accent"><span class="accent-paint" aria-hidden="true"></span><span class="accent-text">se encaixa</span></span></span></span>
-            <span class="line"><span class="line-inner">no seu dia.</span></span>
-          </h1>
-          <p class="hero-lead" data-hero-intro>Estojos para relógio em seis cores, caixas e expositores em acrílico para relojoarias, joalherias e vitrines.</p>
-          <div class="hero-actions" data-hero-intro>
-            <a href="#vitrine" class="btn btn--dark">Ver catálogo</a>
-            <a href="#atacado" class="btn btn--ghost-dark">Sou lojista</a>
-          </div>
-          <a class="pdf-link" data-pdf data-hero-intro href="assets/catalogo-injet-nobre.pdf" download>
-            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M11 3h2v10.2l3.6-3.6 1.4 1.4-6 6-6-6 1.4-1.4 3.6 3.6V3ZM4 19h16v2H4v-2Z"/></svg>
-            Baixar catálogo (PDF)
-          </a>
-        </div>
-
-        <!-- Produto em destaque: preenchido via JS (produto com "destaque: true").
-             As outras cores do mesmo grupo ficam atrás e abrem em leque. -->
-        <article class="hero-feature" id="hero-feature" aria-label="Produto em destaque"></article>
+    <!-- ============ HERO 3D (js/hero3d.js + js/hero3d-scene.js) ============
+         Sem WebGL (ou antes do 3D carregar) aparece a foto real do produto. -->
+    <section class="hero3d" id="inicio" aria-labelledby="hero-titulo" data-tone="light" data-section="hero">
+      <div class="hero3d-bg" data-hero-bg aria-hidden="true"></div>
+      <div class="hero3d-glow" aria-hidden="true"></div>
+      <div class="hero3d-stage" data-hero-stage data-cursor="girar"
+           role="group" aria-roledescription="visualizador 3D"
+           aria-label="Produto em 3D. Arraste para girar; clique, toque, Enter ou espaço para abrir e fechar a tampa; setas para os lados trocam a variação.">
+        <span class="hero3d-word" data-hero-word aria-hidden="true">Estojo</span>
+        <div class="hero3d-photo" data-hero-photo></div>
       </div>
+
+      <div class="hero3d-top" data-hero-in>
+        <div class="hero3d-seg" role="group" aria-label="Produto">
+          <button type="button" data-hero-prod="estojo" aria-pressed="true">Estojo clássico</button>
+          <button type="button" data-hero-prod="acrilico" aria-pressed="false">Caixa de acrílico</button>
+        </div>
+        <a href="#atacado" class="hero3d-pill">Sou lojista</a>
+      </div>
+      <p class="hero3d-hint" data-hero-hint aria-hidden="true">Arraste para girar · toque para abrir</p>
+
+      <button type="button" class="hero3d-arrow hero3d-arrow--prev" data-hero-step="-1" aria-label="Variação anterior"><span class="hero3d-ring" aria-hidden="true"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button type="button" class="hero3d-arrow hero3d-arrow--next" data-hero-step="1" aria-label="Próxima variação"><span class="hero3d-ring" aria-hidden="true"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7"/></svg></button>
+
+      <div class="hero3d-info" data-hero-in>
+        <div class="hero3d-info-row">
+          <p class="hero3d-price"><span class="sr-only">Preço: R$ </span><small aria-hidden="true">R$</small><span data-hero-price>2,50</span><small aria-hidden="true">por unidade</small></p>
+          <div class="hero3d-heading">
+            <p class="hero3d-tag" data-hero-tag>Linha relojoaria</p>
+            <h1 id="hero-titulo" class="hero3d-title" data-hero-title>Estojo para relógio</h1>
+          </div>
+        </div>
+        <a class="hero3d-pdf" data-pdf href="assets/catalogo-injet-nobre.pdf" download>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M11 3h2v10.2l3.6-3.6 1.4 1.4-6 6-6-6 1.4-1.4 3.6 3.6V3ZM4 19h16v2H4v-2Z"/></svg>
+          <span class="hero3d-long">Baixar </span>catálogo (PDF)
+        </a>
+      </div>
+
+      <div class="hero3d-actions" data-hero-in>
+        <button type="button" class="hero3d-btn" data-hero-lid>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M3 10h18v10H3zM2 6l10-3 10 3v4H2z"/></svg>
+          <span>Fechar<span class="hero3d-long"> tampa</span></span>
+        </button>
+        <button type="button" class="hero3d-btn" data-hero-watch disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="6"/><path d="M9 6l1-4h4l1 4M9 18l1 4h4l1-4M12 9v3l2 1"/></svg>
+          <span>Tirar<span class="hero3d-long"> relógio</span></span>
+        </button>
+        <button type="button" class="hero3d-btn hero3d-btn--solid" data-hero-add data-quote-add="IN-E01">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg>
+          <span>Orçamento</span><span class="sr-only"> – adicionar Estojo para relógio – Preto ao orçamento</span>
+        </button>
+      </div>
+
+      <div class="hero3d-variant" data-hero-in>
+        <p class="hero3d-count"><b data-hero-idx>01</b> / <span data-hero-total>06</span></p>
+        <div class="hero3d-vname-wrap"><p class="hero3d-vname" data-hero-vname aria-hidden="true">Preto</p></div>
+        <div class="hero3d-dots" data-hero-dots role="group" aria-label="Variações"></div>
+      </div>
+
+      <a href="#vitrine" class="hero3d-scroll" aria-label="Role para ver mais">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"/></svg>
+      </a>
+      <p class="sr-only" data-hero-status aria-live="polite"></p>
     </section>
 
     <!-- ============ VITRINE (rolagem horizontal presa no desktop / carrossel no celular) ============ -->
@@ -242,6 +419,72 @@
       </div>
     </section>
 
+    <!-- ============ MONTE SUA VITRINE (js/vitrine-builder.js) ============ -->
+    <section class="builder" id="monte-sua-vitrine" aria-labelledby="builder-titulo">
+      <div class="container">
+        <div class="builder-head">
+          <p class="eyebrow">Para lojistas</p>
+          <h2 id="builder-titulo" class="section-title">Monte sua <span class="outline-text">vitrine</span></h2>
+          <p class="builder-lead">Arraste os produtos da bandeja para as prateleiras (no celular, toque no produto e depois na prateleira). Ajuste as quantidades e envie a lista pronta.</p>
+          <p class="sr-only" id="builder-ajuda">Teclado: Enter escolhe um produto da bandeja, setas para cima e para baixo escolhem a prateleira e Enter coloca. Esc cancela. Num produto da prateleira: setas para cima e para baixo trocam de prateleira, para os lados mudam a posição e Delete tira da vitrine.</p>
+        </div>
+
+        <div class="builder-grid">
+          <div class="builder-main">
+            <div class="builder-scene" data-builder-scene role="group" aria-label="Balcão com 3 prateleiras" aria-describedby="builder-ajuda">
+              <span class="dots-pattern" aria-hidden="true"></span>
+              <p class="builder-sign" aria-hidden="true"><span class="logo-mark">IN</span>Injet Nobre</p>
+              <div class="builder-cabinet">
+              <div class="shelf" data-shelf="0">
+                <ul class="shelf-items" aria-label="Prateleira 1"></ul>
+                <button type="button" class="shelf-drop" data-shelf-drop="0" hidden>Colocar na prateleira 1</button>
+              </div>
+              <div class="shelf" data-shelf="1">
+                <ul class="shelf-items" aria-label="Prateleira 2"></ul>
+                <button type="button" class="shelf-drop" data-shelf-drop="1" hidden>Colocar na prateleira 2</button>
+              </div>
+              <div class="shelf" data-shelf="2">
+                <ul class="shelf-items" aria-label="Prateleira 3"></ul>
+                <button type="button" class="shelf-drop" data-shelf-drop="2" hidden>Colocar na prateleira 3</button>
+              </div>
+              </div>
+              <div class="builder-counter" aria-hidden="true"><span>Vitrine · 2026</span></div>
+            </div>
+
+            <div class="builder-hint" aria-live="polite">
+              <p data-builder-hint-text>Escolha um produto da bandeja.</p>
+              <button type="button" class="link-btn" data-builder-takeout hidden>Tirar da vitrine</button>
+              <button type="button" class="link-btn" data-builder-cancel hidden>Cancelar</button>
+            </div>
+
+            <div class="builder-tray">
+              <p class="picker-legend" id="bandeja-titulo">Bandeja de produtos</p>
+              <ul class="tray-list" data-builder-tray aria-labelledby="bandeja-titulo" aria-describedby="builder-ajuda"></ul>
+            </div>
+          </div>
+
+          <aside class="builder-panel" aria-labelledby="builder-lista-titulo">
+            <h3 id="builder-lista-titulo" class="builder-panel-title">Sua vitrine</h3>
+            <p class="builder-empty" data-builder-empty>Nenhum produto ainda. Coloque itens nas prateleiras para montar a lista.</p>
+            <ul class="builder-list" data-builder-list aria-label="Produtos da vitrine" hidden></ul>
+            <div class="builder-total">
+              <span>Total</span>
+              <strong data-builder-total>R$ 0,00</strong>
+            </div>
+            <p class="builder-units" data-builder-units>Nenhum produto na vitrine</p>
+            <button type="button" class="btn btn--orange" data-builder-send disabled>
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z"/></svg>
+              Enviar esta vitrine
+            </button>
+            <button type="button" class="btn btn--outline" data-builder-download disabled>Baixar imagem da minha vitrine</button>
+            <button type="button" class="link-btn" data-builder-clear hidden>Limpar vitrine</button>
+            <p class="builder-note">Ao enviar, a lista abre no WhatsApp e também entra no orçamento do site. Preços por unidade; frete e prazo combinados com a equipe.</p>
+          </aside>
+        </div>
+        <p class="sr-only" data-builder-status aria-live="polite"></p>
+      </div>
+    </section>
+
     <!-- ============ ATACADO ============ -->
     <section class="wholesale" id="atacado" aria-labelledby="atacado-titulo">
       <span class="dots-pattern dots-pattern--corner" data-float aria-hidden="true"></span>
@@ -345,11 +588,6 @@
   </dialog>
 
   <!-- ============ ORÇAMENTO DE ATACADO ============ -->
-  <button type="button" class="quote-fab" id="quote-fab" data-quote-open aria-haspopup="dialog" aria-controls="quote-drawer" aria-label="Abrir orçamento (0 itens)">
-    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M9 2h6a2 2 0 0 1 2 2h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2-2Zm0 2v2h6V4H9ZM7 10v2h10v-2H7Zm0 4v2h7v-2H7Z"/></svg>
-    <span class="quote-fab-label" aria-hidden="true">Orçamento</span>
-    <span class="quote-fab-count" id="quote-count" aria-hidden="true">0</span>
-  </button>
 
   <dialog class="drawer" id="quote-drawer" aria-labelledby="quote-titulo">
     <div class="drawer-inner">
@@ -402,16 +640,72 @@
 
   <p class="sr-only" id="quote-status" aria-live="polite"></p>
 
+  <!-- ============ BARRA INFERIOR (celular) ============ -->
+  <nav class="tabbar" aria-label="Atalhos de navegação">
+    <a class="tab" href="#inicio" data-tab="inicio">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 11 12 4l8 7v9h-5v-6H9v6H4v-9Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      <span>Início</span>
+    </a>
+    <a class="tab" href="#produtos" data-tab="produtos">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 8h18v12H3V8Zm-1-4h20v4H2V4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      <span>Produtos</span>
+    </a>
+    <a class="tab" href="#monte-sua-vitrine" data-tab="vitrine">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 3h16v18H4V3Zm0 6h16M4 15h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      <span>Vitrine</span>
+    </a>
+    <button type="button" class="tab" data-quote-open data-quote-btn aria-haspopup="dialog" aria-controls="quote-drawer" aria-label="Abrir orçamento (0 itens)">
+      <span class="tab-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M9 2h6a2 2 0 0 1 2 2h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2-2Zm0 2v2h6V4H9ZM7 10v2h10v-2H7Zm0 4v2h7v-2H7Z"/></svg>
+        <span class="tab-count" data-quote-count hidden>0</span>
+      </span>
+      <span>Orçamento</span>
+    </button>
+    <a class="tab tab--whats" data-config="whatsapp" href="https://wa.me/5511951146301" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z"/></svg>
+      <span>WhatsApp</span><span class="sr-only"> (abre em nova aba)</span>
+    </a>
+  </nav>
+
+  <!-- ============ BUSCA (Ctrl K) ============ -->
+  <dialog class="search" id="busca" aria-labelledby="busca-titulo">
+    <div class="search-inner">
+      <h2 class="sr-only" id="busca-titulo">Buscar produtos</h2>
+      <div class="search-field">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input type="search" data-search-input placeholder="Buscar estojo, acrílico, suporte, cor…" autocomplete="off" spellcheck="false"
+               role="combobox" aria-expanded="true" aria-controls="busca-lista" aria-autocomplete="list" aria-describedby="busca-ajuda">
+        <button type="button" class="search-close" data-search-close aria-label="Fechar busca"><kbd aria-hidden="true">Esc</kbd></button>
+      </div>
+      <ul class="search-list" id="busca-lista" role="listbox" aria-label="Produtos encontrados" data-search-list></ul>
+      <p class="search-empty" data-search-empty hidden>Nenhum produto encontrado. Tente "estojo", "acrílico" ou uma cor.</p>
+      <p class="search-help" id="busca-ajuda">
+        <span><kbd>↑</kbd><kbd>↓</kbd> navegar</span>
+        <span><kbd>Enter</kbd> abrir</span>
+        <span><kbd data-kbd-mod>Ctrl</kbd>+<kbd>Enter</kbd> orçamento</span>
+        <span><kbd>Esc</kbd> fechar</span>
+      </p>
+      <p class="sr-only" data-search-status aria-live="polite"></p>
+    </div>
+  </dialog>
+
+
   <!-- Conteúdo primeiro: dados, templates e lógica montam a página na hora -->
   <script src="js/products.js"></script>
   <script src="js/render.js"></script>
   <script src="js/main.js"></script>
   <script src="js/quote.js"></script>
+  <script src="js/hero3d.js"></script>
+  <script src="js/vitrine-builder.js"></script>
+  <script src="js/header.js"></script>
 
   <!-- Animações por último, sem bloquear a página (defer).
        Se o CDN falhar, o site funciona estático. -->
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <!-- Experiência (abertura, cursor, confete, agradecimento) antes das animações:
+       o hero espera a abertura terminar -->
+  <script defer src="js/experience.js"></script>
   <script defer src="js/animations.js"></script>
 </body>
 </html>
