@@ -22,11 +22,12 @@ window.SITE_CONFIG = {
   catalogoPdf: "assets/catalogo-injet-nobre.pdf",
 
   // ---- SOBRE A FÁBRICA ----
-  // PLACEHOLDERS: troque pelos números reais. "valor" precisa ser um número.
+  // "valor" precisa ser um número (4000 aparece como "4.000").
+  // Anos de mercado e lojistas são reais; peças/mês e produção própria ainda são provisórios.
   numerosFabrica: [
-    { valor: 20,  sufixo: "+",    rotulo: "anos de mercado" },
+    { valor: 40,   sufixo: "",     rotulo: "anos de mercado" },
     { valor: 500, sufixo: " mil", rotulo: "peças produzidas por mês" },
-    { valor: 300, sufixo: "+",    rotulo: "lojistas atendidos" },
+    { valor: 4000, sufixo: "+",   rotulo: "lojistas atendidos" },
     { valor: 100, sufixo: "%",    rotulo: "produção própria" }
   ],
 
