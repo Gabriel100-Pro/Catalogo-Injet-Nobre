@@ -21,6 +21,8 @@
   const $ = (sel, ctx = hero) => ctx.querySelector(sel);
   const $$ = (sel, ctx = hero) => Array.from(ctx.querySelectorAll(sel));
   const reduceMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Layout de celular da hero (mesmo limite do CSS)
+  const isMobile = () => window.matchMedia("(max-width: 760px)").matches;
   const gsapOK = () => !!window.gsap && !reduceMotion();
   const SCENE_URL = new URL("hero3d-scene.js", document.currentScript.src).href;
   const WATCH_URL = new URL("../assets/relogio.glb", document.currentScript.src).href;
@@ -244,11 +246,36 @@
     }
   });
 
+  // No celular estes botões mostram só o ícone: o aria-label diz a ação
   function syncLid(open) {
     $("span", lidBtn).innerHTML = `${open ? "Fechar" : "Abrir"}<span class="hero3d-long"> tampa</span>`;
+    lidBtn.setAttribute("aria-label", open ? "Fechar tampa" : "Abrir tampa");
   }
   function syncWatch(out) {
     $("span", watchBtn).innerHTML = `${out ? "Guardar" : "Tirar"}<span class="hero3d-long"> relógio</span>`;
+    watchBtn.setAttribute("aria-label", out ? "Guardar relógio" : "Tirar relógio");
+  }
+
+  /* ---------- Celular: espaço livre da caixa (variáveis do CSS) ---------- */
+  function frame() {
+    if (!isMobile()) return null;
+    const cs = getComputedStyle(hero);
+    const px = (name, fallback) => parseFloat(cs.getPropertyValue(name)) || fallback;
+    // side: a caixa não passa por baixo dos botões redondos (44px + 16px)
+    return { top: px("--hf-top", 126), bottom: px("--hf-bot", 156), side: 56 };
+  }
+
+  /* ---------- Celular, primeiro acesso: "Deslize para trocar · toque para abrir" ---------- */
+  const SWIPE_KEY = "injet-hero-swipe-v1";
+  function swipeHint() {
+    const tip = $("[data-hero-swipe]");
+    if (!tip || !isMobile()) return;
+    try {
+      if (localStorage.getItem(SWIPE_KEY)) return;
+      localStorage.setItem(SWIPE_KEY, "1");
+    } catch (e) { /* sem armazenamento: mostra mesmo assim */ }
+    tip.classList.add("is-on");
+    setTimeout(() => tip.classList.remove("is-on"), 3000);
   }
 
   /* ---------- Sem 3D ---------- */
@@ -284,6 +311,13 @@
         reduce: reduceMotion(),
         lowPower,
         onLidChange: syncLid,
+        mobile: isMobile,
+        frame,
+        // deslizar o dedo para os lados troca a variação (com o mesmo giro)
+        onSwipe: (dir) => {
+          hero.classList.add("has-interacted");
+          go(dir);
+        },
         onWatchChange: syncWatch,
         onFirstFrame: () => hero.classList.add("is-3d-ready"),
         // A caixa caiu e abriu a tampa: agora sim baixa o relógio
@@ -301,7 +335,10 @@
         ? "Arraste para girar · clique para abrir"
         : "Arraste para girar · toque para abrir";
       // Só anima depois da abertura do site; para quando a hero sai da tela
-      onReveal(() => watchVisibility());
+      onReveal(() => {
+        watchVisibility();
+        setTimeout(swipeHint, 900);
+      });
     } catch (err) {
       viewer = null;
       fallback();

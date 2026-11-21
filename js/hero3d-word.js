@@ -24,6 +24,8 @@
   const DASH = 1600;   // maior que o contorno de qualquer letra usada
   const GLINT = 130;   // comprimento da luz que passa pelo contorno
   const STROKE_PX = 2.6;
+  const STROKE_PX_MOBILE = 1.5;  // celular: contorno mais fino e suave
+  const isMobile = () => window.matchMedia("(max-width: 760px)").matches;
   const FILL = 0.08;     // preenchimento leve (igual ao .hw-base do CSS)
   const motionOK = () => !!window.gsap && window.matchMedia("(prefers-reduced-motion: no-preference)").matches;
   const up = (s) => String(s).trim().toLocaleUpperCase("pt-BR");
@@ -114,14 +116,18 @@
     fit();
   }
 
-  /* ---------- Tamanho: palavra longa ("ACRÍLICO" no celular) encolhe para caber ----------
+  /* ---------- Tamanho ----------
+     Computador: palavra longa encolhe para caber (92% da largura).
+     Celular: "ESTOJO" e "ACRÍLICO" sempre inteiras, com ~90% da largura.
      Escala no .hw-inner (o GSAP junta com o x/y do mouse); o contorno é
      compensado para manter a mesma espessura na tela. */
   function fit(text = word, animate = false) {
     const px = parseFloat(getComputedStyle(el).fontSize) || 200;
     const wordPx = (Array.from(text).reduce((s, ch) => s + widthOf(ch), 0) / FS) * px;
-    const scale = Math.min(1, (hero.clientWidth * 0.92) / Math.max(1, wordPx));
-    el.style.setProperty("--hw-sw", `${((STROKE_PX * FS) / (px * scale)).toFixed(2)}px`);
+    const mobile = isMobile();
+    const target = (hero.clientWidth * (mobile ? 0.9 : 0.92)) / Math.max(1, wordPx);
+    const scale = mobile ? target : Math.min(1, target);
+    el.style.setProperty("--hw-sw", `${(((mobile ? STROKE_PX_MOBILE : STROKE_PX) * FS) / (px * scale)).toFixed(2)}px`);
     if (window.gsap) window.gsap.to(inner, { scale, duration: animate ? 0.6 : 0, ease: "power3.inOut", overwrite: "auto" });
     else inner.style.transform = `scale(${scale})`;
   }
@@ -159,7 +165,8 @@
   }
   function glint() {
     if (!motionOK()) return;
-    if (onScreen && !tl) {
+    // no celular a luz fica desligada (aparecia como trechos brancos sobre as letras)
+    if (onScreen && !tl && !isMobile()) {
       window.gsap.fromTo(part(".hw-glint"),
         { strokeDashoffset: GLINT, opacity: 1 },
         { strokeDashoffset: -DASH * 0.75, duration: 2.6, ease: "power1.inOut", stagger: 0.14,
