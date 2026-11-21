@@ -35,13 +35,15 @@
     { cor: "rosa",     box: "#E8338A", pill: "#D92A7C", bg: "#FFE0EE", ink: "#111111", stroke: "rgba(17,17,17,.75)", watch: { metal: ROSE, dial: "#e897bd" } },
     { cor: "vermelho", box: "#D61F26", pill: "#B9141B", bg: "#1A1A1A", ink: "#FFFFFF", stroke: "rgba(214,31,38,.95)", watch: { metal: STEEL, dial: "#b0141b" } }
   ];
+  // Quadrada e redonda, cada uma com espuma (R$ 1,90) ou almofada (R$ 2,30)
   const ACRILICO = [
-    { forma: "quad", int: "almofada", watch: { metal: STEEL, dial: null } },
     { forma: "quad", int: "espuma",   watch: { metal: STEEL, dial: "#1f4fd0" } },
-    { forma: "red",  int: "almofada", watch: { metal: GOLD,  dial: null } },
-    { forma: "red",  int: "espuma",   watch: { metal: STEEL, dial: "#e8e8e2" } }
+    { forma: "quad", int: "almofada", watch: { metal: STEEL, dial: null } },
+    { forma: "red",  int: "espuma",   watch: { metal: STEEL, dial: "#e8e8e2" } },
+    { forma: "red",  int: "almofada", watch: { metal: GOLD,  dial: null } }
   ];
-  const ACR_LOOK = { bg: "#111111", ink: "#FFFFFF", stroke: "rgba(255,106,19,.95)" };
+  // Fundo preto com brilho laranja atrás (.hero3d-glow): a tampa transparente aparece
+  const ACR_LOOK = { bg: "#0A0A0A", ink: "#FFFFFF", stroke: "rgba(255,106,19,.95)" };
   const FORMA = { quad: "Quadrangular", red: "Redonda" };
   const INTERIOR = { espuma: "Espuma", almofada: "Almofada" };
 
@@ -60,10 +62,11 @@
   const list = () => LISTS[state.prod];
   const cur = () => list()[state.i];
   const look = () => (state.prod === "estojo" ? cur() : ACR_LOOK);
-  const isDark = (hex) => {
+  const lum = (hex) => {
     const n = parseInt(hex.slice(1), 16);
-    return (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255 < 0.45;
+    return (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
   };
+  const isDark = (hex) => lum(hex) < 0.45;
   const variantName = (v) => (state.prod === "estojo" ? v.product.variante : `${v.product.formato} · ${v.product.interior}`);
   const pad = (n) => String(n).padStart(2, "0");
 
@@ -105,6 +108,9 @@
       hero.style.setProperty("--h-bg", l.bg);
       hero.style.setProperty("--h-ink", l.ink);
       hero.style.setProperty("--h-stroke", l.stroke);
+      // Luz que passa pela palavra do fundo: branca em fundo escuro;
+      // em fundo claro, a cor da caixa (se não for escura demais)
+      hero.style.setProperty("--h-glint", isDark(l.bg) || !l.box || lum(l.box) < 0.2 ? "#FFFFFF" : l.box);
       hero.dataset.tone = isDark(l.bg) ? "dark" : "light";
       hero.classList.toggle("is-acrilico", state.prod === "acrilico");
     };
@@ -152,7 +158,10 @@
     $("[data-hero-price]").textContent = p.preco.toFixed(2).replace(".", ",");
     $("[data-hero-idx]").textContent = pad(state.i + 1);
     $("[data-hero-total]").textContent = pad(list().length);
-    $("[data-hero-word]").textContent = state.prod === "estojo" ? "Estojo" : "Acrílico";
+    // Palavra do fundo: js/hero3d-word.js troca letra por letra (efeito placar)
+    const word = state.prod === "estojo" ? "Estojo" : "Acrílico";
+    if (window.InjetHeroWord) window.InjetHeroWord.set(word);
+    else $("[data-hero-word]").textContent = word;
     setName(variantName(v), dir);
     renderDots();
     addBtn.dataset.quoteAdd = p.ref;

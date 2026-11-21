@@ -2509,7 +2509,10 @@ body.is-thanks-open { overflow: hidden; }
   pointer-events: none;
   opacity: 0;
   transition: opacity .8s var(--ease);
-  background: radial-gradient(circle at 50% 50%, rgba(255, 106, 19, .42), rgba(255, 106, 19, 0) 42%);
+  /* brilho laranja atrás da caixa de acrílico (fundo preto) */
+  background:
+    radial-gradient(circle at 50% var(--glow-y, 52%), rgba(255, 140, 60, .5), rgba(255, 106, 19, 0) 24%),
+    radial-gradient(ellipse 62% 56% at 50% var(--glow-y, 52%), rgba(255, 106, 19, .42), rgba(255, 106, 19, .12) 55%, rgba(255, 106, 19, 0) 78%);
 }
 .hero3d.is-acrilico .hero3d-glow { opacity: 1; }
 
@@ -2528,13 +2531,16 @@ body.is-thanks-open { overflow: hidden; }
 .hero3d-stage:focus-visible { outline-offset: -10px; }
 .is-3d-fallback .hero3d-stage { cursor: default; }
 .hero3d-canvas { position: absolute; inset: 0; z-index: 1; display: block; width: 100%; height: 100%; }
+/* Palavra gigante do fundo (js/hero3d-word.js monta uma letra por SVG).
+   Sem JS: texto com contorno. Palavra longa encolhe (escala) para caber. */
 .hero3d-word {
+  --hw-size: min(25vw, 340px);
   position: absolute;
   left: 50%; top: 50%;
   z-index: 0;
   transform: translate(-50%, -50%);
   font-family: var(--font-title);
-  font-size: min(25vw, 340px);
+  font-size: var(--hw-size);
   font-weight: 700;
   line-height: .85;
   text-transform: uppercase;
@@ -2542,7 +2548,37 @@ body.is-thanks-open { overflow: hidden; }
   color: transparent;
   -webkit-text-stroke: 2px var(--h-stroke);
   pointer-events: none;
+  perspective: 1000px;
 }
+.hero3d-word.is-svg {
+  line-height: 1;
+  -webkit-text-stroke: 0;
+}
+.hw-inner { display: flex; perspective: 700px; will-change: transform; }
+.hw-ch { display: block; flex: none; backface-visibility: hidden; }
+.hw-ch svg { display: block; overflow: visible; }
+.hero3d-word text { font-family: inherit; font-size: 200px; font-weight: 700; }
+.hw-base {
+  fill: var(--h-stroke);
+  fill-opacity: .08;
+  stroke: var(--h-stroke);
+  stroke-width: var(--hw-sw, 2.6px);
+  stroke-linejoin: round;
+  transition: fill .6s var(--ease), stroke .6s var(--ease);
+}
+/* Luz curta que percorre o contorno (animada por JS) */
+.hw-glint {
+  fill: none;
+  stroke: var(--h-glint, #fff);
+  stroke-width: calc(var(--hw-sw, 2.6px) * 1.7);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 130 1600;
+  stroke-dashoffset: 130;
+  opacity: 0;
+}
+/* Antes da entrada: contorno ainda não desenhado */
+.hw-pending .hw-base { stroke-dasharray: 1600; stroke-dashoffset: 1600; fill-opacity: 0; }
 .hero3d-photo {
   position: absolute;
   left: 50%; top: 50%;
@@ -2567,21 +2603,32 @@ body.is-thanks-open { overflow: hidden; }
   width: fit-content;
   margin-inline: auto;
 }
-.hero3d-seg { display: flex; border: 2px solid currentColor; }
+/* Seletor Estojo clássico / Caixa de acrílico: bem visível sobre qualquer fundo */
+.hero3d-seg {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 2px solid currentColor;
+  background: color-mix(in srgb, var(--h-bg) 72%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .16);
+}
 .hero3d-seg button {
-  min-height: 44px;
-  padding: 0 18px;
+  min-height: 46px;
+  padding: 0 22px;
   border: 0;
   background: transparent;
   color: inherit;
   font-family: var(--font-title);
-  font-size: .78rem;
+  font-size: .86rem;
   font-weight: 600;
   letter-spacing: .12em;
   text-transform: uppercase;
   cursor: pointer;
   transition: background-color .25s var(--ease), color .25s var(--ease);
 }
+.hero3d-seg button:hover { background: color-mix(in srgb, var(--h-ink) 12%, transparent); }
 .hero3d-seg button[aria-pressed="true"] { background: var(--h-ink); color: var(--h-bg); }
 .hero3d-pill {
   display: inline-flex;
@@ -2602,7 +2649,7 @@ body.is-thanks-open { overflow: hidden; }
 .hero3d-pill:hover { background: var(--h-ink); color: var(--h-bg); opacity: 1; }
 .hero3d-hint {
   position: absolute;
-  top: 166px; left: 0; right: 0;
+  top: 180px; left: 0; right: 0;
   z-index: 2;
   margin: 0;
   font-size: .7rem;
@@ -2805,7 +2852,7 @@ body.is-thanks-open { overflow: hidden; }
 @media (max-width: 1099px) {
   .hero3d { height: calc(100svh - var(--tabbar-h)); }
   .hero3d-top { top: 80px; }
-  .hero3d-hint { top: 134px; }
+  .hero3d-hint { top: 150px; }
 }
 @media (max-width: 980px) {
   .hero3d-title { font-size: 1.9rem; }
@@ -2817,10 +2864,12 @@ body.is-thanks-open { overflow: hidden; }
 @media (max-width: 759px) {
   .hero3d-top { top: 80px; left: 16px; right: 16px; width: auto; }
   .hero3d-seg { flex: 1; }
-  .hero3d-seg button { flex: 1; padding: 0 6px; font-size: .7rem; }
+  .hero3d-seg { padding: 3px; gap: 3px; }
+  .hero3d-seg button { flex: 1; min-height: 42px; padding: 0 6px; font-size: .68rem; letter-spacing: .08em; white-space: nowrap; }
   .hero3d-pill { padding: 0 10px; font-size: .64rem; }
-  .hero3d-hint { top: 134px; }
-  .hero3d-word { top: 42%; font-size: 34vw; }
+  .hero3d-hint { top: 140px; }
+  .hero3d-word { --hw-size: 34vw; top: 42%; }
+  .hero3d-glow { --glow-y: 42%; }
   .hero3d-photo { top: 42%; }
   .hero3d-arrow { top: 42%; width: 54px; height: 54px; margin-top: -27px; }
   .hero3d-arrow--prev { left: 10px; }
