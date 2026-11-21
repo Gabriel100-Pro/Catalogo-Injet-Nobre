@@ -1,0 +1,177 @@
+<!--
+  INJET NOBRE – SEÇÕES GUARDADAS (fora da página inicial desde a reorganização)
+  ============================================================================
+  Este arquivo não é uma página do site: guarda o HTML das seções que saíram
+  de index.html, para reaproveitar depois. O CSS (css/styles.css) e o JS
+  continuam no projeto e funcionam sozinhos quando o HTML volta para a página:
+
+  1. Vitrine horizontal (#vitrine)
+     JS: initVitrine() em js/main.js + vitrinePinned()/vitrineCarousel() em
+     js/animations.js. Para reativar, cole o bloco 1 logo depois da hero.
+
+  2. Produtos por linha, com destaque em tela cheia ([data-spotlight]) e
+     cards grandes (R.cardHTML)
+     JS: initSpotlights() e initGrids() em js/main.js; spotlights() e grids()
+     em js/animations.js. O filtro (initFilter) aceita as duas versões.
+
+  3. Kit vitrine em tela grande (#kit)
+     JS: initKit() em js/main.js; kit() em js/animations.js. Hoje o kit é uma
+     linha dentro da faixa de atacado.
+
+  4. Atacado na versão grande (antes da faixa curta)
+
+  "Sobre a fábrica" foi para sobre.html (não está aqui).
+-->
+
+<!-- ===== 1. VITRINE HORIZONTAL ===== -->
+    <!-- ============ VITRINE (rolagem horizontal presa no desktop / carrossel no celular) ============ -->
+    <section class="vitrine" id="vitrine" aria-labelledby="vitrine-titulo" aria-roledescription="carrossel">
+      <!-- Camadas de cor do painel: a do slide atual aparece (troca suave por opacidade) -->
+      <div class="vitrine-bg" id="vitrine-bg" aria-hidden="true"></div>
+      <div class="vitrine-viewport" id="vitrine-viewport" tabindex="-1">
+        <ul class="vitrine-track" id="vitrine-track">
+          <!-- slides inseridos via JS -->
+        </ul>
+      </div>
+
+      <div class="vitrine-ui">
+        <h2 id="vitrine-titulo" class="vitrine-label">Vitrine <span aria-hidden="true">·</span> 2026</h2>
+        <p class="vitrine-count" aria-live="polite">
+          <span class="sr-only">Produto </span><strong id="vitrine-current">01</strong> / <span id="vitrine-total">13</span>
+          <span class="vitrine-name" id="vitrine-name"></span>
+        </p>
+        <div class="vitrine-progress" aria-hidden="true"><span id="vitrine-bar"></span></div>
+        <div class="vitrine-arrows">
+          <button type="button" class="nav-arrow nav-arrow--light" data-vitrine-step="-1" aria-label="Produto anterior">←</button>
+          <button type="button" class="nav-arrow nav-arrow--light" data-vitrine-step="1" aria-label="Próximo produto">→</button>
+        </div>
+      </div>
+    </section>
+
+<!-- ===== 2. PRODUTOS POR LINHA (destaques em tela cheia + cards grandes) ===== -->
+    <!-- ============ PRODUTOS ============ -->
+    <section class="products" id="produtos" aria-labelledby="produtos-titulo">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Nossos produtos</p>
+            <h2 id="produtos-titulo" class="section-title">Catálogo <span class="outline-text">2026</span></h2>
+          </div>
+
+          <div class="filter" role="group" aria-label="Filtrar produtos por linha">
+            <button type="button" class="filter-btn" data-filter="todos" aria-pressed="true">Todos</button>
+            <button type="button" class="filter-btn" data-filter="estojos" aria-pressed="false">Estojos</button>
+            <button type="button" class="filter-btn" data-filter="expositores" aria-pressed="false">Expositores</button>
+            <button type="button" class="filter-btn" data-filter="acrilicos" aria-pressed="false">Acrílico</button>
+          </div>
+        </div>
+        <p class="sr-only" id="filtro-status" aria-live="polite"></p>
+      </div>
+
+      <!-- Linha Estojos -->
+      <div class="product-line" id="linha-estojos" data-line="estojos" aria-labelledby="linha-estojos-titulo" role="region">
+        <div data-spotlight="estojos" data-word="Estojos" data-line-name="Estojos para relógio" data-picker="swatches"><!-- vitrine de linha via JS --></div>
+        <div class="container">
+          <div class="mosaic" data-grid="estojos">
+            <div class="tile tile--line tile--orange">
+              <span class="dots-pattern" aria-hidden="true"></span>
+              <p class="tile-kicker">Linha</p>
+              <h3 id="linha-estojos-titulo" class="tile-title">
+                <span class="outline-text outline-text--light">Esto</span><span class="outline-text outline-text--light">jos</span>
+              </h3>
+              <p class="tile-text">Estojos para relógio com almofada interna, em seis cores para combinar com a sua vitrine.</p>
+            </div>
+            <!-- cards inseridos via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Linha Expositores -->
+      <div class="product-line" id="linha-expositores" data-line="expositores" aria-labelledby="linha-expositores-titulo" role="region">
+        <div data-spotlight="expositores" data-word="Expositores" data-line-name="Expositores" data-picker="segmented"><!-- vitrine de linha via JS --></div>
+        <div class="container">
+          <div class="mosaic" data-grid="expositores">
+            <div class="tile tile--line tile--dark">
+              <span class="dots-pattern dots-pattern--orange" aria-hidden="true"></span>
+              <p class="tile-kicker tile-kicker--orange">Linha</p>
+              <h3 id="linha-expositores-titulo" class="tile-title">
+                <span class="outline-text outline-text--light">Expo</span><span class="outline-text outline-text--light">sitores</span>
+              </h3>
+              <p class="tile-text">Suportes em acrílico para relógios, joias e bijuterias.</p>
+            </div>
+            <!-- cards inseridos via JS -->
+            <a href="#kit" class="tile tile--cta tile--gray" data-tile="kit">
+              <p class="tile-kicker">Para lojistas</p>
+              <p class="tile-title tile-title--solid">Monte seu<br>kit vitrine</p>
+              <p class="tile-text">Combine estojos e expositores com preço de atacado.</p>
+              <span class="tile-link">Saiba mais <span aria-hidden="true">→</span></span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Linha Caixas de acrílico -->
+      <div class="product-line" id="linha-acrilicos" data-line="acrilicos" aria-labelledby="linha-acrilicos-titulo" role="region">
+        <div data-spotlight="acrilicos" data-word="Acrílico" data-line-name="Caixas de acrílico" data-picker="options"><!-- vitrine de linha via JS --></div>
+        <div class="container">
+          <div class="mosaic" data-grid="acrilicos">
+            <div class="tile tile--line tile--dark">
+              <span class="dots-pattern dots-pattern--orange" aria-hidden="true"></span>
+              <p class="tile-kicker tile-kicker--orange">Linha</p>
+              <h3 id="linha-acrilicos-titulo" class="tile-title">
+                <span class="outline-text outline-text--light">Acrí</span><span class="outline-text outline-text--light">lico</span>
+              </h3>
+              <p class="tile-text">Caixas com tampa de acrílico, redondas ou quadrangulares, com espuma ou almofada.</p>
+            </div>
+            <!-- cards inseridos via JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+<!-- ===== 3. KIT VITRINE (seção grande) ===== -->
+    <!-- ============ MONTE SEU KIT VITRINE ============ -->
+    <section class="kit" id="kit" aria-labelledby="kit-titulo">
+      <div class="kit-grid">
+        <!-- Composição: "ref" dos produtos (js/products.js). Para incluir um relógio,
+             preencha SITE_CONFIG.fotoRelogioKit em js/products.js -->
+        <div class="kit-stage" role="img" aria-label="Kit vitrine: estojo para relógio branco com suporte de acrílico preto">
+          <span class="dots-pattern" data-float aria-hidden="true"></span>
+          <span class="kit-word outline-text outline-text--light" aria-hidden="true">Kit</span>
+          <div class="kit-item kit-item--case" data-kit-item="IN-E02"></div>
+          <div class="kit-item kit-item--stand" data-kit-item="IN-S02"></div>
+          <img class="kit-watch" data-kit-watch alt="" width="600" height="600" decoding="async" hidden>
+          <span class="kit-tag" aria-hidden="true">Estojo + suporte</span>
+        </div>
+        <div class="kit-text">
+          <p class="eyebrow">Para lojistas</p>
+          <h2 id="kit-titulo" class="section-title">Monte seu <span class="outline-text">kit vitrine</span></h2>
+          <p>Estojo para apresentar e suporte para expor: o par certo para valorizar cada relógio no balcão. Combine cores e versões e peça tudo de uma vez.</p>
+          <ul class="kit-list" data-kit-list></ul>
+          <div class="kit-actions">
+            <button type="button" class="btn btn--dark" data-kit-add>Adicionar kit ao orçamento</button>
+            <a href="#vitrine" class="btn btn--outline">Ver todas as cores</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+<!-- ===== 4. ATACADO (versão grande) ===== -->
+    <!-- ============ ATACADO ============ -->
+    <section class="wholesale" id="atacado" aria-labelledby="atacado-titulo">
+      <span class="dots-pattern dots-pattern--corner" data-float aria-hidden="true"></span>
+      <div class="container wholesale-grid">
+        <div>
+          <p class="eyebrow eyebrow--dark">Para lojistas e revendedores</p>
+          <h2 id="atacado-titulo" class="wholesale-title">Compre no atacado</h2>
+          <p class="wholesale-sub"><span class="outline-text outline-text--dark">Preço de fábrica</span></p>
+        </div>
+        <div class="wholesale-side">
+          <p>Condições especiais para lojistas, pedido mínimo acessível e envio para todo o Brasil. Consulte nossa equipe.</p>
+          <div class="wholesale-actions">
+            <button type="button" class="btn btn--dark" data-quote-open aria-haspopup="dialog" aria-controls="quote-drawer">Montar orçamento</button>
+            <a class="btn btn--ghost-dark" id="atacado-whatsapp" href="#" target="_blank" rel="noopener">Falar com a equipe</a>
+          </div>
+        </div>
+      </div>
+    </section>

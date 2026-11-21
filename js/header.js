@@ -48,19 +48,22 @@
   const estojos = byGroup("estojo-relogio");
   const caixas = byGroup("caixa-acrilico");
   const suportes = R.products.filter((p) => p.linha === "expositores");
+  // Na página inicial os atalhos filtram a grade; em sobre.html voltam para ela
+  const onHome = !!document.getElementById("produtos");
+  const lineHref = (line) => (onHome ? "#produtos" : `index.html?linha=${line}#produtos`);
   const LINES = [
     {
-      num: "01", nome: "Estojo para relógio", href: "#linha-estojos", short: "Estojos",
+      num: "01", nome: "Estojo para relógio", href: lineHref("estojos"), filter: "estojos", short: "Estojos",
       foto: (estojos.find((p) => p.variante === "Preto") || estojos[0]),
       preco: estojos.length ? minPrice(estojos) : 0, desde: false, cores: estojos.map((p) => ({ cor: p.cor, nome: p.variante }))
     },
     {
-      num: "02", nome: "Caixa de acrílico", href: "#linha-acrilicos", short: "Acrílico",
+      num: "02", nome: "Caixa de acrílico", href: lineHref("acrilicos"), filter: "acrilicos", short: "Acrílico",
       foto: caixas.find((p) => p.destaqueLinha) || caixas[0],
       preco: caixas.length ? minPrice(caixas) : 0, desde: caixas.length > 1
     },
     {
-      num: "03", nome: "Suportes", href: "#linha-expositores", short: "Suportes",
+      num: "03", nome: "Suportes", href: lineHref("expositores"), filter: "expositores", short: "Suportes",
       foto: suportes.find((p) => p.destaqueLinha) || suportes[0],
       preco: suportes.length ? minPrice(suportes) : 0, desde: suportes.length > 1
     }
@@ -69,7 +72,7 @@
 
   $("[data-mega-cards]").innerHTML = LINES.map((l) => `
     <li>
-      <a class="mega-card" href="${l.href}">
+      <a class="mega-card" href="${l.href}" data-filter-link="${l.filter}">
         <span class="mega-photo" aria-hidden="true">${R.pictureHTML(l.foto.imagem, "", { sizes: "180px" })}</span>
         <span class="hdr-num" aria-hidden="true">${l.num}</span>
         <strong class="mega-name">${R.esc(l.nome)}</strong>
@@ -80,7 +83,7 @@
 
   $("[data-mmenu-shortcuts]").innerHTML = LINES.map((l) => `
     <li>
-      <a class="mmenu-short" href="${l.href}">
+      <a class="mmenu-short" href="${l.href}" data-filter-link="${l.filter}">
         <span class="mmenu-short-photo" aria-hidden="true">${R.pictureHTML(l.foto.imagem, "", { sizes: "64px" })}</span>
         <span class="mmenu-short-name">${R.esc(l.short)}</span>
         <span class="mmenu-short-price">${R.esc(priceLabel(l))}</span>

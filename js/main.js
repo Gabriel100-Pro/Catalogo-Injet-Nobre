@@ -43,9 +43,19 @@
   }
 
   /* ---------- Grades de produtos ---------- */
+  // Ordem da grade "Todos": estojos, acrílico, expositores
+  const LINE_ORDER = ["estojos", "acrilicos", "expositores"];
+  const byLine = (a, b) => LINE_ORDER.indexOf(a.linha) - LINE_ORDER.indexOf(b.linha);
+
   function initGrids() {
     $$("[data-grid]").forEach((grid) => {
       const line = grid.dataset.grid;
+      // Grade compacta da página inicial: todos os produtos em cards pequenos
+      if (grid.hasAttribute("data-grid-compact")) {
+        const list = line === "todos" ? products.slice().sort(byLine) : products.filter((p) => p.linha === line);
+        grid.innerHTML = list.map(R.compactCardHTML).join("");
+        return;
+      }
       const html = products.filter((p) => p.linha === line).map(R.cardHTML).join("");
       const anchor = $("[data-tile]", grid); // tiles fixos no fim da grade
       if (anchor) anchor.insertAdjacentHTML("beforebegin", html);
@@ -265,10 +275,13 @@
     if (gallery) gallery.innerHTML = (config.fotosFabrica || []).map(R.factoryPhotoHTML).join("");
   }
 
-  /* ---------- Filtro por linha ---------- */
+  /* ---------- Filtro por linha ----------
+     Esconde os cards da grade compacta (e, se existirem, as linhas antigas
+     .product-line guardadas em guardados/secoes-antigas.html). */
   function initFilter() {
     const buttons = $$(".filter-btn");
     const lines = $$("[data-line].product-line");
+    const cards = $$("[data-grid-compact] .pcard");
     const status = $("#filtro-status");
 
     buttons.forEach((btn) => {
@@ -277,6 +290,9 @@
         buttons.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
         lines.forEach((line) => {
           line.hidden = filter !== "todos" && line.dataset.line !== filter;
+        });
+        cards.forEach((card) => {
+          card.hidden = filter !== "todos" && card.dataset.line !== filter;
         });
         const count = filter === "todos" ? products.length : products.filter((p) => p.linha === filter).length;
         if (status) status.textContent = `Mostrando ${count} produtos (${btn.textContent.trim()}).`;
@@ -291,6 +307,21 @@
         if (target && target.hidden) $('.filter-btn[data-filter="todos"]').click();
       });
     });
+
+    // Atalhos do menu (mega menu / menu do celular) já filtram a grade:
+    // <a href="#produtos" data-filter-link="estojos">
+    document.addEventListener("click", (e) => {
+      const a = e.target.closest("[data-filter-link]");
+      if (!a) return;
+      const btn = $(`.filter-btn[data-filter="${a.dataset.filterLink}"]`);
+      if (btn && btn.getAttribute("aria-pressed") !== "true") btn.click();
+    });
+    // Vindo de outra página (sobre.html): index.html?linha=estojos#produtos
+    const fromUrl = new URLSearchParams(location.search).get("linha");
+    if (fromUrl) {
+      const btn = $(`.filter-btn[data-filter="${fromUrl}"]`);
+      if (btn) btn.click();
+    }
   }
 
   /* ---------- Modal showcase ---------- */
