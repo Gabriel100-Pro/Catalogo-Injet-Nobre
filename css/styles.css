@@ -3312,3 +3312,206 @@ body.is-thanks-open { overflow: hidden; }
     overflow: visible;
   }
 }
+
+/* 13. PÁGINA INICIAL CURTA -------------------------------------------------
+   Grade compacta de produtos logo abaixo da hero, "Monte sua vitrine" mais
+   enxuta, faixa curta de atacado e espaços verticais menores. As seções
+   antigas (vitrine horizontal, destaques por linha, kit) estão em
+   guardados/secoes-antigas.html e o CSS delas continua acima. */
+
+/* Produtos: título + filtros em pílulas */
+.catalog { padding: 28px 0 40px; background: var(--white); }
+.catalog-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  margin-bottom: 18px;
+}
+.catalog-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: clamp(1.8rem, 6vw, 2.6rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+.catalog-title small {
+  font-family: var(--font-body);
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--gray-text);
+}
+.filter--pills {
+  flex-wrap: nowrap;
+  gap: 6px;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.filter--pills::-webkit-scrollbar { display: none; }
+.filter--pills .filter-btn {
+  flex: none;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1.5px solid var(--black);
+  border-radius: 999px;
+  font-size: .82rem;
+  white-space: nowrap;
+}
+.filter--pills .filter-btn[aria-pressed="true"]::before { content: none; }
+/* Celular: as quatro pílulas cabem numa linha (360px ou mais) */
+@media (max-width: 639px) {
+  .filter--pills { width: 100%; gap: 5px; }
+  .filter--pills .filter-btn { flex: 1 1 auto; padding: 0 8px; font-size: .74rem; letter-spacing: .03em; }
+}
+
+/* Grade: 2 por linha no celular, 3 no tablet, 4 no computador */
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.pcard {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--gray-line);
+  border-radius: 14px;
+  background: var(--white);
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.pcard[hidden] { display: none; }
+.pcard-media {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  background: var(--gray);
+  cursor: pointer;
+}
+.pcard-frame { display: block; width: 100%; height: 100%; }
+.pcard-frame .pic, .pcard-frame img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.pcard-body { display: flex; flex-direction: column; flex: 1; gap: 6px; padding: 10px 12px 12px; }
+.pcard-title { margin: 0; font-size: .92rem; line-height: 1.12; }
+.pcard-open {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-family: var(--font-title);
+  font-size: inherit;
+  font-weight: 600;
+  letter-spacing: .02em;
+  line-height: inherit;
+  text-align: left;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.pcard-open:hover { color: var(--orange); }
+.pcard-variant { display: block; color: var(--orange); }
+.pcard-price { margin: auto 0 0; padding-top: 2px; color: var(--gray-text); font-size: .78rem; }
+.pcard-price strong { color: var(--black); font-family: var(--font-title); font-size: 1.15rem; font-weight: 700; }
+.pcard-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--black);
+  color: var(--white);
+  font-size: .85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.pcard-add > span[aria-hidden] { font-size: 1.1rem; line-height: 1; }
+.pcard-add:hover, .pcard-add.is-added { background: var(--orange); color: var(--black); }
+@media (hover: hover) {
+  .pcard:hover { border-color: var(--black); box-shadow: 0 10px 24px rgba(0, 0, 0, .08); }
+}
+@media (min-width: 640px) {
+  .catalog-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .pcard-title { font-size: 1rem; }
+}
+@media (min-width: 1024px) {
+  .catalog { padding: 36px 0 48px; }
+  .catalog-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+  .pcard-body { padding: 14px 16px 16px; }
+  .pcard-title { font-size: 1.1rem; }
+}
+
+/* Monte sua vitrine: mais compacta (prateleiras, letreiro e balcão menores) */
+.builder { padding: 36px 0 40px; }
+.builder-head { margin-bottom: 16px; }
+.builder .section-title { font-size: clamp(1.8rem, 6vw, 2.6rem); }
+.builder .eyebrow { margin-bottom: 6px; }
+.builder-scene { padding-top: 12px; }
+.builder-sign { padding: 4px 12px 4px 4px; font-size: .8rem; }
+.builder-sign .logo-mark { width: 24px; height: 24px; font-size: .72rem; }
+.builder-cabinet { margin-top: 10px; border-width: 10px; }
+.builder-cabinet .shelf { height: clamp(78px, 18vw, 112px); border-bottom-width: 10px; }
+.builder-counter { padding: 8px 0 10px; border-top-width: 6px; font-size: .85rem; }
+.builder-hint { min-height: 40px; }
+.builder-tray { padding: 10px; }
+
+/* Atacado: faixa curta */
+.band { padding: 28px 0; background: var(--orange); color: var(--black); }
+.band-grid { display: grid; gap: 16px; align-items: center; }
+.band-kicker { margin: 0 0 6px; font-size: .72rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+.band-title { margin: 0; font-family: var(--font-title); font-size: clamp(1.6rem, 5vw, 2.4rem); line-height: 1.08; text-transform: uppercase; }
+.band-sub { margin: 6px 0 0; font-weight: 500; }
+.band-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.band-actions .btn { flex: 1 1 auto; justify-content: center; }
+.band-whats .icon { width: 20px; height: 20px; }
+.band-kit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin: 0;
+  padding-top: 14px;
+  border-top: 1.5px solid rgba(17, 17, 17, .25);
+  font-size: .92rem;
+}
+.band-kit-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1.5px solid currentColor;
+  border-radius: 999px;
+  color: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.band-kit-link:hover { background: var(--black); color: var(--orange); }
+@media (min-width: 960px) {
+  .band-grid { grid-template-columns: 1fr auto; gap: 18px 40px; }
+  .band-actions .btn { flex: none; }
+  .band-kit { grid-column: 1 / -1; }
+}
+
+/* Footer: menos espaço */
+.footer-grid { padding-block: 40px; }
+
+/* Página Sobre (sobre.html) */
+.page-about { padding-top: 96px; }
+.about-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+@media (min-width: 1100px) { .page-about { padding-top: 120px; } }

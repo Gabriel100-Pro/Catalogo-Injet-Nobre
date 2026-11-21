@@ -5,7 +5,9 @@ Site estático feito com HTML, CSS e JavaScript puros. Não tem build nem depend
 ## Estrutura
 
 ```
-index.html                Página única (estrutura e textos fixos)
+index.html                Página inicial: hero 3D → produtos → monte sua vitrine → atacado → contato
+sobre.html                Sobre a fábrica (texto, números e fotos da produção)
+guardados/                Seções que saíram da página inicial (HTML guardado para reaproveitar)
 css/styles.css            Estilos (mobile first, organizados por seção)
 js/products.js            DADOS: contatos + produtos  ← edite aqui
 js/render.js              Templates HTML (card, hero, vitrine, vitrine de linha, modal)
@@ -79,6 +81,18 @@ python -m http.server 8000
 3. Ou, pelo terminal: `npx vercel` na pasta do projeto.
 
 Nos dois casos, cada alteração enviada ao GitHub publica o site de novo automaticamente.
+
+## Página inicial (curta)
+
+Ordem: **hero 3D → produtos → monte sua vitrine → atacado → contato/footer**.
+
+- **Produtos:** grade compacta com todos os produtos ativos (card de `R.compactCardHTML` em `js/render.js`: foto, nome, preço por unidade e "+ Orçamento"). Filtros em pílulas (Todos · Estojos · Acrílico · Expositores). 2 por linha no celular, 3 no tablet, 4 no computador. Os atalhos do menu filtram a grade (`data-filter-link`); de outra página use `index.html?linha=estojos#produtos`.
+- **Atacado:** faixa curta com WhatsApp, "Montar orçamento" e a linha do kit vitrine (leva para "Monte sua vitrine").
+- **Sobre a fábrica** fica em `sobre.html` (mesmo header, menu, barra inferior e footer; foi gerada a partir do `index.html`, então mudanças no header/footer precisam ir para as duas páginas).
+- Barra inferior do celular: Produtos · Vitrine · Orçamento · Atacado · WhatsApp. "Sobre" e "Contato" ficam no menu ☰.
+- **Seções guardadas:** `guardados/secoes-antigas.html` tem o HTML da vitrine horizontal, dos destaques em tela cheia por linha (com os cards grandes), do kit vitrine grande e do atacado grande. O CSS e o JS delas continuam no projeto: basta colar o bloco de volta no `index.html` (instruções no topo do arquivo).
+
+Os itens abaixo sobre vitrine, vitrine de linha e kit descrevem essas seções guardadas.
 
 ## Seções e animações
 

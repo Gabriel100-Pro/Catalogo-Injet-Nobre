@@ -140,7 +140,7 @@
           </li>
           <li><a class="hdr-link" href="#monte-sua-vitrine" data-spy-link="vitrine"><span class="hdr-num" aria-hidden="true">02</span>Monte a vitrine</a></li>
           <li><a class="hdr-link" href="#atacado" data-spy-link="atacado"><span class="hdr-num" aria-hidden="true">03</span>Atacado</a></li>
-          <li><a class="hdr-link" href="#sobre" data-spy-link="sobre"><span class="hdr-num" aria-hidden="true">04</span>Sobre</a></li>
+          <li><a class="hdr-link" href="sobre.html" data-spy-link="sobre"><span class="hdr-num" aria-hidden="true">04</span>Sobre</a></li>
           <li><a class="hdr-link" href="#contato" data-spy-link="contato"><span class="hdr-num" aria-hidden="true">05</span>Contato</a></li>
         </ul>
         <span class="hdr-pill" data-hdr-pill aria-hidden="true"></span>
@@ -200,7 +200,7 @@
         <li style="--i: 0"><a href="#produtos" data-spy-link="produtos"><span class="mmenu-num" aria-hidden="true">01</span><span class="mmenu-text">Produtos</span></a></li>
         <li style="--i: 1"><a href="#monte-sua-vitrine" data-spy-link="vitrine"><span class="mmenu-num" aria-hidden="true">02</span><span class="mmenu-text">Monte a vitrine</span></a></li>
         <li style="--i: 2"><a href="#atacado" data-spy-link="atacado"><span class="mmenu-num" aria-hidden="true">03</span><span class="mmenu-text">Atacado</span></a></li>
-        <li style="--i: 3"><a href="#sobre" data-spy-link="sobre"><span class="mmenu-num" aria-hidden="true">04</span><span class="mmenu-text">Sobre</span></a></li>
+        <li style="--i: 3"><a href="sobre.html" data-spy-link="sobre"><span class="mmenu-num" aria-hidden="true">04</span><span class="mmenu-text">Sobre</span></a></li>
         <li style="--i: 4"><a href="#contato" data-spy-link="contato"><span class="mmenu-num" aria-hidden="true">05</span><span class="mmenu-text">Contato</span></a></li>
       </ol>
     </nav>
@@ -289,139 +289,28 @@
         Deslize para trocar · toque para abrir
       </p>
 
-      <a href="#vitrine" class="hero3d-scroll" aria-label="Role para ver mais">
+      <a href="#produtos" class="hero3d-scroll" aria-label="Role para ver mais">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"/></svg>
       </a>
       <p class="sr-only" data-hero-status aria-live="polite"></p>
     </section>
 
-    <!-- ============ VITRINE (rolagem horizontal presa no desktop / carrossel no celular) ============ -->
-    <section class="vitrine" id="vitrine" aria-labelledby="vitrine-titulo" aria-roledescription="carrossel">
-      <!-- Camadas de cor do painel: a do slide atual aparece (troca suave por opacidade) -->
-      <div class="vitrine-bg" id="vitrine-bg" aria-hidden="true"></div>
-      <div class="vitrine-viewport" id="vitrine-viewport" tabindex="-1">
-        <ul class="vitrine-track" id="vitrine-track">
-          <!-- slides inseridos via JS -->
-        </ul>
-      </div>
-
-      <div class="vitrine-ui">
-        <h2 id="vitrine-titulo" class="vitrine-label">Vitrine <span aria-hidden="true">·</span> 2026</h2>
-        <p class="vitrine-count" aria-live="polite">
-          <span class="sr-only">Produto </span><strong id="vitrine-current">01</strong> / <span id="vitrine-total">13</span>
-          <span class="vitrine-name" id="vitrine-name"></span>
-        </p>
-        <div class="vitrine-progress" aria-hidden="true"><span id="vitrine-bar"></span></div>
-        <div class="vitrine-arrows">
-          <button type="button" class="nav-arrow nav-arrow--light" data-vitrine-step="-1" aria-label="Produto anterior">←</button>
-          <button type="button" class="nav-arrow nav-arrow--light" data-vitrine-step="1" aria-label="Próximo produto">→</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ PRODUTOS ============ -->
-    <section class="products" id="produtos" aria-labelledby="produtos-titulo">
+    <!-- ============ PRODUTOS: grade compacta com todos os produtos ============
+         Cards montados por js/main.js (R.compactCardHTML). As seções antigas
+         (vitrine horizontal, destaques por linha, kit) estão em guardados/. -->
+    <section class="catalog" id="produtos" aria-labelledby="produtos-titulo">
       <div class="container">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">Nossos produtos</p>
-            <h2 id="produtos-titulo" class="section-title">Catálogo <span class="outline-text">2026</span></h2>
-          </div>
-
-          <div class="filter" role="group" aria-label="Filtrar produtos por linha">
+        <div class="catalog-head">
+          <h2 id="produtos-titulo" class="catalog-title">Produtos <small>preço por unidade</small></h2>
+          <div class="filter filter--pills" role="group" aria-label="Filtrar produtos por linha">
             <button type="button" class="filter-btn" data-filter="todos" aria-pressed="true">Todos</button>
             <button type="button" class="filter-btn" data-filter="estojos" aria-pressed="false">Estojos</button>
-            <button type="button" class="filter-btn" data-filter="expositores" aria-pressed="false">Expositores</button>
             <button type="button" class="filter-btn" data-filter="acrilicos" aria-pressed="false">Acrílico</button>
+            <button type="button" class="filter-btn" data-filter="expositores" aria-pressed="false">Expositores</button>
           </div>
         </div>
         <p class="sr-only" id="filtro-status" aria-live="polite"></p>
-      </div>
-
-      <!-- Linha Estojos -->
-      <div class="product-line" id="linha-estojos" data-line="estojos" aria-labelledby="linha-estojos-titulo" role="region">
-        <div data-spotlight="estojos" data-word="Estojos" data-line-name="Estojos para relógio" data-picker="swatches"><!-- vitrine de linha via JS --></div>
-        <div class="container">
-          <div class="mosaic" data-grid="estojos">
-            <div class="tile tile--line tile--orange">
-              <span class="dots-pattern" aria-hidden="true"></span>
-              <p class="tile-kicker">Linha</p>
-              <h3 id="linha-estojos-titulo" class="tile-title">
-                <span class="outline-text outline-text--light">Esto</span><span class="outline-text outline-text--light">jos</span>
-              </h3>
-              <p class="tile-text">Estojos para relógio com almofada interna, em seis cores para combinar com a sua vitrine.</p>
-            </div>
-            <!-- cards inseridos via JS -->
-          </div>
-        </div>
-      </div>
-
-      <!-- Linha Expositores -->
-      <div class="product-line" id="linha-expositores" data-line="expositores" aria-labelledby="linha-expositores-titulo" role="region">
-        <div data-spotlight="expositores" data-word="Expositores" data-line-name="Expositores" data-picker="segmented"><!-- vitrine de linha via JS --></div>
-        <div class="container">
-          <div class="mosaic" data-grid="expositores">
-            <div class="tile tile--line tile--dark">
-              <span class="dots-pattern dots-pattern--orange" aria-hidden="true"></span>
-              <p class="tile-kicker tile-kicker--orange">Linha</p>
-              <h3 id="linha-expositores-titulo" class="tile-title">
-                <span class="outline-text outline-text--light">Expo</span><span class="outline-text outline-text--light">sitores</span>
-              </h3>
-              <p class="tile-text">Suportes em acrílico para relógios, joias e bijuterias.</p>
-            </div>
-            <!-- cards inseridos via JS -->
-            <a href="#kit" class="tile tile--cta tile--gray" data-tile="kit">
-              <p class="tile-kicker">Para lojistas</p>
-              <p class="tile-title tile-title--solid">Monte seu<br>kit vitrine</p>
-              <p class="tile-text">Combine estojos e expositores com preço de atacado.</p>
-              <span class="tile-link">Saiba mais <span aria-hidden="true">→</span></span>
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Linha Caixas de acrílico -->
-      <div class="product-line" id="linha-acrilicos" data-line="acrilicos" aria-labelledby="linha-acrilicos-titulo" role="region">
-        <div data-spotlight="acrilicos" data-word="Acrílico" data-line-name="Caixas de acrílico" data-picker="options"><!-- vitrine de linha via JS --></div>
-        <div class="container">
-          <div class="mosaic" data-grid="acrilicos">
-            <div class="tile tile--line tile--dark">
-              <span class="dots-pattern dots-pattern--orange" aria-hidden="true"></span>
-              <p class="tile-kicker tile-kicker--orange">Linha</p>
-              <h3 id="linha-acrilicos-titulo" class="tile-title">
-                <span class="outline-text outline-text--light">Acrí</span><span class="outline-text outline-text--light">lico</span>
-              </h3>
-              <p class="tile-text">Caixas com tampa de acrílico, redondas ou quadrangulares, com espuma ou almofada.</p>
-            </div>
-            <!-- cards inseridos via JS -->
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ MONTE SEU KIT VITRINE ============ -->
-    <section class="kit" id="kit" aria-labelledby="kit-titulo">
-      <div class="kit-grid">
-        <!-- Composição: "ref" dos produtos (js/products.js). Para incluir um relógio,
-             preencha SITE_CONFIG.fotoRelogioKit em js/products.js -->
-        <div class="kit-stage" role="img" aria-label="Kit vitrine: estojo para relógio branco com suporte de acrílico preto">
-          <span class="dots-pattern" data-float aria-hidden="true"></span>
-          <span class="kit-word outline-text outline-text--light" aria-hidden="true">Kit</span>
-          <div class="kit-item kit-item--case" data-kit-item="IN-E02"></div>
-          <div class="kit-item kit-item--stand" data-kit-item="IN-S02"></div>
-          <img class="kit-watch" data-kit-watch alt="" width="600" height="600" decoding="async" hidden>
-          <span class="kit-tag" aria-hidden="true">Estojo + suporte</span>
-        </div>
-        <div class="kit-text">
-          <p class="eyebrow">Para lojistas</p>
-          <h2 id="kit-titulo" class="section-title">Monte seu <span class="outline-text">kit vitrine</span></h2>
-          <p>Estojo para apresentar e suporte para expor: o par certo para valorizar cada relógio no balcão. Combine cores e versões e peça tudo de uma vez.</p>
-          <ul class="kit-list" data-kit-list></ul>
-          <div class="kit-actions">
-            <button type="button" class="btn btn--dark" data-kit-add>Adicionar kit ao orçamento</button>
-            <a href="#vitrine" class="btn btn--outline">Ver todas as cores</a>
-          </div>
-        </div>
+        <div class="catalog-grid" data-grid="todos" data-grid-compact></div>
       </div>
     </section>
 
@@ -431,7 +320,7 @@
         <div class="builder-head">
           <p class="eyebrow">Para lojistas</p>
           <h2 id="builder-titulo" class="section-title">Monte sua <span class="outline-text">vitrine</span></h2>
-          <p class="builder-lead">Arraste os produtos da bandeja para as prateleiras (no celular, toque no produto e depois na prateleira). Ajuste as quantidades e envie a lista pronta.</p>
+          <p class="builder-lead">Arraste os produtos para as prateleiras (no celular, toque no produto e depois na prateleira) e envie a lista pronta.</p>
           <p class="sr-only" id="builder-ajuda">Teclado: Enter escolhe um produto da bandeja, setas para cima e para baixo escolhem a prateleira e Enter coloca. Esc cancela. Num produto da prateleira: setas para cima e para baixo trocam de prateleira, para os lados mudam a posição e Delete tira da vitrine.</p>
         </div>
 
@@ -491,43 +380,25 @@
       </div>
     </section>
 
-    <!-- ============ ATACADO ============ -->
-    <section class="wholesale" id="atacado" aria-labelledby="atacado-titulo">
-      <span class="dots-pattern dots-pattern--corner" data-float aria-hidden="true"></span>
-      <div class="container wholesale-grid">
-        <div>
-          <p class="eyebrow eyebrow--dark">Para lojistas e revendedores</p>
-          <h2 id="atacado-titulo" class="wholesale-title">Compre no atacado</h2>
-          <p class="wholesale-sub"><span class="outline-text outline-text--dark">Preço de fábrica</span></p>
+    <!-- ============ ATACADO: faixa curta ============ -->
+    <section class="band" id="atacado" aria-labelledby="atacado-titulo">
+      <div class="container band-grid">
+        <div class="band-text">
+          <p class="band-kicker">Para lojistas e revendedores</p>
+          <h2 id="atacado-titulo" class="band-title">Compre no atacado com preço de fábrica</h2>
+          <p class="band-sub">Pedido mínimo acessível e envio para todo o Brasil.</p>
         </div>
-        <div class="wholesale-side">
-          <p>Condições especiais para lojistas, pedido mínimo acessível e envio para todo o Brasil. Consulte nossa equipe.</p>
-          <div class="wholesale-actions">
-            <button type="button" class="btn btn--dark" data-quote-open aria-haspopup="dialog" aria-controls="quote-drawer">Montar orçamento</button>
-            <a class="btn btn--ghost-dark" id="atacado-whatsapp" href="#" target="_blank" rel="noopener">Falar com a equipe</a>
-          </div>
+        <div class="band-actions">
+          <a class="btn btn--dark band-whats" id="atacado-whatsapp" href="https://wa.me/5511951146301" target="_blank" rel="noopener">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.4-.3Z"/></svg>
+            Falar no WhatsApp<span class="sr-only"> (abre em nova aba)</span>
+          </a>
+          <button type="button" class="btn btn--ghost-dark" data-quote-open aria-haspopup="dialog" aria-controls="quote-drawer">Montar orçamento</button>
         </div>
-      </div>
-    </section>
-
-    <!-- ============ SOBRE ============ -->
-    <section class="about" id="sobre" aria-labelledby="sobre-titulo">
-      <span class="dots-pattern dots-pattern--corner dots-pattern--orange" aria-hidden="true"></span>
-      <div class="container">
-        <div class="about-grid">
-          <div class="about-text">
-            <p class="eyebrow">Sobre a fábrica</p>
-            <h2 id="sobre-titulo" class="section-title">Feito em São Paulo,<br><span class="outline-text">feito para durar</span></h2>
-            <!-- PLACEHOLDER: ajuste o texto com a história real da empresa -->
-            <p>A Injet Nobre fabrica estojos e expositores com foco em praticidade, resistência e bom acabamento. Do estojo de relógio ao suporte de acrílico, cada peça é pensada para valorizar o produto na vitrine de quem vende.</p>
-            <p>Da matéria-prima à expedição, todo o processo acontece na nossa fábrica na capital paulista: produção, controle de qualidade e envio para lojistas de todo o Brasil.</p>
-          </div>
-          <!-- Números vêm de SITE_CONFIG.numerosFabrica (js/products.js) -->
-          <ul class="about-stats" id="fabrica-numeros" aria-label="A fábrica em números"></ul>
-        </div>
-
-        <!-- Fotos vêm de SITE_CONFIG.fotosFabrica (js/products.js) -->
-        <ul class="factory-gallery" id="fabrica-galeria" aria-label="Fotos da produção"></ul>
+        <p class="band-kit">
+          <span><strong>Kit vitrine:</strong> estojo para apresentar + suporte para expor, o par certo para o seu balcão.</span>
+          <a class="band-kit-link" href="#monte-sua-vitrine">Monte sua vitrine <span aria-hidden="true">→</span></a>
+        </p>
       </div>
     </section>
   </main>
@@ -648,10 +519,6 @@
 
   <!-- ============ BARRA INFERIOR (celular) ============ -->
   <nav class="tabbar" aria-label="Atalhos de navegação">
-    <a class="tab" href="#inicio" data-tab="inicio">
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 11 12 4l8 7v9h-5v-6H9v6H4v-9Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
-      <span>Início</span>
-    </a>
     <a class="tab" href="#produtos" data-tab="produtos">
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 8h18v12H3V8Zm-1-4h20v4H2V4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
       <span>Produtos</span>
@@ -667,6 +534,10 @@
       </span>
       <span>Orçamento</span>
     </button>
+    <a class="tab" href="#atacado" data-tab="atacado">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M3 9l1.5-5h15L21 9M3 9v11h18V9M3 9h18M9 20v-6h6v6"/></svg>
+      <span>Atacado</span>
+    </a>
     <a class="tab tab--whats" data-config="whatsapp" href="https://wa.me/5511951146301" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z"/></svg>
       <span>WhatsApp</span><span class="sr-only"> (abre em nova aba)</span>

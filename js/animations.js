@@ -162,6 +162,17 @@
 
   /* ---------- Cards e tiles das grades ---------- */
   function grids() {
+    // Grade compacta: cards entram em cascata (curto, sem atrasar a leitura)
+    const small = $$(".pcard");
+    if (small.length) {
+      gsap.set(small, { y: 24, opacity: 0 });
+      ScrollTrigger.batch(small, {
+        start: "top 92%",
+        once: true,
+        onEnter: (batch) => gsap.to(batch, { y: 0, opacity: 1, duration: 0.45, ease: OUT, stagger: 0.05, clearProps: "transform,opacity" })
+      });
+    }
+
     const cards = $$(".card");
     cards.forEach((card) => {
       gsap.set($(".media-frame", card), imageFrom(1));
@@ -199,15 +210,17 @@
   /* ---------- Textos entram pelos lados, alternando por seção ---------- */
   function textReveals() {
     const groups = [
+      { trigger: "#produtos .catalog-head", items: "#produtos .catalog-title, #produtos .filter" },
       { trigger: "#produtos .section-head", items: "#produtos .section-head > div > *, #produtos .filter" },
       { trigger: "#kit", items: ".kit-text > *" },
-      { trigger: "#atacado", items: ".wholesale-grid > div:first-child > :not(.wholesale-title)", opposite: ".wholesale-side > *" },
+      { trigger: "#atacado", items: ".band-text > *", opposite: ".band-actions > *, .band-kit" },
       { trigger: "#sobre", items: ".about-text > *", opposite: ".about-stats > li" },
       { trigger: "#contato", items: ".footer-brand > *, .footer-contact > *", opposite: ".footer-map, .footer-qr" },
       { trigger: "#monte-sua-vitrine", items: "#monte-sua-vitrine .builder-head > *" }
     ];
 
-    groups.forEach((g, i) => {
+    // seções guardadas (kit, sobre...) podem não estar na página
+    groups.filter((g) => $(g.trigger)).forEach((g, i) => {
       const dir = i % 2 ? 1 : -1; // esquerda, direita, esquerda...
       const tl = gsap.timeline({ scrollTrigger: { trigger: g.trigger, start: "top 78%" } });
       tl.from(g.items, { x: 70 * dir, opacity: 0, duration: 0.7, ease: OUT, stagger: 0.08 });
@@ -219,6 +232,7 @@
 
   /* ---------- Títulos gigantes: desfoque que vira nitidez ---------- */
   function blurTitles() {
+    if (!$(".wholesale-title")) return;
     gsap.fromTo(".wholesale-title",
       { filter: "blur(14px)", opacity: 0, x: -120 },
       { filter: "blur(0px)", opacity: 1, x: 0, duration: 0.8, ease: OUT, clearProps: "filter",
@@ -296,6 +310,7 @@
 
   function factoryGallery() {
     const photos = $$(".factory-item");
+    if (!photos.length) return;
     gsap.set(photos, { rotation: (i) => (i % 2 ? -8 : 8), scale: 0.8, opacity: 0 });
     ScrollTrigger.batch(photos, {
       start: "top 88%",

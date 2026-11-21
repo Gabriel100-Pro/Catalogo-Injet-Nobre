@@ -188,6 +188,33 @@
   }
 
   /**
+   * Card compacto da grade da página inicial: foto, nome, preço por unidade
+   * e "+ Orçamento" (1 unidade; a quantidade se ajusta no orçamento).
+   * Foto e nome abrem o detalhe do produto (modal).
+   */
+  function compactCardHTML(product) {
+    const ref = esc(product.ref);
+    const name = esc(fullName(product));
+    return `
+      <article class="pcard" data-ref="${ref}" data-line="${esc(product.linha)}">
+        <button type="button" class="pcard-media" data-open-product="${ref}" aria-haspopup="dialog" tabindex="-1" aria-hidden="true">
+          <span class="pcard-frame" data-art>${artHTML(product, { sizes: "(min-width: 1024px) 22vw, (min-width: 640px) 30vw, 46vw" })}</span>
+        </button>
+        <div class="pcard-body">
+          <h3 class="pcard-title">
+            <button type="button" class="pcard-open" data-open-product="${ref}" aria-haspopup="dialog">${esc(product.nome)}${product.variante ? ` <span class="pcard-variant">${esc(product.variante)}</span>` : ""}</button>
+          </h3>
+          <p class="pcard-price"><strong>${formatPrice(product.preco)}</strong> <span>/un</span></p>
+          <button type="button" class="pcard-add" data-quote-add="${ref}">
+            <span aria-hidden="true">+</span>
+            <span data-quote-label data-label="Orçamento">Orçamento</span>
+            <span class="sr-only"> – adicionar ${name}</span>
+          </button>
+        </div>
+      </article>`;
+  }
+
+  /**
    * Produto em destaque no hero. Atrás da foto principal ficam as outras
    * cores do mesmo grupo, que abrem em leque (variável CSS --fan).
    */
@@ -465,6 +492,7 @@
     pictureHTML,
     artHTML,
     cardHTML,
+    compactCardHTML,
     heroHTML,
     slideHTML,
     spotlightHTML,
