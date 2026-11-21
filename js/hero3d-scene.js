@@ -2,7 +2,7 @@
    INJET NOBRE – HERO 3D (cena)
    Módulo ES carregado por js/hero3d.js. Three.js r160 vem do mapa de imports
    do index.html ("three"). Baseado em hero-3d-injet-nobre.html (protótipo):
-   estojo em 6 cores e caixa de acrílico (4 variações), mini caixas flutuantes,
+   estojo em 6 cores e caixa de acrílico (4 variações), sozinhos no centro,
    tampa que abre/fecha e relógio real (assets/relogio.glb, GLTFLoader) com
    shader que muda mostrador e metal conforme a cor da caixa.
    Melhorias mantidas da seção 3D anterior: reflexos de estúdio, almofada de
@@ -224,11 +224,10 @@ export function createHero(host, opts = {}) {
     return g;
   })();
 
-  // detail=false: versão leve para as mini caixas (sem cantos arredondados)
-  function buildEstojo(bm, pm, detail = true) {
+  function buildEstojo(bm, pm) {
     const g = new THREE.Group();
     const panel = (w, h, d, x, y, z, parent) => {
-      const geo = detail ? new RoundedBoxGeometry(w, h, d, 2, 0.012) : new THREE.BoxGeometry(w, h, d);
+      const geo = new RoundedBoxGeometry(w, h, d, 2, 0.012);
       const m = new THREE.Mesh(geo, bm);
       m.position.set(x, y, z);
       parent.add(m);
@@ -279,18 +278,18 @@ export function createHero(host, opts = {}) {
   const Hb = 0.7;
   const CUSH_TOP = Hb - 0.34 + 0.16 + 0.16;
 
-  function buildAcrylic(kind, detail = true) {
+  function buildAcrylic(kind) {
     const g = new THREE.Group();
     const S = 1.62, R = kind === "quad" ? 0.44 : 0.81, t = 0.06, LHh = 0.42;
     const outer = () => (kind === "quad" ? roundedRect(S, S, R) : circle(R));
     const inner = (pad) => (kind === "quad" ? roundedRect(S - 2 * pad, S - 2 * pad, Math.max(0.05, R - pad)) : circle(R - pad));
-    const curveSegments = detail ? (lowPower ? 28 : 44) : 16;
+    const curveSegments = lowPower ? 28 : 44;
     const ring = outer();
     ring.holes.push(inner(t));
     g.add(new THREE.Mesh(upright(new THREE.ExtrudeGeometry(ring, { depth: Hb, bevelEnabled: false, curveSegments })), baseMat));
     g.add(new THREE.Mesh(upright(new THREE.ExtrudeGeometry(outer(), { depth: t, bevelEnabled: false, curveSegments })), baseMat));
     const cushGeo = upright(new THREE.ExtrudeGeometry(inner(t + 0.09), {
-      depth: 0.16, bevelEnabled: true, bevelThickness: 0.16, bevelSize: 0.075, bevelSegments: detail ? 8 : 3, curveSegments
+      depth: 0.16, bevelEnabled: true, bevelThickness: 0.16, bevelSize: 0.075, bevelSegments: 8, curveSegments
     }));
     const foam = new THREE.Mesh(cushGeo, foamMat);
     const fur = new THREE.Mesh(cushGeo, furMat);
@@ -314,12 +313,10 @@ export function createHero(host, opts = {}) {
       w.renderOrder = tp.renderOrder = 5 + i;
       body.add(w, tp);
     });
-    if (detail) {
-      const e1 = new THREE.LineSegments(new THREE.EdgesGeometry(wallGeo, 35), edgeMat);
-      const e2 = new THREE.LineSegments(new THREE.EdgesGeometry(topGeo, 35), edgeMat);
-      e2.position.y = LHh - 0.05;
-      body.add(e1, e2);
-    }
+    const e1 = new THREE.LineSegments(new THREE.EdgesGeometry(wallGeo, 35), edgeMat);
+    const e2 = new THREE.LineSegments(new THREE.EdgesGeometry(topGeo, 35), edgeMat);
+    e2.position.y = LHh - 0.05;
+    body.add(e1, e2);
     g.userData = { pivot, foam, fur };
     return g;
   }
@@ -404,41 +401,6 @@ export function createHero(host, opts = {}) {
   turntable.add(holder);
   holder.add(estojo, acr.quad, acr.red, watch);
 
-  /* ---------- Mini caixas flutuantes ---------- */
-  const MINI_POS = [[-2.9, 2.2, -1.6], [2.7, 2.5, -1.8], [-3.3, 0.9, -0.6], [3.3, 1.1, -0.8], [-2.1, 3.0, -2.6], [2.0, 3.1, -2.4],
-    [-1.9, 0.35, 1.2], [2.1, 0.45, 1.0], [-3.9, 1.9, -2.8], [3.8, 2.0, -2.9], [0.0, 3.5, -3.4], [-1.0, 2.7, -2.0]];
-  const minis = [];
-  const miniLayer = new THREE.Group();
-  scene.add(miniLayer);
-  const miniAcrSrc = { quad: buildAcrylic("quad", false) };
-  MINI_POS.slice(0, lowPower ? 6 : 12).forEach((p, k) => {
-    const mb = boxMat.clone();
-    const mp = new THREE.MeshStandardMaterial({ color: pillMat.color.clone(), roughness: 1 });
-    const e = buildEstojo(mb, mp, false);
-    const a = miniAcrSrc.quad.clone(true);
-    a.userData = {};
-    // metade com espuma, metade com almofada
-    const fill = a.children.filter((ch) => ch.isMesh && (ch.material === foamMat || ch.material === furMat));
-    fill.forEach((ch) => { ch.visible = (ch.material === foamMat) === (k % 2 === 0); });
-    a.visible = false;
-    const g = new THREE.Group();
-    g.add(e, a);
-    const s = 0.2 + ((k * 37) % 10) / 100;
-    g.scale.setScalar(s);
-    g.position.set(...p);
-    g.rotation.set((k % 3 - 1) * 0.25, k, k % 2 ? 0.2 : -0.15);
-    const lidA = 0.4 + ((k * 13) % 5) / 10;
-    e.userData.pivot.rotation.x = -lidA * 1.2;
-    const ap = a.children.find((ch) => ch.type === "Group");
-    if (ap) ap.rotation.x = -lidA * 1.1;
-    g.userData = {
-      base: new THREE.Vector3(...p), ph: k * 1.3, sp: 0.6 + (k % 4) * 0.15, rs: (k % 2 ? 1 : -1) * (0.25 + (k % 3) * 0.1),
-      mb, mp, e, a, s, spin: 0, tBox: mb.color.clone(), tPill: mp.color.clone()
-    };
-    miniLayer.add(g);
-    minis.push(g);
-  });
-
   /* ---------- Estado ---------- */
   const state = { prod: "estojo", forma: "quad", int: "almofada" };
   const target = {
@@ -458,7 +420,6 @@ export function createHero(host, opts = {}) {
       g.userData.foam.visible = state.int === "espuma";
       g.userData.fur.visible = state.int === "almofada";
     });
-    minis.forEach((m) => { m.userData.e.visible = state.prod === "estojo"; m.userData.a.visible = state.prod === "acrilico"; });
   }
 
   function setLook(v) {
@@ -470,13 +431,6 @@ export function createHero(host, opts = {}) {
       target.metal.set(v.watch.metal);
       if (v.watch.dial) { target.dial.set(v.watch.dial); target.mix = 1; } else target.mix = 0;
     }
-    minis.forEach((m, k) => {
-      const go = () => {
-        if (state.prod === "estojo" && v.colors) { m.userData.tBox.set(v.colors.box); m.userData.tPill.set(v.colors.pill); }
-        if (!reduce) m.userData.spin = 1;
-      };
-      if (reduce) go(); else setTimeout(go, 60 + k * 55);
-    });
   }
 
   const setLid = (open) => {
@@ -502,10 +456,9 @@ export function createHero(host, opts = {}) {
     if (watchTarget && !lidTarget) setLid(true);
   }
 
-  /* ---------- Arrastar / tocar / parallax ---------- */
+  /* ---------- Arrastar / tocar ---------- */
   let rotY = -0.5, rotX = 0, tRotY = -0.5, tRotX = 0;
   let dragging = false, sx = 0, sy = 0, moved = 0, lastInput = 0, pointerType = "";
-  const ptr = { x: 0, y: 0 }, ptrS = { x: 0, y: 0 };
 
   host.addEventListener("pointerdown", (e) => {
     if (e.button !== 0) return;
@@ -518,9 +471,6 @@ export function createHero(host, opts = {}) {
     lastInput = performance.now();
   });
   host.addEventListener("pointermove", (e) => {
-    const r = host.getBoundingClientRect();
-    ptr.x = ((e.clientX - r.left) / r.width) * 2 - 1;
-    ptr.y = ((e.clientY - r.top) / r.height) * 2 - 1;
     if (!dragging) return;
     const dx = e.clientX - sx, dy = e.clientY - sy;
     sx = e.clientX;
@@ -542,7 +492,6 @@ export function createHero(host, opts = {}) {
   host.addEventListener("pointercancel", () => endDrag(false));
 
   /* ---------- Tamanho ---------- */
-  let xSpread = 1;
   function resize() {
     const w = host.clientWidth, h = host.clientHeight;
     if (!w || !h) return;
@@ -557,7 +506,6 @@ export function createHero(host, opts = {}) {
     camera.position.set(0, dist * 0.42 + 0.4, dist);
     camera.lookAt(LOOK);
     camera.updateProjectionMatrix();
-    xSpread = Math.max(0.42, Math.min(1.15, camera.aspect / 1.7));
     render();
   }
   const ro = new ResizeObserver(resize);
@@ -630,28 +578,6 @@ export function createHero(host, opts = {}) {
     const lift = (1 - back(dropT)) * 2.4;
     holder.position.y = lift;
     blob.scale.setScalar(Math.max(0.35, 1 - Math.abs(lift) * 0.3));
-
-    // Mini caixas: flutuam, giram e seguem o mouse de leve
-    ptrS.x += (ptr.x - ptrS.x) * Math.min(1, dt * 3);
-    ptrS.y += (ptr.y - ptrS.y) * Math.min(1, dt * 3);
-    miniLayer.rotation.y = ptrS.x * 0.12;
-    miniLayer.rotation.x = ptrS.y * 0.05;
-    const mk = Math.min(1, dt * 5);
-    minis.forEach((m) => {
-      const u = m.userData;
-      m.position.set(u.base.x * xSpread, u.base.y + (reduce ? 0 : Math.sin(t * u.sp + u.ph) * 0.16), u.base.z);
-      if (!reduce) {
-        m.rotation.y += dt * u.rs;
-        m.rotation.x = Math.sin(t * 0.7 + u.ph) * 0.2;
-      }
-      if (u.spin > 0) {
-        u.spin = Math.max(0, u.spin - dt * 1.8);
-        m.rotation.y += dt * 9 * u.spin;
-        m.scale.setScalar(u.s * (1 + 0.25 * Math.sin(u.spin * Math.PI)));
-      }
-      u.mb.color.lerp(u.tBox, mk);
-      u.mp.color.lerp(u.tPill, mk);
-    });
 
     render();
 
