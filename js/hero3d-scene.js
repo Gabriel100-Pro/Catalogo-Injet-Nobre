@@ -136,7 +136,11 @@ const upright = (g) => { g.rotateX(-Math.PI / 2); return g; };
    createHero(host, opts) -> controle da cena da hero
    opts: {
      reduce, lowPower,
-     onLidChange(open), onWatchChange(out), onFirstFrame(), onWatchReady(ok)
+     onLidChange(open), onWatchChange(out), onFirstFrame(), onWatchReady(ok),
+     mobile()  -> true no layout de celular: deslizar troca a variação
+                  (onSwipe(dir)) em vez de girar a caixa,
+     frame()   -> { top, bottom, side } em px: espaço livre onde a caixa
+                  deve caber (celular), ou null para o enquadramento padrão
    }
    ========================================================================== */
 export function createHero(host, opts = {}) {
@@ -340,7 +344,17 @@ export function createHero(host, opts = {}) {
   const WS = 0.62;
   let dialTop = 0.74 * WS;
   let watchReady = false;
-  const IN_Y = () => (state.prod === "estojo" ? PILL_TOP + 0.06 : CUSH_TOP + 0.1) - dialTop;
+  /* Pose do relógio dentro da caixa. No acrílico ele fica do mesmo tamanho
+     proporcional do estojo, um pouco mais alto e inclinado para a frente:
+     o mostrador aparece através da tampa transparente (deitado, de cima,
+     parecia uma moeda). acrK vai de 0 (estojo) a 1 (acrílico) suavemente. */
+  const ACR_POSE = { y: CUSH_TOP + 0.15, tilt: 0.56, scale: 1.12, z: -0.06 };
+  let acrK = 0;
+  const IN_Y = () => {
+    const s = 1 + (ACR_POSE.scale - 1) * acrK;
+    const top = PILL_TOP + 0.06 + (ACR_POSE.y - PILL_TOP - 0.06) * acrK;
+    return top - dialTop * s;
+  };
 
   function prepareWatchMaterial(m) {
     m.envMapIntensity = 1.35;
@@ -459,14 +473,19 @@ export function createHero(host, opts = {}) {
   /* ---------- Arrastar / tocar ---------- */
   let rotY = -0.5, rotX = 0, tRotY = -0.5, tRotX = 0;
   let dragging = false, sx = 0, sy = 0, moved = 0, lastInput = 0, pointerType = "";
+  // Celular (dedo): deslizar na horizontal troca a variação; vertical rola a página
+  let swipe = false, x0 = 0, y0 = 0;
+  const SWIPE_MIN = 40;
+  const isMobile = () => !!(opts.mobile && opts.mobile());
 
   host.addEventListener("pointerdown", (e) => {
     if (e.button !== 0) return;
     dragging = true;
     moved = 0;
-    sx = e.clientX;
-    sy = e.clientY;
+    sx = x0 = e.clientX;
+    sy = y0 = e.clientY;
     pointerType = e.pointerType;
+    swipe = pointerType !== "mouse" && isMobile();
     host.classList.add("is-dragging");
     lastInput = performance.now();
   });
@@ -476,19 +495,26 @@ export function createHero(host, opts = {}) {
     sx = e.clientX;
     sy = e.clientY;
     moved += Math.abs(dx) + Math.abs(dy);
+    lastInput = performance.now();
+    if (swipe) return; // a caixa não gira com o dedo; a troca acontece ao soltar
     if (moved > 6 && !host.hasPointerCapture(e.pointerId)) host.setPointerCapture(e.pointerId);
     tRotY += dx * 0.011;
     if (pointerType === "mouse") tRotX = Math.max(-0.25, Math.min(0.45, tRotX + dy * 0.006));
     lastInput = performance.now();
   });
-  const endDrag = (tap) => {
+  const endDrag = (tap, e) => {
     if (!dragging) return;
     dragging = false;
     host.classList.remove("is-dragging");
     if (tap && moved < 6) toggleLid();
+    else if (tap && swipe && e) {
+      const tdx = e.clientX - x0, tdy = e.clientY - y0;
+      if (Math.abs(tdx) >= SWIPE_MIN && Math.abs(tdx) > Math.abs(tdy) * 1.2 && opts.onSwipe) opts.onSwipe(tdx < 0 ? 1 : -1);
+    }
+    swipe = false;
     lastInput = performance.now();
   };
-  host.addEventListener("pointerup", () => endDrag(true));
+  host.addEventListener("pointerup", (e) => endDrag(true, e));
   host.addEventListener("pointercancel", () => endDrag(false));
 
   /* ---------- Tamanho ---------- */
@@ -497,14 +523,32 @@ export function createHero(host, opts = {}) {
     if (!w || !h) return;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
-    // Telas altas (celular em pé): câmera mais longe e caixa um pouco acima,
-    // para caber inteira entre os controles de cima e os de baixo
-    const base = w < 760 ? 9.2 : 7.4;
-    const tall = camera.aspect < 0.75;
-    const dist = tall ? base * Math.pow(0.75 / camera.aspect, 0.7) : base;
-    LOOK.y = tall ? 0.45 : 0.75;
-    camera.position.set(0, dist * 0.42 + 0.4, dist);
-    camera.lookAt(LOOK);
+    const fr = opts.frame ? opts.frame() : null;
+    if (fr) {
+      // Celular: a caixa (com a tampa aberta) ocupa o espaço livre entre a
+      // pílula e as informações. Distância calculada pelos dois lados e
+      // centro da imagem deslocado (setViewOffset) para o meio desse espaço.
+      const fh = Math.max(120, h - fr.top - fr.bottom);
+      const fw = Math.max(120, w - 2 * (fr.side || 0));
+      const t = Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2);
+      const RV = 1.5, RH = 1.32; // meia altura (caixa + tampa aberta) e meia largura (girando)
+      const dist = Math.max(RV / (t * fh / h), RH / (t * camera.aspect * fw / w));
+      LOOK.set(0, 1.12, -0.22);
+      const dir = new THREE.Vector3(0, 0.42, 1).normalize();
+      camera.position.copy(LOOK).addScaledVector(dir, dist);
+      camera.lookAt(LOOK);
+      camera.setViewOffset(w, h, 0, h / 2 - (fr.top + fh / 2), w, h);
+    } else {
+      // Telas altas (celular em pé): câmera mais longe e caixa um pouco acima,
+      // para caber inteira entre os controles de cima e os de baixo
+      camera.clearViewOffset();
+      const base = w < 760 ? 9.2 : 7.4;
+      const tall = camera.aspect < 0.75;
+      const dist = tall ? base * Math.pow(0.75 / camera.aspect, 0.7) : base;
+      LOOK.set(0, tall ? 0.45 : 0.75, 0);
+      camera.position.set(0, dist * 0.42 + 0.4, dist);
+      camera.lookAt(LOOK);
+    }
     camera.updateProjectionMatrix();
     render();
   }
@@ -529,7 +573,8 @@ export function createHero(host, opts = {}) {
     prev = now;
     const t = now / 1000;
 
-    if (!reduce && !dragging && !watchTarget && now - lastInput > 2600) tRotY += dt * 0.3;
+    // parada, a caixa gira sozinha (bem devagar no celular)
+    if (!reduce && !dragging && !watchTarget && now - lastInput > 2600) tRotY += dt * (isMobile() ? 0.16 : 0.3);
     // relógio fora: a caixa vira de frente para ele
     if (watchTarget && !dragging && now - lastInput > 1500) {
       tRotY += (Math.round(tRotY / (Math.PI * 2)) * Math.PI * 2 - 0.35 - tRotY) * Math.min(1, dt * 2);
@@ -566,12 +611,14 @@ export function createHero(host, opts = {}) {
       const ay = wrapPI(turntable.rotation.y);
       const wz = 0.7, wy = 1.5 + (reduce ? 0 : Math.sin(t * 1.6) * 0.06);
       const lx = -wz * Math.sin(ay), lz = wz * Math.cos(ay);
+      acrK += ((state.prod === "acrilico" ? 1 : 0) - acrK) * (reduce ? 1 : Math.min(1, dt * 6));
       const inY = IN_Y();
+      const inZ = ACR_POSE.z * acrK, inTilt = ACR_POSE.tilt * acrK, inS = 1 + (ACR_POSE.scale - 1) * acrK;
       const hs = holder.scale.x || 1;
-      watch.position.set((lx * wo) / hs, inY + (wy / hs - inY) * wo, (lz * wo) / hs);
-      watch.rotation.x = 1.05 * wo;
+      watch.position.set((lx * wo) / hs, inY + (wy / hs - inY) * wo, inZ + ((lz / hs) - inZ) * wo);
+      watch.rotation.x = inTilt + (1.05 - inTilt) * wo;
       watch.rotation.y = ((reduce ? 0 : Math.sin(t * 0.8) * 0.35) - ay) * wo;
-      watch.scale.setScalar(1 + 0.35 * wo);
+      watch.scale.setScalar(inS + (1.35 - inS) * wo);
     }
 
     if (dropT < 1) dropT = Math.min(1, dropT + dt * 1.4);
@@ -660,6 +707,7 @@ export function createHero(host, opts = {}) {
         setTimeout(apply, 260);
       }
     },
+    resize,
     setDarkBackground(dark) {
       blob.material.opacity = dark ? 0.85 : 0.5;
       ground.material.opacity = dark ? 0.35 : 0.18;

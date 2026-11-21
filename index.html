@@ -231,15 +231,15 @@
       <div class="hero3d-glow" aria-hidden="true"></div>
       <div class="hero3d-stage" data-hero-stage data-cursor="girar"
            role="group" aria-roledescription="visualizador 3D"
-           aria-label="Produto em 3D. Arraste para girar; clique, toque, Enter ou espaço para abrir e fechar a tampa; setas para os lados trocam a variação.">
+           aria-label="Produto em 3D. Arraste para girar (no celular, deslize para os lados para trocar a variação); clique, toque, Enter ou espaço para abrir e fechar a tampa; setas para os lados trocam a variação.">
         <span class="hero3d-word" data-hero-word data-hero-words="Estojo|Acrílico" aria-hidden="true">Estojo</span>
         <div class="hero3d-photo" data-hero-photo></div>
       </div>
 
       <div class="hero3d-top" data-hero-in>
         <div class="hero3d-seg" role="group" aria-label="Produto">
-          <button type="button" data-hero-prod="estojo" aria-pressed="true">Estojo clássico</button>
-          <button type="button" data-hero-prod="acrilico" aria-pressed="false">Caixa de acrílico</button>
+          <button type="button" data-hero-prod="estojo" aria-pressed="true">Estojo<span class="hero3d-long"> clássico</span></button>
+          <button type="button" data-hero-prod="acrilico" aria-pressed="false"><span class="hero3d-long">Caixa de acrílico</span><span class="hero3d-m-only">Acrílico</span></button>
         </div>
         <a href="#atacado" class="hero3d-pill">Sou lojista</a>
       </div>
@@ -250,7 +250,7 @@
 
       <div class="hero3d-info" data-hero-in>
         <div class="hero3d-info-row">
-          <p class="hero3d-price"><span class="sr-only">Preço: R$ </span><small aria-hidden="true">R$</small><span data-hero-price>2,50</span><small aria-hidden="true">por unidade</small></p>
+          <p class="hero3d-price"><span class="sr-only">Preço: R$ </span><small aria-hidden="true">R$</small><span data-hero-price>2,50</span><small aria-hidden="true"><span class="hero3d-long">por unidade</span><span class="hero3d-m-only">/un</span></small></p>
           <div class="hero3d-heading">
             <p class="hero3d-tag" data-hero-tag>Linha relojoaria</p>
             <h1 id="hero-titulo" class="hero3d-title" data-hero-title>Estojo para relógio</h1>
@@ -273,7 +273,7 @@
         </button>
         <button type="button" class="hero3d-btn hero3d-btn--solid" data-hero-add data-quote-add="IN-E01">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg>
-          <span>Orçamento</span><span class="sr-only"> – adicionar Estojo para relógio – Preto ao orçamento</span>
+          <span class="hero3d-long">Orçamento</span><span class="hero3d-m-only">Adicionar ao orçamento</span><span class="sr-only"> – adicionar Estojo para relógio – Preto ao orçamento</span>
         </button>
       </div>
 
@@ -282,6 +282,12 @@
         <div class="hero3d-vname-wrap"><p class="hero3d-vname" data-hero-vname aria-hidden="true">Preto</p></div>
         <div class="hero3d-dots" data-hero-dots role="group" aria-label="Variações"></div>
       </div>
+
+      <!-- Celular, primeiro acesso: dica por 3 s (js/hero3d.js guarda em localStorage) -->
+      <p class="hero3d-swipe" data-hero-swipe aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M7 8l-4 4 4 4M17 8l4 4-4 4M3 12h18"/></svg>
+        Deslize para trocar · toque para abrir
+      </p>
 
       <a href="#vitrine" class="hero3d-scroll" aria-label="Role para ver mais">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"/></svg>

@@ -2861,22 +2861,35 @@ body.is-thanks-open { overflow: hidden; }
   .hero3d-vname { font-size: 3rem; }
   .hero3d-vname-wrap { height: 54px; }
 }
-@media (max-width: 759px) {
-  .hero3d-top { top: 80px; left: 16px; right: 16px; width: auto; }
-  .hero3d-seg { flex: 1; }
-  .hero3d-seg { padding: 3px; gap: 3px; }
-  .hero3d-seg button { flex: 1; min-height: 42px; padding: 0 6px; font-size: .68rem; letter-spacing: .08em; white-space: nowrap; }
-  .hero3d-pill { padding: 0 10px; font-size: .64rem; }
-  .hero3d-hint { top: 140px; }
-  .hero3d-word { --hw-size: 34vw; top: 42%; }
-  .hero3d-glow { --glow-y: 42%; }
-  .hero3d-photo { top: 42%; }
-  .hero3d-arrow { top: 42%; width: 54px; height: 54px; margin-top: -27px; }
-  .hero3d-arrow--prev { left: 10px; }
-  .hero3d-arrow--next { right: 10px; }
-  .hero3d-arrow svg { width: 22px; height: 22px; }
-  .hero3d-info { left: 16px; bottom: 112px; gap: 4px; }
-  /* No celular o nome do produto fica só para leitores de tela */
+/* Textos só do celular (ex.: "Acrílico", "/un", "Adicionar ao orçamento") */
+.hero3d-m-only, .hero3d-swipe { display: none; }
+
+/* ---------- Hero no celular (até 760px): versão limpa ----------
+   De cima para baixo: pílula Estojo | Acrílico, caixa 3D (com os botões
+   redondos de tampa e relógio à direita), linha de informações (nome +
+   bolinhas | preço) e o botão principal em largura total.
+   --hf-top / --hf-bot delimitam o espaço livre da caixa; js/hero3d.js lê
+   os dois para enquadrar a câmera do Three.js. A hero termina acima da
+   barra inferior (--tabbar-h já inclui env(safe-area-inset-bottom)). */
+@media (max-width: 760px) {
+  .hero3d {
+    --hf-top: 126px;
+    --hf-bot: 156px;
+    --hf-mid: calc(var(--hf-top) + (100% - var(--hf-top) - var(--hf-bot)) / 2);
+    --m-solid-bg: #111111;
+    --m-solid-ink: #FFFFFF;
+    --m-accent-bg: var(--m-solid-bg);
+    --m-accent-ink: var(--m-solid-ink);
+    min-height: 480px;
+  }
+  /* fundos escuros (estojo branco/vermelho e acrílico): preto vira branco */
+  .hero3d[data-tone="dark"] { --m-solid-bg: #FFFFFF; --m-solid-ink: #111111; }
+  .hero3d.is-acrilico { --m-accent-bg: #FF6A13; --m-accent-ink: #111111; }
+
+  .hero3d-long { display: none; }
+  .hero3d-m-only { display: inline; }
+  .hero3d-pill, .hero3d-hint, .hero3d-arrow, .hero3d-pdf, .hero3d-scroll, .hero3d-count { display: none !important; }
+  /* nome do produto só para leitores de tela */
   .hero3d-heading {
     position: absolute;
     width: 1px; height: 1px;
@@ -2884,14 +2897,142 @@ body.is-thanks-open { overflow: hidden; }
     clip: rect(0 0 0 0);
     white-space: nowrap;
   }
-  .hero3d-variant { right: 16px; bottom: 112px; }
-  .hero3d-vname { font-size: 2.4rem; }
-  .hero3d-vname-wrap { height: 44px; }
-  .hero3d-vname.is-long { padding-top: 14px; font-size: 1.35rem; }
-  .hero3d-actions { left: 16px; right: 16px; bottom: 54px; width: auto; }
-  .hero3d-btn { flex: 1; justify-content: center; padding: 0 6px; font-size: .68rem; }
-  .hero3d-long { display: none; }
-  .hero3d-scroll { bottom: 4px; }
+
+  /* 1. Pílula compacta, centralizada logo abaixo do header */
+  .hero3d-top { top: 78px; }
+  .hero3d-seg {
+    gap: 2px;
+    height: 40px;
+    padding: 3px;
+    border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--h-bg) 70%, transparent);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .12);
+  }
+  .hero3d-seg button {
+    min-height: 0;
+    height: 100%;
+    padding: 0 18px;
+    border-radius: 999px;
+    font-size: .8rem;
+    letter-spacing: .1em;
+    white-space: nowrap;
+  }
+  .hero3d-seg button:hover { background: transparent; }
+  .hero3d-seg button[aria-pressed="true"] { background: var(--m-accent-bg); color: var(--m-accent-ink); }
+
+  /* 3/4. Caixa e palavra centralizadas no espaço livre */
+  .hero3d-word { --hw-size: 30vw; top: var(--hf-mid); }
+  .hero3d-glow { --glow-y: var(--hf-mid); }
+  .hero3d-photo { top: var(--hf-mid); width: min(70vw, calc(100% - var(--hf-top) - var(--hf-bot))); transform: translate(-50%, -50%); }
+  .hw-base { stroke-opacity: .78; }
+  .hw-glint { display: none; }
+
+  /* 6. Tampa e relógio: botões redondos à direita da caixa;
+     "Adicionar ao orçamento" em largura total, embaixo */
+  .hero3d-actions { display: contents; }
+  .hero3d-btn[data-hero-lid], .hero3d-btn[data-hero-watch] {
+    position: absolute;
+    right: 16px;
+    z-index: 3;
+    justify-content: center;
+    width: 44px; height: 44px;
+    min-height: 0;
+    padding: 0;
+    border: 1.5px solid color-mix(in srgb, currentColor 55%, transparent);
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--h-bg) 65%, transparent);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+  .hero3d-btn[data-hero-lid] { top: calc(var(--hf-mid) - 50px); }
+  .hero3d-btn[data-hero-watch] { top: calc(var(--hf-mid) + 6px); }
+  .hero3d-btn[data-hero-lid] > span, .hero3d-btn[data-hero-watch] > span { display: none; }
+  .hero3d-btn[data-hero-lid]:hover:not(:disabled),
+  .hero3d-btn[data-hero-watch]:hover:not(:disabled) { background: color-mix(in srgb, var(--h-bg) 65%, transparent); color: inherit; }
+  .hero3d-btn[data-hero-add] {
+    position: absolute;
+    left: 16px; right: 16px; bottom: 16px;
+    z-index: 3;
+    justify-content: center;
+    gap: 8px;
+    height: 52px;
+    min-height: 0;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 16px;
+    background: var(--m-accent-bg);
+    color: var(--m-accent-ink);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .18);
+  }
+  .hero3d-btn[data-hero-add]:hover:not(:disabled) { background: var(--m-accent-bg); color: var(--m-accent-ink); }
+  .hero3d-btn[data-hero-add] svg { width: 20px; height: 20px; }
+
+  /* 5. Informações numa linha: nome + bolinhas | preço */
+  .hero3d-variant { left: 16px; right: 140px; bottom: 82px; text-align: left; }
+  .hero3d-vname-wrap { height: 32px; margin: 0; }
+  .hero3d-vname, .hero3d-vname.is-long {
+    padding: 0;
+    overflow: hidden;
+    font-size: clamp(1.25rem, 6.4vw, 1.7rem);
+    line-height: 32px;
+    text-overflow: ellipsis;
+  }
+  .hero3d-vname.is-long { font-size: clamp(1rem, 4.6vw, 1.3rem); }
+  .hero3d-dots { justify-content: flex-start; gap: 0; margin: 4px 0 0 -5px; }
+  .hero3d-dots button { width: auto; height: 22px; padding: 0 5px; }
+  .hero3d-dots i { width: 7px; height: 7px; border-width: 1.5px; transition: width .3s var(--ease), background-color .3s var(--ease); }
+  .hero3d-dots [aria-current="true"] i { width: 22px; border-radius: 4px; transform: none; }
+
+  .hero3d-info { left: auto; right: 16px; bottom: 89px; }
+  .hero3d-price {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 4px;
+    width: auto; height: 44px;
+    padding: 0 16px;
+    border-radius: 999px;
+    background: var(--m-solid-bg);
+    color: var(--m-solid-ink);
+    line-height: 44px;
+  }
+  .hero3d-price small { font-family: var(--font-title); font-size: .9rem; font-weight: 600; }
+  .hero3d-price [data-hero-price] { margin: 0; font-size: 1.35rem; }
+  .hero3d-price small:last-child { font-family: var(--font-body); font-size: .74rem; opacity: .75; }
+
+  /* 7. Dica do primeiro acesso, entre a caixa e as informações */
+  .hero3d-swipe {
+    position: absolute;
+    left: 0; right: 0; bottom: 146px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    margin: 0 auto;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: rgba(17, 17, 17, .86);
+    color: #fff;
+    font-size: .78rem;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(6px);
+    transition: opacity .35s var(--ease), transform .35s var(--ease), visibility 0s .35s;
+  }
+  .hero3d-swipe svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .hero3d-swipe.is-on { opacity: 1; visibility: visible; transform: none; transition: opacity .35s var(--ease), transform .35s var(--ease); }
+}
+@media (max-width: 760px) and (prefers-reduced-motion: reduce) {
+  .hero3d-swipe, .hero3d-swipe.is-on { transition: none; transform: none; }
 }
 
 /* 12. MONTE SUA VITRINE (js/vitrine-builder.js) ---------------------------
