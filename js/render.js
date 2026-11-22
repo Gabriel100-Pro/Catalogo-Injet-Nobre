@@ -187,31 +187,98 @@
       </article>`;
   }
 
+  /* ---------- Grade da página inicial (cards compactos) ----------
+     Estojo: um card com as 6 cores (bolinhas). Caixa de acrílico: um card
+     com "Espuma | Almofada" e "Redonda | Quadrada". Os demais: um card cada.
+     Comportamento e animações em js/catalog.js. */
+
+  /** Número que "rola": cada dígito é uma fita 0–9 (só transform). */
+  function rollHTML(text) {
+    return `<span class="roll" aria-hidden="true">${Array.from(String(text)).map((ch) =>
+      /\d/.test(ch)
+        ? `<span class="roll-d"><span class="roll-strip" style="transform: translateY(-${Number(ch) * 10}%)">${"0123456789".split("").join("<br>")}</span></span>`
+        : `<span class="roll-c">${esc(ch)}</span>`).join("")}</span>`;
+  }
+
+  // "Redonda – Com espuma" -> formato/interior; "Quadrangular" aparece como "Quadrada"
+  const FORMA_CURTA = { Redonda: "Redonda", Quadrangular: "Quadrada" };
+
+  function pcardPics(list, active) {
+    return list.map((p) => `
+            <span class="pcard-pic${p === active ? " is-active" : ""}" data-pic="${esc(p.ref)}">${artHTML(p, { sizes: "(min-width: 1100px) 18vw, (min-width: 640px) 30vw, 46vw" })}</span>`).join("");
+  }
+
   /**
-   * Card compacto da grade da página inicial: foto, nome, preço por unidade
-   * e "+ Orçamento" (1 unidade; a quantidade se ajusta no orçamento).
-   * Foto e nome abrem o detalhe do produto (modal).
+   * Card compacto. list = variações do mesmo item (1 para produtos simples).
+   * kind: "single" | "colors" (estojo) | "options" (acrílico)
    */
-  function compactCardHTML(product) {
-    const ref = esc(product.ref);
-    const name = esc(fullName(product));
+  function compactCardHTML(list, kind = "single") {
+    if (!Array.isArray(list)) list = [list];
+    const current = list[0];
+    const ref = esc(current.ref);
+    const name = esc(fullName(current));
+    const variant = kind === "options" ? FORMA_CURTA[current.formato] + " · " + current.interior : current.variante;
+
+    // Estojo: camadas de fundo (troca por opacidade) + bolinhas
+    const bgs = kind === "colors"
+      ? `<span class="pcard-bgs" aria-hidden="true">${list.map((p) => `<span data-bg="${esc(p.ref)}" style="background: ${esc(p.fundo || "#fff")}"></span>`).join("")}</span>`
+      : "";
+    const picker = kind === "colors"
+      ? `<div class="pcard-dots" role="group" aria-label="Cor">${list.map((p) => `
+            <button type="button" class="pcard-dot" data-pick="${esc(p.ref)}" aria-pressed="${p === current}" aria-label="${esc(p.variante)}" style="--dot: ${esc(p.cor)}"><i></i></button>`).join("")}
+          </div>`
+      : kind === "options"
+        ? ["interior", "formato"].map((key) => {
+          const values = Array.from(new Set(list.map((p) => p[key])));
+          const label = key === "interior" ? "Interior" : "Formato";
+          return `
+          <div class="pcard-switch" role="group" aria-label="${label}" data-opt="${key}">${values.map((v) => `
+            <button type="button" data-val="${esc(v)}" aria-pressed="${current[key] === v}">${esc(FORMA_CURTA[v] || v)}</button>`).join("")}
+          </div>`;
+        }).join("")
+        : "";
+
     return `
-      <article class="pcard" data-ref="${ref}" data-line="${esc(product.linha)}">
+      <article class="pcard pcard--${kind}" data-ref="${ref}" data-line="${esc(current.linha)}" data-variants="${list.length}" data-ink="dark">
+        ${bgs}
+        <span class="pcard-shadow" aria-hidden="true"></span>
         <button type="button" class="pcard-media" data-open-product="${ref}" aria-haspopup="dialog" tabindex="-1" aria-hidden="true">
-          <span class="pcard-frame" data-art>${artHTML(product, { sizes: "(min-width: 1024px) 22vw, (min-width: 640px) 30vw, 46vw" })}</span>
+          <span class="pcard-frame">${pcardPics(list, current)}
+          </span>
         </button>
+        <span class="pcard-glare" aria-hidden="true"><i></i></span>
         <div class="pcard-body">
           <h3 class="pcard-title">
-            <button type="button" class="pcard-open" data-open-product="${ref}" aria-haspopup="dialog">${esc(product.nome)}${product.variante ? ` <span class="pcard-variant">${esc(product.variante)}</span>` : ""}</button>
+            <button type="button" class="pcard-open" data-open-product="${ref}" aria-haspopup="dialog">${esc(current.nome)} <span class="pcard-variant" data-variant-name>${esc(variant || "")}</span></button>
           </h3>
-          <p class="pcard-price"><strong>${formatPrice(product.preco)}</strong> <span>/un</span></p>
+          ${picker}
+          <p class="pcard-price">
+            <span class="pcard-pill">
+              <span class="sr-only" data-price-sr>${formatPrice(current.preco)} por unidade</span>
+              <span aria-hidden="true">R$ </span>${rollHTML(formatNumber(current.preco))}<small aria-hidden="true">/un</small>
+            </span>
+          </p>
           <button type="button" class="pcard-add" data-quote-add="${ref}">
-            <span aria-hidden="true">+</span>
-            <span data-quote-label data-label="Orçamento">Orçamento</span>
-            <span class="sr-only"> – adicionar ${name}</span>
+            <span class="pcard-add-icon" aria-hidden="true"></span>
+            <span data-quote-label data-label="Orçamento" data-added="Adicionado">Orçamento</span>
+            <span class="sr-only" data-add-sr> – adicionar ${name}</span>
           </button>
         </div>
       </article>`;
+  }
+
+  /** Todos os cards da grade: estojo e acrílico agrupados, o resto um por um. */
+  function catalogCardsHTML(list) {
+    const ORDER = ["estojos", "acrilicos", "expositores"];
+    const groups = [];
+    const seen = new Map();
+    list.slice().sort((x, y) => ORDER.indexOf(x.linha) - ORDER.indexOf(y.linha)).forEach((p) => {
+      const kind = p.grupo === "estojo-relogio" ? "colors" : p.grupo === "caixa-acrilico" ? "options" : "single";
+      if (kind === "single") { groups.push({ kind, items: [p] }); return; }
+      if (!seen.has(p.grupo)) { const g = { kind, items: [] }; seen.set(p.grupo, g); groups.push(g); }
+      seen.get(p.grupo).items.push(p);
+    });
+    return groups.map((g) => compactCardHTML(g.items, g.kind)).join("");
   }
 
   /**
@@ -493,6 +560,9 @@
     artHTML,
     cardHTML,
     compactCardHTML,
+    catalogCardsHTML,
+    rollHTML,
+    formatNumber,
     heroHTML,
     slideHTML,
     spotlightHTML,

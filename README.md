@@ -14,6 +14,7 @@ js/render.js              Templates HTML (card, hero, vitrine, vitrine de linha,
 js/main.js                Comportamento (menu, filtro, vitrine/carrossel, seletores, modal, kit)
 js/quote.js               Orçamento de atacado (cor + quantidade → WhatsApp)
 js/animations.js          Animações com GSAP + ScrollTrigger
+js/catalog.js             Grade de produtos: cores do estojo, interruptores do acrílico, filtros com Flip, card 3D, voo até o orçamento
 js/experience.js          Abertura do estojo, cursor, confete, aviso e agradecimento
 js/hero3d.js              Hero 3D: variações, tampa, relógio, orçamento e carregamento
 js/hero3d-scene.js        Cena da hero (módulo ES, Three.js r160 + relógio .glb)
@@ -86,7 +87,7 @@ Nos dois casos, cada alteração enviada ao GitHub publica o site de novo automa
 
 Ordem: **hero 3D → produtos → monte sua vitrine → atacado → contato/footer**.
 
-- **Produtos:** grade compacta com todos os produtos ativos (card de `R.compactCardHTML` em `js/render.js`: foto, nome, preço por unidade e "+ Orçamento"). Filtros em pílulas (Todos · Estojos · Acrílico · Expositores). 2 por linha no celular, 3 no tablet, 4 no computador. Os atalhos do menu filtram a grade (`data-filter-link`); de outra página use `index.html?linha=estojos#produtos`.
+- **Produtos:** o estojo é um card com 6 bolinhas de cor e a caixa de acrílico um card com "Espuma | Almofada" e "Redonda | Quadrada"; os expositores têm um card cada (5 cards, 13 variações). Animações em `js/catalog.js` (GSAP + ScrollTrigger + Flip; tudo estático com "reduzir movimento"). Grade compacta com todos os produtos ativos (card de `R.compactCardHTML` em `js/render.js`: foto, nome, preço por unidade e "+ Orçamento"). Filtros em pílulas (Todos · Estojos · Acrílico · Expositores). 2 por linha no celular, 3 no tablet, 4 no computador. Os atalhos do menu filtram a grade (`data-filter-link`); de outra página use `index.html?linha=estojos#produtos`.
 - **Atacado:** faixa curta com WhatsApp, "Montar orçamento" e a linha do kit vitrine (leva para "Monte sua vitrine").
 - **Sobre a fábrica** fica em `sobre.html` (mesmo header, menu, barra inferior e footer; foi gerada a partir do `index.html`, então mudanças no header/footer precisam ir para as duas páginas).
 - Barra inferior do celular: Produtos · Vitrine · Orçamento · Atacado · WhatsApp. "Sobre" e "Contato" ficam no menu ☰.

@@ -162,16 +162,7 @@
 
   /* ---------- Cards e tiles das grades ---------- */
   function grids() {
-    // Grade compacta: cards entram em cascata (curto, sem atrasar a leitura)
-    const small = $$(".pcard");
-    if (small.length) {
-      gsap.set(small, { y: 24, opacity: 0 });
-      ScrollTrigger.batch(small, {
-        start: "top 92%",
-        once: true,
-        onEnter: (batch) => gsap.to(batch, { y: 0, opacity: 1, duration: 0.45, ease: OUT, stagger: 0.05, clearProps: "transform,opacity" })
-      });
-    }
+    // A grade compacta da página inicial (.pcard) é animada em js/catalog.js
 
     const cards = $$(".card");
     cards.forEach((card) => {

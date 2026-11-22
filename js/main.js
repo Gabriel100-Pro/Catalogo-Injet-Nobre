@@ -47,13 +47,26 @@
   const LINE_ORDER = ["estojos", "acrilicos", "expositores"];
   const byLine = (a, b) => LINE_ORDER.indexOf(a.linha) - LINE_ORDER.indexOf(b.linha);
 
+  /* Brilho de carregamento (skeleton) até cada foto chegar */
+  function watchPhotos(root) {
+    $$(".pcard-pic", root).forEach((pic) => {
+      const img = $("img", pic);
+      const done = () => pic.classList.add("is-loaded");
+      if (!img || (img.complete && img.naturalWidth)) return done();
+      img.addEventListener("load", done, { once: true });
+      img.addEventListener("error", done, { once: true });
+    });
+  }
+
   function initGrids() {
     $$("[data-grid]").forEach((grid) => {
       const line = grid.dataset.grid;
-      // Grade compacta da página inicial: todos os produtos em cards pequenos
+      // Grade compacta da página inicial: estojo (6 cores) e acrílico (4 versões)
+      // num card cada; os outros produtos um por card. Animações: js/catalog.js
       if (grid.hasAttribute("data-grid-compact")) {
         const list = line === "todos" ? products.slice().sort(byLine) : products.filter((p) => p.linha === line);
-        grid.innerHTML = list.map(R.compactCardHTML).join("");
+        grid.innerHTML = R.catalogCardsHTML(list);
+        watchPhotos(grid);
         return;
       }
       const html = products.filter((p) => p.linha === line).map(R.cardHTML).join("");
