@@ -259,14 +259,13 @@
       const item = items.find((i) => i.ref === ref);
       if (label && item) {
         addBtn.classList.add("is-added");
-        label.textContent = label.dataset.label
-          ? `${item.qty.toLocaleString("pt-BR")} no orçamento`   // card compacto: texto curto
-          : `No orçamento: ${item.qty.toLocaleString("pt-BR")} un.`;
+        // card compacto: "✓ Adicionado" por 1,2 s (o ✓ vem do CSS)
+        label.textContent = label.dataset.added || `No orçamento: ${item.qty.toLocaleString("pt-BR")} un.`;
         clearTimeout(labelTimers.get(addBtn));
         labelTimers.set(addBtn, setTimeout(() => {
           addBtn.classList.remove("is-added");
           label.textContent = label.dataset.label || "Adicionar ao orçamento";
-        }, 2000));
+        }, label.dataset.added ? 1200 : 2000));
       }
       return;
     }

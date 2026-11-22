@@ -299,6 +299,8 @@
          Cards montados por js/main.js (R.compactCardHTML). As seções antigas
          (vitrine horizontal, destaques por linha, kit) estão em guardados/. -->
     <section class="catalog" id="produtos" aria-labelledby="produtos-titulo">
+      <!-- Palavra gigante vazada atrás do título (parallax em js/catalog.js) -->
+      <span class="catalog-word" aria-hidden="true">Produtos</span>
       <div class="container">
         <div class="catalog-head">
           <h2 id="produtos-titulo" class="catalog-title">Produtos <small>preço por unidade</small></h2>
@@ -308,6 +310,8 @@
             <button type="button" class="filter-btn" data-filter="acrilicos" aria-pressed="false">Acrílico</button>
             <button type="button" class="filter-btn" data-filter="expositores" aria-pressed="false">Expositores</button>
           </div>
+          <!-- "13 produtos" com os números rolando (js/catalog.js) -->
+          <p class="catalog-count" data-catalog-count aria-hidden="true" hidden></p>
         </div>
         <p class="sr-only" id="filtro-status" aria-live="polite"></p>
         <div class="catalog-grid" data-grid="todos" data-grid-compact></div>
@@ -580,11 +584,14 @@
        Se o CDN falhar, o site funciona estático. -->
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/Flip.min.js"></script>
   <!-- Experiência (abertura, cursor, confete, agradecimento) antes das animações:
        o hero espera a abertura terminar -->
   <script defer src="js/experience.js"></script>
   <!-- Palavra gigante do fundo da hero (contorno desenhado, troca em placar) -->
   <script defer src="js/hero3d-word.js"></script>
+  <!-- Grade de produtos: cores, interruptores, filtros com Flip, card 3D e voo até o orçamento -->
+  <script defer src="js/catalog.js"></script>
   <script defer src="js/animations.js"></script>
 </body>
 </html>

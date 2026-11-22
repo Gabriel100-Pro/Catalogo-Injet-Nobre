@@ -3373,35 +3373,155 @@ body.is-thanks-open { overflow: hidden; }
   .filter--pills .filter-btn { flex: 1 1 auto; padding: 0 8px; font-size: .74rem; letter-spacing: .03em; }
 }
 
-/* Grade: 2 por linha no celular, 3 no tablet, 4 no computador */
+/* Contador "13 produtos" ao lado dos filtros (números rolam) */
+.catalog-count {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0;
+  color: var(--gray-text);
+  font-size: .8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.catalog-count .roll { color: var(--black); font-family: var(--font-title); font-size: 1.15rem; font-weight: 700; }
+.catalog-head { position: relative; z-index: 1; justify-content: flex-start; }
+.catalog-title { margin-right: auto; }
+/* Celular: contador na linha do título; pílulas embaixo, na largura toda */
+@media (max-width: 639px) {
+  .catalog-head { gap: 10px; }
+  .catalog-count { order: 1; }
+  .filter--pills { order: 2; }
+  /* 6 bolinhas numa linha só no card do estojo */
+  .pcard .pcard-dots { gap: 0; margin-left: -3px; }
+  .pcard .pcard-dot { width: 22px; height: 26px; }
+  .pcard .pcard-dot i { width: 14px; height: 14px; }
+}
+/* Telas estreitas: o "/un" dos preços já diz isso; o contador cabe ao lado do título */
+@media (max-width: 399px) {
+  .catalog-title small { display: none; }
+}
+
+/* Pílula do filtro ativo que desliza (js/catalog.js) */
+.filter--pills { position: relative; }
+.filter-ind {
+  position: absolute;
+  left: 0; top: 0;
+  z-index: 0;
+  border-radius: 999px;
+  background: var(--black);
+  transform-origin: left center;
+  pointer-events: none;
+}
+.filter--pills .filter-btn { position: relative; z-index: 1; }
+.filter--pills.has-ind .filter-btn { background: transparent; transition: color .3s var(--ease); }
+.filter--pills.has-ind .filter-btn[aria-pressed="true"] { color: var(--white); }
+
+/* Palavra gigante "PRODUTOS" vazada atrás do título (sem ocupar altura) */
+.catalog { position: relative; overflow: hidden; }
+.catalog-word {
+  position: absolute;
+  top: 2px; left: 0;
+  z-index: 0;
+  width: 100%;
+  font-family: var(--font-title);
+  font-size: clamp(4.5rem, 21vw, 15rem);
+  font-weight: 700;
+  line-height: .8;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(17, 17, 17, .09);
+  pointer-events: none;
+  user-select: none;
+}
+.catalog > .container { position: relative; z-index: 1; }
+
+/* Números que rolam: fita 0–9 por dígito (só transform) */
+.roll { display: inline-flex; line-height: 1; }
+.roll-d { display: inline-block; height: 1em; overflow: hidden; }
+.roll-strip { display: block; text-align: center; will-change: transform; }
+
+/* Grade: 2 por linha no celular, 3 no tablet, 5 no computador */
 .catalog-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 .pcard {
+  --pc-ink: var(--black);
+  --pc-accent: var(--orange);
+  --pc-solid: var(--black);
+  --pc-solid-ink: var(--white);
+  position: relative;
   display: flex;
   flex-direction: column;
   min-width: 0;
-  overflow: hidden;
   border: 1px solid var(--gray-line);
   border-radius: 14px;
   background: var(--white);
-  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  color: var(--pc-ink);
+  transform-style: preserve-3d;   /* foto "levanta" (translateZ) no card 3D */
 }
 .pcard[hidden] { display: none; }
+/* Estojo: fundo na cor escolhida (mesmas cores da hero) */
+.pcard[data-ink="light"] { --pc-ink: #fff; --pc-solid: #fff; --pc-solid-ink: var(--black); }
+.pcard[data-bgtone="orange"] { --pc-accent: var(--black); }
+.pcard-bgs { position: absolute; inset: 0; z-index: 0; overflow: hidden; border-radius: inherit; pointer-events: none; }
+.pcard-bgs > span { position: absolute; inset: 0; opacity: 0; transition: opacity .45s var(--ease); }
+.pcard-bgs > span.is-on { opacity: 1; }
+/* Sombra mais forte no card 3D (só opacity anima) */
+.pcard-shadow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  box-shadow: 0 26px 44px -12px rgba(17, 17, 17, .38);
+  opacity: 0;
+  pointer-events: none;
+}
 .pcard-media {
+  position: relative;
+  z-index: 1;
   display: block;
   width: 100%;
   aspect-ratio: 1;
   padding: 0;
   border: 0;
-  background: var(--gray);
+  border-radius: 14px 14px 0 0;
+  background: rgba(128, 128, 128, .08);
   cursor: pointer;
 }
-.pcard-frame { display: block; width: 100%; height: 100%; }
-.pcard-frame .pic, .pcard-frame img { display: block; width: 100%; height: 100%; object-fit: contain; }
-.pcard-body { display: flex; flex-direction: column; flex: 1; gap: 6px; padding: 10px 12px 12px; }
+.pcard-frame { position: relative; display: block; width: 100%; height: 100%; }
+.pcard-pic { position: absolute; inset: 0; overflow: hidden; border-radius: 14px 14px 0 0; opacity: 0; }
+.pcard-pic.is-active { opacity: 1; }
+.pcard-pic .pic, .pcard-pic img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.pcard-pic img { opacity: 0; transition: opacity .35s var(--ease); }
+.pcard-pic.is-loaded img { opacity: 1; }
+/* 8. Carregando: brilho deslizando no lugar da foto */
+.pcard-pic:not(.is-loaded)::before { content: ""; position: absolute; inset: 0; background: rgba(128, 128, 128, .1); }
+.pcard-pic:not(.is-loaded)::after {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0; left: 0;
+  width: 60%;
+  background: linear-gradient(100deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, .7) 50%, rgba(255, 255, 255, 0) 100%);
+  transform: translateX(-100%);
+  animation: pcard-shimmer 1.2s ease-in-out infinite;
+}
+@keyframes pcard-shimmer { to { transform: translateX(270%); } }
+.pcard-pic .photo-pending { height: 100%; }
+/* Reflexo de luz que acompanha o cursor */
+.pcard-glare { position: absolute; inset: 0; z-index: 2; overflow: hidden; border-radius: inherit; opacity: 0; pointer-events: none; }
+.pcard-glare i {
+  position: absolute;
+  left: -50%; top: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, .45), rgba(255, 255, 255, 0) 34%);
+  mix-blend-mode: soft-light;
+}
+.pcard-body { position: relative; z-index: 1; display: flex; flex-direction: column; flex: 1; gap: 8px; padding: 10px 12px 12px; }
 .pcard-title { margin: 0; font-size: .92rem; line-height: 1.12; }
 .pcard-open {
   padding: 0;
@@ -3417,10 +3537,74 @@ body.is-thanks-open { overflow: hidden; }
   text-transform: uppercase;
   cursor: pointer;
 }
-.pcard-open:hover { color: var(--orange); }
-.pcard-variant { display: block; color: var(--orange); }
-.pcard-price { margin: auto 0 0; padding-top: 2px; color: var(--gray-text); font-size: .78rem; }
-.pcard-price strong { color: var(--black); font-family: var(--font-title); font-size: 1.15rem; font-weight: 700; }
+.pcard-open:hover { opacity: .75; }
+.pcard-variant { display: block; color: var(--pc-accent); }
+
+/* 4. Bolinhas de cor (estojo) */
+.pcard-dots { display: flex; flex-wrap: wrap; gap: 2px; margin: -2px 0 0 -4px; }
+.pcard-dot {
+  display: grid;
+  place-items: center;
+  width: 26px; height: 26px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.pcard-dot i {
+  display: block;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--dot);
+  box-shadow: inset 0 0 0 1px rgba(17, 17, 17, .25);
+  transition: transform .2s var(--ease);
+}
+.pcard-dot[aria-pressed="true"] i { box-shadow: inset 0 0 0 1px rgba(17, 17, 17, .25), 0 0 0 2px var(--pc-bg-ring, #fff), 0 0 0 3.5px var(--pc-ink); transform: scale(1.1); }
+@media (hover: hover) { .pcard-dot:hover i { transform: scale(1.2); } }
+
+/* 5. Interruptores (acrílico) */
+.pcard-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--gray-line);
+  border-radius: 999px;
+}
+.pcard-switch button {
+  min-height: 28px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font-size: .7rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.pcard-switch button[aria-pressed="true"] { background: var(--black); color: var(--white); }
+
+/* Preço em pílula (entra com "pop") */
+.pcard-price { margin: auto 0 0; padding-top: 2px; }
+.pcard-pill {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--pc-solid);
+  color: var(--pc-solid-ink);
+  font-family: var(--font-title);
+  font-size: .9rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.pcard-pill .roll { font-size: 1.2rem; }
+.pcard-pill small { margin-left: 3px; font-family: var(--font-body); font-size: .7rem; font-weight: 600; opacity: .75; }
+
+/* 6. "+ Orçamento" / "✓ Adicionado" */
 .pcard-add {
   display: flex;
   align-items: center;
@@ -3428,29 +3612,51 @@ body.is-thanks-open { overflow: hidden; }
   gap: 6px;
   min-height: 40px;
   padding: 0 10px;
-  border: 0;
+  border: 1.5px solid var(--pc-solid);
   border-radius: 10px;
-  background: var(--black);
-  color: var(--white);
+  background: var(--pc-solid);
+  color: var(--pc-solid-ink);
   font-size: .85rem;
   font-weight: 700;
   cursor: pointer;
   transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
 }
-.pcard-add > span[aria-hidden] { font-size: 1.1rem; line-height: 1; }
-.pcard-add:hover, .pcard-add.is-added { background: var(--orange); color: var(--black); }
+.pcard-add-icon { display: inline-block; width: 1em; font-size: 1.1rem; line-height: 1; text-align: center; }
+.pcard-add-icon::before { content: "+"; }
+.pcard-add.is-added { border-color: #1F9D55; background: #1F9D55; color: #fff; }
+.pcard-add.is-added .pcard-add-icon::before { content: "✓"; }
 @media (hover: hover) {
-  .pcard:hover { border-color: var(--black); box-shadow: 0 10px 24px rgba(0, 0, 0, .08); }
+  .pcard-add:hover:not(.is-added) { border-color: var(--orange); background: var(--orange); color: var(--black); }
 }
+/* A cópia da foto que voa até o orçamento */
+.pcard-flyer {
+  position: fixed;
+  z-index: 3000;
+  margin: 0;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 10px 14px rgba(17, 17, 17, .3));
+}
+
+/* Celular: o card afunda ao toque */
+@media (hover: none) and (prefers-reduced-motion: no-preference) {
+  .pcard { transition: transform .15s var(--ease); }
+  .pcard:active { transform: scale(.97); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pcard-pic:not(.is-loaded)::after { animation: none; }
+  .pcard-bgs > span, .pcard-pic img { transition: none; }
+}
+
 @media (min-width: 640px) {
   .catalog-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
   .pcard-title { font-size: 1rem; }
 }
-@media (min-width: 1024px) {
+@media (min-width: 1100px) {
   .catalog { padding: 36px 0 48px; }
-  .catalog-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
-  .pcard-body { padding: 14px 16px 16px; }
-  .pcard-title { font-size: 1.1rem; }
+  .catalog-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 18px; }
+  .pcard-body { padding: 12px 14px 14px; }
+  .pcard-title { font-size: 1.05rem; }
 }
 
 /* Monte sua vitrine: mais compacta (prateleiras, letreiro e balcão menores) */

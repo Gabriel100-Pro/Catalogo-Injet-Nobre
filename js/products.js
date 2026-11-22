@@ -46,6 +46,9 @@ window.SITE_CONFIG = {
   Campos de cada produto (cada variação de cor é um produto = um slide da vitrine):
   - ref .............. referência (ex.: "IN-E01")
   - ativo ............ false = oculto no site e no orçamento
+  - fundo / tinta .... (estojos) fundo do card da grade ao escolher a cor e a cor
+                       do texto sobre ele ("light" = texto branco). Mesmas cores
+                       de fundo da hero 3D (js/hero3d.js).
   - numero ........... número do slide e do card ("01", "02"...)
   - nome ............. nome do produto ("Estojo para relógio")
   - variante ......... cor/versão ("Preto"). Vai junto do nome no orçamento:
@@ -135,18 +138,18 @@ const SUPORTE = {
 window.PRODUCTS = [
   // ---------------- ESTOJOS PARA RELÓGIO ----------------
   { ...ESTOJO, ref: "IN-E01", numero: "01", variante: "Preto", ativo: true,
-    imagem: "estojo-relogio-preto", cor: "#1E1E1E", painel: "#FF6A13", contorno: "light",
+    imagem: "estojo-relogio-preto", cor: "#1E1E1E", painel: "#FF6A13", contorno: "light", fundo: "#FF6A13", tinta: "dark",
     destaque: true, destaqueLinha: true },
   { ...ESTOJO, ref: "IN-E02", numero: "02", variante: "Branco", ativo: true,
-    imagem: "estojo-relogio-branco", cor: "#F4F4F4", painel: "#111111", contorno: "orange" },
+    imagem: "estojo-relogio-branco", cor: "#F4F4F4", painel: "#111111", contorno: "orange", fundo: "#151515", tinta: "light" },
   { ...ESTOJO, ref: "IN-E03", numero: "03", variante: "Amarelo", ativo: true,
-    imagem: "estojo-relogio-amarelo", cor: "#F5C518", painel: "#F5C518", contorno: "dark", tema: "dark" },
+    imagem: "estojo-relogio-amarelo", cor: "#F5C518", painel: "#F5C518", contorno: "dark", tema: "dark", fundo: "#FFF1BF", tinta: "dark" },
   { ...ESTOJO, ref: "IN-E04", numero: "04", variante: "Azul", ativo: true,
-    imagem: "estojo-relogio-azul", cor: "#2F8FE0", painel: "#2F8FE0", contorno: "light" },
+    imagem: "estojo-relogio-azul", cor: "#2F8FE0", painel: "#2F8FE0", contorno: "light", fundo: "#DDEBFF", tinta: "dark" },
   { ...ESTOJO, ref: "IN-E05", numero: "05", variante: "Rosa", ativo: true,
-    imagem: "estojo-relogio-rosa", cor: "#E8338A", painel: "#E8338A", contorno: "light" },
+    imagem: "estojo-relogio-rosa", cor: "#E8338A", painel: "#E8338A", contorno: "light", fundo: "#FFE0EE", tinta: "dark" },
   { ...ESTOJO, ref: "IN-E06", numero: "06", variante: "Vermelho", ativo: true,
-    imagem: "estojo-relogio-vermelho", cor: "#D62828", painel: "#D62828", contorno: "light" },
+    imagem: "estojo-relogio-vermelho", cor: "#D62828", painel: "#D62828", contorno: "light", fundo: "#1A1A1A", tinta: "light" },
 
   // ---------------- EXPOSITORES ----------------
   { ...SUPORTE, ref: "IN-S01", numero: "07", variante: "Transparente", legenda: "Cristal", ativo: true,

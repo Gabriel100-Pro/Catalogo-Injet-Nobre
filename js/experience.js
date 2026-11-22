@@ -114,7 +114,7 @@
   /* ======================================================================
      2. CURSOR PERSONALIZADO (só mouse, sem movimento reduzido)
      ====================================================================== */
-  const PRODUCT_SEL = ".card .media-frame, .slide-art, .spotlight-art, .hero-feature .media-frame, .kit-stage, .line-thumb";
+  const PRODUCT_SEL = ".card .media-frame, .pcard-media, .slide-art, .spotlight-art, .hero-feature .media-frame, .kit-stage, .line-thumb";
   const INTERACTIVE_SEL = "a, button, [role='button'], summary, label, select";
 
   function cursor() {
@@ -255,11 +255,15 @@
       }).join(" + "));
 
       if (!animate()) return;
+      // Cards da grade: a foto voa até o orçamento e o contador pula na
+      // chegada (js/catalog.js), em vez do confete
+      if (origin && origin.closest(".pcard") && window.InjetCatalogFX) return;
       if (origin) confetti(origin);
       jumpCounter();
     }
   }
 
+  window.InjetJumpCounter = () => jumpCounter();
   function jumpCounter() {
     const btn = window.InjetQuote && window.InjetQuote.visibleButton();
     if (btn) gsap.fromTo(btn, { scale: 0.9 }, { scale: 1, duration: 0.5, ease: "back.out(3)", overwrite: "auto" });
