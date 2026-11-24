@@ -254,7 +254,12 @@
         return p ? (p.variante ? `${p.nome} · ${p.variante}` : p.nome) : ref;
       }).join(" + "));
 
+      // Produtos em gravidade zero (js/produtos-zero.js): a miniatura já voou
+      // até o orçamento; aqui só o contador pula
+      const landed = window.InjetFlyLanding;
+      window.InjetFlyLanding = false;
       if (!animate()) return;
+      if (landed) { jumpCounter(); return; }
       // Cards da grade: a foto voa até o orçamento e o contador pula na
       // chegada (js/catalog.js), em vez do confete
       if (origin && origin.closest(".pcard") && window.InjetCatalogFX) return;

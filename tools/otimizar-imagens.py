@@ -6,7 +6,8 @@ Para cada PNG com fundo transparente em assets/ (nomes em kebab-case):
   1. recorta o espaço vazio em volta do produto;
   2. centraliza num quadro quadrado, com o lado maior do produto ocupando
      88% do quadro (assim todos ficam com o mesmo tamanho visual);
-  3. salva <nome>-600.webp, <nome>-1000.webp e <nome>.png (fallback, 1000 px).
+  3. salva <nome>-460.webp (seção de produtos em gravidade zero), <nome>-600.webp,
+     <nome>-1000.webp e <nome>.png (fallback, 1000 px).
 """
 import glob
 import os
@@ -36,6 +37,7 @@ for path in sorted(glob.glob(os.path.join(SRC, "*.png"))):
 
     canvas.save(os.path.join(OUT, f"{name}-1000.webp"), "WEBP", quality=82, method=6)
     canvas.resize((600, 600), Image.LANCZOS).save(os.path.join(OUT, f"{name}-600.webp"), "WEBP", quality=80, method=6)
+    canvas.resize((460, 460), Image.LANCZOS).save(os.path.join(OUT, f"{name}-460.webp"), "WEBP", quality=80, method=6)
     # PNG de fallback com paleta de 256 cores (bem menor; o alfa é preservado)
     canvas.quantize(colors=256, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.FLOYDSTEINBERG).save(
         os.path.join(OUT, f"{name}.png"), optimize=True)
