@@ -175,3 +175,34 @@
         </div>
       </div>
     </section>
+
+
+<!-- ======================================================================
+  4. Grade compacta de produtos (#produtos), substituída em 23/11/2026 pela
+     seção "gravidade zero" (js/produtos-zero.js).
+     JS: initGrids() e initFilter() em js/main.js + js/catalog.js (cores,
+     interruptores, Flip, card 3D e voo até o orçamento). Para reativar, cole
+     o bloco no lugar da seção atual e volte a incluir js/catalog.js.
+     ====================================================================== -->
+    <!-- ============ PRODUTOS: grade compacta com todos os produtos ============
+         Cards montados por js/main.js (R.compactCardHTML). As seções antigas
+         (vitrine horizontal, destaques por linha, kit) estão em guardados/. -->
+    <section class="catalog" id="produtos" aria-labelledby="produtos-titulo">
+      <!-- Palavra gigante vazada atrás do título (parallax em js/catalog.js) -->
+      <span class="catalog-word" aria-hidden="true">Produtos</span>
+      <div class="container">
+        <div class="catalog-head">
+          <h2 id="produtos-titulo" class="catalog-title">Produtos <small>preço por unidade</small></h2>
+          <div class="filter filter--pills" role="group" aria-label="Filtrar produtos por linha">
+            <button type="button" class="filter-btn" data-filter="todos" aria-pressed="true">Todos</button>
+            <button type="button" class="filter-btn" data-filter="estojos" aria-pressed="false">Estojos</button>
+            <button type="button" class="filter-btn" data-filter="acrilicos" aria-pressed="false">Acrílico</button>
+            <button type="button" class="filter-btn" data-filter="expositores" aria-pressed="false">Expositores</button>
+          </div>
+          <!-- "13 produtos" com os números rolando (js/catalog.js) -->
+          <p class="catalog-count" data-catalog-count aria-hidden="true" hidden></p>
+        </div>
+        <p class="sr-only" id="filtro-status" aria-live="polite"></p>
+        <div class="catalog-grid" data-grid="todos" data-grid-compact></div>
+      </div>
+    </section>

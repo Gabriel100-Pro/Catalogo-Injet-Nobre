@@ -295,27 +295,62 @@
       <p class="sr-only" data-hero-status aria-live="polite"></p>
     </section>
 
-    <!-- ============ PRODUTOS: grade compacta com todos os produtos ============
-         Cards montados por js/main.js (R.compactCardHTML). As seções antigas
-         (vitrine horizontal, destaques por linha, kit) estão em guardados/. -->
-    <section class="catalog" id="produtos" aria-labelledby="produtos-titulo">
-      <!-- Palavra gigante vazada atrás do título (parallax em js/catalog.js) -->
-      <span class="catalog-word" aria-hidden="true">Produtos</span>
-      <div class="container">
-        <div class="catalog-head">
-          <h2 id="produtos-titulo" class="catalog-title">Produtos <small>preço por unidade</small></h2>
-          <div class="filter filter--pills" role="group" aria-label="Filtrar produtos por linha">
-            <button type="button" class="filter-btn" data-filter="todos" aria-pressed="true">Todos</button>
-            <button type="button" class="filter-btn" data-filter="estojos" aria-pressed="false">Estojos</button>
-            <button type="button" class="filter-btn" data-filter="acrilicos" aria-pressed="false">Acrílico</button>
-            <button type="button" class="filter-btn" data-filter="expositores" aria-pressed="false">Expositores</button>
-          </div>
-          <!-- "13 produtos" com os números rolando (js/catalog.js) -->
-          <p class="catalog-count" data-catalog-count aria-hidden="true" hidden></p>
-        </div>
-        <p class="sr-only" id="filtro-status" aria-live="polite"></p>
-        <div class="catalog-grid" data-grid="todos" data-grid-compact></div>
+    <!-- ============ PRODUTOS EM GRAVIDADE ZERO (js/produtos-zero.js) ============
+         Produtos flutuando sobre um fundo animado em canvas. Os produtos vêm de
+         js/products.js; posições e profundidade ficam em js/produtos-zero.js.
+         A grade antiga está em guardados/secoes-antigas.html (bloco 4). -->
+    <section class="zg" id="produtos" aria-labelledby="produtos-titulo" data-zg>
+      <!-- Vídeo de fundo (12 s em loop). Pausa fora da tela (js/produtos-zero.js).
+           Com movimento reduzido ou economia de dados fica só o poster. -->
+      <video class="zg-video" data-zg-video autoplay muted loop playsinline preload="metadata" poster="assets/video/fundo-produtos-poster.jpg" aria-hidden="true" tabindex="-1">
+        <source src="assets/video/fundo-produtos.mp4" type="video/mp4">
+      </video>
+      <script>
+        (function () {
+          var v = document.querySelector("[data-zg-video]");
+          var c = navigator.connection;
+          var off = (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) || !!(c && c.saveData);
+          if (off) { v.removeAttribute("autoplay"); v.preload = "none"; v.autoplay = false; v.pause(); v.dataset.off = "1"; }
+        })();
+      </script>
+      <div class="zg-shade" aria-hidden="true"></div>
+      <canvas class="zg-bg" data-zg-bg aria-hidden="true"></canvas>
+      <div class="zg-word" data-zg-word aria-hidden="true"></div>
+      <div class="zg-vignette" aria-hidden="true"></div>
+
+      <div class="zg-top">
+        <p class="zg-kicker"><b aria-hidden="true">●</b> 01 / Catálogo · preço por unidade</p>
+        <h2 id="produtos-titulo" class="zg-title">Embalagens e expositores</h2>
       </div>
+
+      <p class="sr-only" id="zg-ajuda">Cada produto é um botão. Ao receber o foco, os detalhes aparecem; Enter leva ao botão de orçamento e Esc fecha.</p>
+      <div class="zg-field" data-zg-field role="list" aria-label="Produtos" aria-describedby="zg-ajuda"></div>
+
+      <div class="zg-card" data-zg-card role="group" aria-label="Detalhes do produto" aria-hidden="true">
+        <button class="zg-x" type="button" data-zg-close aria-label="Fechar detalhes"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        <p class="zg-ck" data-zg-k></p>
+        <h3 class="zg-ct" data-zg-t></h3>
+        <p class="zg-cv" data-zg-v></p>
+        <div class="zg-dots" data-zg-dots aria-hidden="true"></div>
+        <div class="zg-specs" data-zg-specs></div>
+        <div class="zg-row">
+          <p class="zg-price" data-zg-price></p>
+          <button class="zg-add" type="button" data-zg-add><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span data-zg-add-label>Orçamento</span></button>
+        </div>
+      </div>
+
+      <p class="zg-hint" data-zg-hint aria-hidden="true">Passe o mouse num produto para ele parar</p>
+      <div class="zg-bar">
+        <div class="zg-pills" data-zg-pills role="group" aria-label="Filtrar produtos por linha">
+          <span class="zg-ind" data-zg-ind aria-hidden="true"></span>
+          <button type="button" data-zg-filter="todos" aria-pressed="true">Todos</button>
+          <button type="button" data-zg-filter="estojos" aria-pressed="false">Estojos</button>
+          <button type="button" data-zg-filter="acrilicos" aria-pressed="false">Acrílico</button>
+          <button type="button" data-zg-filter="expositores" aria-pressed="false">Expositores</button>
+        </div>
+        <p class="zg-count" aria-hidden="true"><b data-zg-num>0</b> produtos</p>
+      </div>
+      <p class="sr-only" data-zg-status aria-live="polite"></p>
     </section>
 
     <!-- ============ MONTE SUA VITRINE (js/vitrine-builder.js) ============ -->
@@ -590,8 +625,8 @@
   <script defer src="js/experience.js"></script>
   <!-- Palavra gigante do fundo da hero (contorno desenhado, troca em placar) -->
   <script defer src="js/hero3d-word.js"></script>
-  <!-- Grade de produtos: cores, interruptores, filtros com Flip, card 3D e voo até o orçamento -->
-  <script defer src="js/catalog.js"></script>
+  <!-- Produtos em gravidade zero (não depende do GSAP) -->
+  <script defer src="js/produtos-zero.js"></script>
   <script defer src="js/animations.js"></script>
 </body>
 </html>
